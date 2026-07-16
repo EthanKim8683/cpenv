@@ -1,0 +1,21 @@
+module github.com/EthanKim8683/cpenv
+
+go 1.26.3
+
+tool (
+	connectrpc.com/connect/cmd/protoc-gen-connect-go
+	google.golang.org/protobuf/cmd/protoc-gen-go
+)
+
+require (
+	connectrpc.com/connect v1.20.0
+	github.com/caarlos0/env/v11 v11.4.1
+	github.com/spf13/cobra v1.10.2
+	golang.org/x/sync v0.22.0
+	google.golang.org/protobuf v1.36.11
+)
+
+require (
+	github.com/inconshreveable/mousetrap v1.1.0 // indirect
+	github.com/spf13/pflag v1.0.10 // indirect
+)

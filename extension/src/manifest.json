@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json.schemastore.org/chrome-manifest.json",
+  "chromium:manifest_version": 3,
+  "version": "1.0.0",
+  "name": "cpenv",
+  "description": "Browser extension for cpenv",
+  "chromium:permissions": [
+    "tabs",
+    "tabGroups",
+    "storage"
+  ],
+  "chromium:host_permissions": [
+    "http://localhost:$EXTENSION_PUBLIC_PORT/*",
+    "http://127.0.0.1:$EXTENSION_PUBLIC_PORT/*"
+  ],
+  "background": {
+    "chromium:service_worker": "background/main.ts"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://codeforces.com/*"],
+      "js": ["content/main.ts"]
+    }
+  ],
+  "author": "Ethan Kim"
+}

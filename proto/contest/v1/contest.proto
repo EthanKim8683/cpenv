@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+package contest.v1;
+
+import "problem/v1/problem.proto";
+
+message Contest {
+  string id = 1;
+  map<string, problem.v1.Problem> problems = 2;
+}

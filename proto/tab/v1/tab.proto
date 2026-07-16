@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package tab.v1;
+
+import "contest/v1/contest.proto";
+import "problem/v1/problem.proto";
+
+message Tab {
+	string profile_id = 1;
+	oneof content {
+		contest.v1.Contest contest = 2;
+		problem.v1.Problem problem = 3;
+	}
+}

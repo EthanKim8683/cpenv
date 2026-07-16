@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package observation.v1;
+
+import "tab/v1/tab.proto";
+
+service ObservationService {
+  rpc FocusTab(FocusTabRequest) returns (FocusTabResponse);
+}
+
+message FocusTabRequest {
+  string profile_id = 1;
+  tab.v1.Tab tab = 2;
+}
+
+message FocusTabResponse {}

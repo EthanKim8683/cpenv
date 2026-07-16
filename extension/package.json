@@ -1,0 +1,40 @@
+{
+  "private": true,
+  "name": "cpenv",
+  "description": "Browser extension for cpenv",
+  "version": "1.0.0",
+  "license": "MIT",
+  "type": "module",
+  "author": {
+    "name": "Ethan Kim",
+    "email": "ethankim8683@gmail.com",
+    "url": "https://github.com/EthanKim8683"
+  },
+  "devDependencies": {
+    "extension": "^4.0.9",
+    "typescript": "5.3.3"
+  },
+  "scripts": {
+    "dev": "extension dev --no-browser",
+    "start": "extension start",
+    "build": "extension build",
+    "preview": "extension preview",
+    "build:chrome": "extension build --browser chrome",
+    "build:firefox": "extension build --browser firefox",
+    "build:edge": "extension build --browser edge"
+  },
+  "packageManager": "npm@11.17.0",
+  "pnpm": {
+    "ignoredBuiltDependencies": [
+      "less"
+    ]
+  },
+  "dependencies": {
+    "@connectrpc/connect": "^2.1.2",
+    "@connectrpc/connect-web": "^2.1.2",
+    "async-mutex": "^0.5.0",
+    "is-promise": "^4.0.0",
+    "stable-hash": "^0.0.6",
+    "zod": "^4.4.3"
+  }
+}

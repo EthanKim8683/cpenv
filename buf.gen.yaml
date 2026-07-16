@@ -1,0 +1,22 @@
+version: v2
+clean: true
+managed:
+  enabled: true
+  override:
+    - file_option: go_package_prefix
+      value: github.com/EthanKim8683/cpenv/gen
+plugins:
+  - local: [go, tool, protoc-gen-go]
+    out: gen
+    opt: paths=source_relative
+  - local: [go, tool, protoc-gen-connect-go]
+    out: gen
+    opt:
+      - paths=source_relative
+      - simple
+  - remote: buf.build/bufbuild/es
+    out: extension/src/gen
+    opt: target=ts
+  - remote: buf.build/connectrpc/es
+    out: extension/src/gen
+    opt: target=ts
