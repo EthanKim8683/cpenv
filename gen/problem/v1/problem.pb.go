@@ -176,7 +176,7 @@ func (x *ProblemSample) GetOutput() string {
 
 type Problem struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Id            []string               `protobuf:"bytes,1,rep,name=id,proto3" json:"id,omitempty"`
 	Io            ProblemIo              `protobuf:"varint,2,opt,name=io,proto3,enum=problem.v1.ProblemIo" json:"io,omitempty"`
 	Type          ProblemType            `protobuf:"varint,3,opt,name=type,proto3,enum=problem.v1.ProblemType" json:"type,omitempty"`
 	Samples       []*ProblemSample       `protobuf:"bytes,4,rep,name=samples,proto3" json:"samples,omitempty"`
@@ -214,11 +214,11 @@ func (*Problem) Descriptor() ([]byte, []int) {
 	return file_problem_v1_problem_proto_rawDescGZIP(), []int{1}
 }
 
-func (x *Problem) GetId() string {
+func (x *Problem) GetId() []string {
 	if x != nil {
 		return x.Id
 	}
-	return ""
+	return nil
 }
 
 func (x *Problem) GetIo() ProblemIo {
@@ -252,7 +252,7 @@ const file_problem_v1_problem_proto_rawDesc = "" +
 	"\x05input\x18\x01 \x01(\tR\x05input\x12\x16\n" +
 	"\x06output\x18\x02 \x01(\tR\x06output\"\xa2\x01\n" +
 	"\aProblem\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\x12%\n" +
+	"\x02id\x18\x01 \x03(\tR\x02id\x12%\n" +
 	"\x02io\x18\x02 \x01(\x0e2\x15.problem.v1.ProblemIoR\x02io\x12+\n" +
 	"\x04type\x18\x03 \x01(\x0e2\x17.problem.v1.ProblemTypeR\x04type\x123\n" +
 	"\asamples\x18\x04 \x03(\v2\x19.problem.v1.ProblemSampleR\asamples*}\n" +

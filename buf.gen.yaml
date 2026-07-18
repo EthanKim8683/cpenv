@@ -15,8 +15,8 @@ plugins:
       - paths=source_relative
       - simple
   - remote: buf.build/bufbuild/es
-    out: extension/src/gen
+    out: extension/gen
     opt: target=ts
   - remote: buf.build/connectrpc/es
-    out: extension/src/gen
+    out: extension/gen
     opt: target=ts

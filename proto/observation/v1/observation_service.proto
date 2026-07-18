@@ -9,8 +9,7 @@ service ObservationService {
 }
 
 message FocusTabRequest {
-  string profile_id = 1;
-  tab.v1.Tab tab = 2;
+  tab.v1.Tab tab = 1;
 }
 
 message FocusTabResponse {}

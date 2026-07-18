@@ -24,7 +24,7 @@ const (
 
 type Contest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Id            []string               `protobuf:"bytes,1,rep,name=id,proto3" json:"id,omitempty"`
 	Problems      map[string]*v1.Problem `protobuf:"bytes,2,rep,name=problems,proto3" json:"problems,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -60,11 +60,11 @@ func (*Contest) Descriptor() ([]byte, []int) {
 	return file_contest_v1_contest_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *Contest) GetId() string {
+func (x *Contest) GetId() []string {
 	if x != nil {
 		return x.Id
 	}
-	return ""
+	return nil
 }
 
 func (x *Contest) GetProblems() map[string]*v1.Problem {
@@ -81,7 +81,7 @@ const file_contest_v1_contest_proto_rawDesc = "" +
 	"\x18contest/v1/contest.proto\x12\n" +
 	"contest.v1\x1a\x18problem/v1/problem.proto\"\xaa\x01\n" +
 	"\aContest\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\x12=\n" +
+	"\x02id\x18\x01 \x03(\tR\x02id\x12=\n" +
 	"\bproblems\x18\x02 \x03(\v2!.contest.v1.Contest.ProblemsEntryR\bproblems\x1aP\n" +
 	"\rProblemsEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12)\n" +

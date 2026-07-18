@@ -7,9 +7,7 @@
 package observationv1
 
 import (
-	v1 "github.com/EthanKim8683/cpenv/gen/contest/v1"
-	v11 "github.com/EthanKim8683/cpenv/gen/problem/v1"
-	v12 "github.com/EthanKim8683/cpenv/gen/tab/v1"
+	v1 "github.com/EthanKim8683/cpenv/gen/tab/v1"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
@@ -24,193 +22,16 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-type ReportContestRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	ProfileId     string                 `protobuf:"bytes,1,opt,name=profile_id,json=profileId,proto3" json:"profile_id,omitempty"`
-	Contest       *v1.Contest            `protobuf:"bytes,2,opt,name=contest,proto3" json:"contest,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *ReportContestRequest) Reset() {
-	*x = ReportContestRequest{}
-	mi := &file_observation_v1_observation_service_proto_msgTypes[0]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *ReportContestRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ReportContestRequest) ProtoMessage() {}
-
-func (x *ReportContestRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_observation_v1_observation_service_proto_msgTypes[0]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ReportContestRequest.ProtoReflect.Descriptor instead.
-func (*ReportContestRequest) Descriptor() ([]byte, []int) {
-	return file_observation_v1_observation_service_proto_rawDescGZIP(), []int{0}
-}
-
-func (x *ReportContestRequest) GetProfileId() string {
-	if x != nil {
-		return x.ProfileId
-	}
-	return ""
-}
-
-func (x *ReportContestRequest) GetContest() *v1.Contest {
-	if x != nil {
-		return x.Contest
-	}
-	return nil
-}
-
-type ReportContestResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *ReportContestResponse) Reset() {
-	*x = ReportContestResponse{}
-	mi := &file_observation_v1_observation_service_proto_msgTypes[1]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *ReportContestResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ReportContestResponse) ProtoMessage() {}
-
-func (x *ReportContestResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_observation_v1_observation_service_proto_msgTypes[1]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ReportContestResponse.ProtoReflect.Descriptor instead.
-func (*ReportContestResponse) Descriptor() ([]byte, []int) {
-	return file_observation_v1_observation_service_proto_rawDescGZIP(), []int{1}
-}
-
-type ReportProblemRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	ProfileId     string                 `protobuf:"bytes,1,opt,name=profile_id,json=profileId,proto3" json:"profile_id,omitempty"`
-	Problem       *v11.Problem           `protobuf:"bytes,2,opt,name=problem,proto3" json:"problem,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *ReportProblemRequest) Reset() {
-	*x = ReportProblemRequest{}
-	mi := &file_observation_v1_observation_service_proto_msgTypes[2]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *ReportProblemRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ReportProblemRequest) ProtoMessage() {}
-
-func (x *ReportProblemRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_observation_v1_observation_service_proto_msgTypes[2]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ReportProblemRequest.ProtoReflect.Descriptor instead.
-func (*ReportProblemRequest) Descriptor() ([]byte, []int) {
-	return file_observation_v1_observation_service_proto_rawDescGZIP(), []int{2}
-}
-
-func (x *ReportProblemRequest) GetProfileId() string {
-	if x != nil {
-		return x.ProfileId
-	}
-	return ""
-}
-
-func (x *ReportProblemRequest) GetProblem() *v11.Problem {
-	if x != nil {
-		return x.Problem
-	}
-	return nil
-}
-
-type ReportProblemResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *ReportProblemResponse) Reset() {
-	*x = ReportProblemResponse{}
-	mi := &file_observation_v1_observation_service_proto_msgTypes[3]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *ReportProblemResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ReportProblemResponse) ProtoMessage() {}
-
-func (x *ReportProblemResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_observation_v1_observation_service_proto_msgTypes[3]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ReportProblemResponse.ProtoReflect.Descriptor instead.
-func (*ReportProblemResponse) Descriptor() ([]byte, []int) {
-	return file_observation_v1_observation_service_proto_rawDescGZIP(), []int{3}
-}
-
 type FocusTabRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	ProfileId     string                 `protobuf:"bytes,1,opt,name=profile_id,json=profileId,proto3" json:"profile_id,omitempty"`
-	Tab           *v12.Tab               `protobuf:"bytes,2,opt,name=tab,proto3" json:"tab,omitempty"`
+	Tab           *v1.Tab                `protobuf:"bytes,1,opt,name=tab,proto3" json:"tab,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *FocusTabRequest) Reset() {
 	*x = FocusTabRequest{}
-	mi := &file_observation_v1_observation_service_proto_msgTypes[4]
+	mi := &file_observation_v1_observation_service_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -222,7 +43,7 @@ func (x *FocusTabRequest) String() string {
 func (*FocusTabRequest) ProtoMessage() {}
 
 func (x *FocusTabRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_observation_v1_observation_service_proto_msgTypes[4]
+	mi := &file_observation_v1_observation_service_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -235,17 +56,10 @@ func (x *FocusTabRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use FocusTabRequest.ProtoReflect.Descriptor instead.
 func (*FocusTabRequest) Descriptor() ([]byte, []int) {
-	return file_observation_v1_observation_service_proto_rawDescGZIP(), []int{4}
+	return file_observation_v1_observation_service_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *FocusTabRequest) GetProfileId() string {
-	if x != nil {
-		return x.ProfileId
-	}
-	return ""
-}
-
-func (x *FocusTabRequest) GetTab() *v12.Tab {
+func (x *FocusTabRequest) GetTab() *v1.Tab {
 	if x != nil {
 		return x.Tab
 	}
@@ -260,7 +74,7 @@ type FocusTabResponse struct {
 
 func (x *FocusTabResponse) Reset() {
 	*x = FocusTabResponse{}
-	mi := &file_observation_v1_observation_service_proto_msgTypes[5]
+	mi := &file_observation_v1_observation_service_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -272,7 +86,7 @@ func (x *FocusTabResponse) String() string {
 func (*FocusTabResponse) ProtoMessage() {}
 
 func (x *FocusTabResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_observation_v1_observation_service_proto_msgTypes[5]
+	mi := &file_observation_v1_observation_service_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -285,32 +99,18 @@ func (x *FocusTabResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use FocusTabResponse.ProtoReflect.Descriptor instead.
 func (*FocusTabResponse) Descriptor() ([]byte, []int) {
-	return file_observation_v1_observation_service_proto_rawDescGZIP(), []int{5}
+	return file_observation_v1_observation_service_proto_rawDescGZIP(), []int{1}
 }
 
 var File_observation_v1_observation_service_proto protoreflect.FileDescriptor
 
 const file_observation_v1_observation_service_proto_rawDesc = "" +
 	"\n" +
-	"(observation/v1/observation_service.proto\x12\x0eobservation.v1\x1a\x18contest/v1/contest.proto\x1a\x18problem/v1/problem.proto\x1a\x10tab/v1/tab.proto\"d\n" +
-	"\x14ReportContestRequest\x12\x1d\n" +
-	"\n" +
-	"profile_id\x18\x01 \x01(\tR\tprofileId\x12-\n" +
-	"\acontest\x18\x02 \x01(\v2\x13.contest.v1.ContestR\acontest\"\x17\n" +
-	"\x15ReportContestResponse\"d\n" +
-	"\x14ReportProblemRequest\x12\x1d\n" +
-	"\n" +
-	"profile_id\x18\x01 \x01(\tR\tprofileId\x12-\n" +
-	"\aproblem\x18\x02 \x01(\v2\x13.problem.v1.ProblemR\aproblem\"\x17\n" +
-	"\x15ReportProblemResponse\"O\n" +
+	"(observation/v1/observation_service.proto\x12\x0eobservation.v1\x1a\x10tab/v1/tab.proto\"0\n" +
 	"\x0fFocusTabRequest\x12\x1d\n" +
-	"\n" +
-	"profile_id\x18\x01 \x01(\tR\tprofileId\x12\x1d\n" +
-	"\x03tab\x18\x02 \x01(\v2\v.tab.v1.TabR\x03tab\"\x12\n" +
-	"\x10FocusTabResponse2\x9f\x02\n" +
-	"\x12ObservationService\x12\\\n" +
-	"\rReportContest\x12$.observation.v1.ReportContestRequest\x1a%.observation.v1.ReportContestResponse\x12\\\n" +
-	"\rReportProblem\x12$.observation.v1.ReportProblemRequest\x1a%.observation.v1.ReportProblemResponse\x12M\n" +
+	"\x03tab\x18\x01 \x01(\v2\v.tab.v1.TabR\x03tab\"\x12\n" +
+	"\x10FocusTabResponse2c\n" +
+	"\x12ObservationService\x12M\n" +
 	"\bFocusTab\x12\x1f.observation.v1.FocusTabRequest\x1a .observation.v1.FocusTabResponseB\xc6\x01\n" +
 	"\x12com.observation.v1B\x17ObservationServiceProtoP\x01Z>github.com/EthanKim8683/cpenv/gen/observation/v1;observationv1\xa2\x02\x03OXX\xaa\x02\x0eObservation.V1\xca\x02\x0eObservation\\V1\xe2\x02\x1aObservation\\V1\\GPBMetadata\xea\x02\x0fObservation::V1b\x06proto3"
 
@@ -326,33 +126,21 @@ func file_observation_v1_observation_service_proto_rawDescGZIP() []byte {
 	return file_observation_v1_observation_service_proto_rawDescData
 }
 
-var file_observation_v1_observation_service_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
+var file_observation_v1_observation_service_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
 var file_observation_v1_observation_service_proto_goTypes = []any{
-	(*ReportContestRequest)(nil),  // 0: observation.v1.ReportContestRequest
-	(*ReportContestResponse)(nil), // 1: observation.v1.ReportContestResponse
-	(*ReportProblemRequest)(nil),  // 2: observation.v1.ReportProblemRequest
-	(*ReportProblemResponse)(nil), // 3: observation.v1.ReportProblemResponse
-	(*FocusTabRequest)(nil),       // 4: observation.v1.FocusTabRequest
-	(*FocusTabResponse)(nil),      // 5: observation.v1.FocusTabResponse
-	(*v1.Contest)(nil),            // 6: contest.v1.Contest
-	(*v11.Problem)(nil),           // 7: problem.v1.Problem
-	(*v12.Tab)(nil),               // 8: tab.v1.Tab
+	(*FocusTabRequest)(nil),  // 0: observation.v1.FocusTabRequest
+	(*FocusTabResponse)(nil), // 1: observation.v1.FocusTabResponse
+	(*v1.Tab)(nil),           // 2: tab.v1.Tab
 }
 var file_observation_v1_observation_service_proto_depIdxs = []int32{
-	6, // 0: observation.v1.ReportContestRequest.contest:type_name -> contest.v1.Contest
-	7, // 1: observation.v1.ReportProblemRequest.problem:type_name -> problem.v1.Problem
-	8, // 2: observation.v1.FocusTabRequest.tab:type_name -> tab.v1.Tab
-	0, // 3: observation.v1.ObservationService.ReportContest:input_type -> observation.v1.ReportContestRequest
-	2, // 4: observation.v1.ObservationService.ReportProblem:input_type -> observation.v1.ReportProblemRequest
-	4, // 5: observation.v1.ObservationService.FocusTab:input_type -> observation.v1.FocusTabRequest
-	1, // 6: observation.v1.ObservationService.ReportContest:output_type -> observation.v1.ReportContestResponse
-	3, // 7: observation.v1.ObservationService.ReportProblem:output_type -> observation.v1.ReportProblemResponse
-	5, // 8: observation.v1.ObservationService.FocusTab:output_type -> observation.v1.FocusTabResponse
-	6, // [6:9] is the sub-list for method output_type
-	3, // [3:6] is the sub-list for method input_type
-	3, // [3:3] is the sub-list for extension type_name
-	3, // [3:3] is the sub-list for extension extendee
-	0, // [0:3] is the sub-list for field type_name
+	2, // 0: observation.v1.FocusTabRequest.tab:type_name -> tab.v1.Tab
+	0, // 1: observation.v1.ObservationService.FocusTab:input_type -> observation.v1.FocusTabRequest
+	1, // 2: observation.v1.ObservationService.FocusTab:output_type -> observation.v1.FocusTabResponse
+	2, // [2:3] is the sub-list for method output_type
+	1, // [1:2] is the sub-list for method input_type
+	1, // [1:1] is the sub-list for extension type_name
+	1, // [1:1] is the sub-list for extension extendee
+	0, // [0:1] is the sub-list for field type_name
 }
 
 func init() { file_observation_v1_observation_service_proto_init() }
@@ -366,7 +154,7 @@ func file_observation_v1_observation_service_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_observation_v1_observation_service_proto_rawDesc), len(file_observation_v1_observation_service_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   6,
+			NumMessages:   2,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

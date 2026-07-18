@@ -33,12 +33,6 @@ const (
 // reflection-formatted method names, remove the leading slash and convert the remaining slash to a
 // period.
 const (
-	// ObservationServiceReportContestProcedure is the fully-qualified name of the ObservationService's
-	// ReportContest RPC.
-	ObservationServiceReportContestProcedure = "/observation.v1.ObservationService/ReportContest"
-	// ObservationServiceReportProblemProcedure is the fully-qualified name of the ObservationService's
-	// ReportProblem RPC.
-	ObservationServiceReportProblemProcedure = "/observation.v1.ObservationService/ReportProblem"
 	// ObservationServiceFocusTabProcedure is the fully-qualified name of the ObservationService's
 	// FocusTab RPC.
 	ObservationServiceFocusTabProcedure = "/observation.v1.ObservationService/FocusTab"
@@ -46,8 +40,6 @@ const (
 
 // ObservationServiceClient is a client for the observation.v1.ObservationService service.
 type ObservationServiceClient interface {
-	ReportContest(context.Context, *v1.ReportContestRequest) (*v1.ReportContestResponse, error)
-	ReportProblem(context.Context, *v1.ReportProblemRequest) (*v1.ReportProblemResponse, error)
 	FocusTab(context.Context, *v1.FocusTabRequest) (*v1.FocusTabResponse, error)
 }
 
@@ -62,18 +54,6 @@ func NewObservationServiceClient(httpClient connect.HTTPClient, baseURL string, 
 	baseURL = strings.TrimRight(baseURL, "/")
 	observationServiceMethods := v1.File_observation_v1_observation_service_proto.Services().ByName("ObservationService").Methods()
 	return &observationServiceClient{
-		reportContest: connect.NewClient[v1.ReportContestRequest, v1.ReportContestResponse](
-			httpClient,
-			baseURL+ObservationServiceReportContestProcedure,
-			connect.WithSchema(observationServiceMethods.ByName("ReportContest")),
-			connect.WithClientOptions(opts...),
-		),
-		reportProblem: connect.NewClient[v1.ReportProblemRequest, v1.ReportProblemResponse](
-			httpClient,
-			baseURL+ObservationServiceReportProblemProcedure,
-			connect.WithSchema(observationServiceMethods.ByName("ReportProblem")),
-			connect.WithClientOptions(opts...),
-		),
 		focusTab: connect.NewClient[v1.FocusTabRequest, v1.FocusTabResponse](
 			httpClient,
 			baseURL+ObservationServiceFocusTabProcedure,
@@ -85,27 +65,7 @@ func NewObservationServiceClient(httpClient connect.HTTPClient, baseURL string, 
 
 // observationServiceClient implements ObservationServiceClient.
 type observationServiceClient struct {
-	reportContest *connect.Client[v1.ReportContestRequest, v1.ReportContestResponse]
-	reportProblem *connect.Client[v1.ReportProblemRequest, v1.ReportProblemResponse]
-	focusTab      *connect.Client[v1.FocusTabRequest, v1.FocusTabResponse]
-}
-
-// ReportContest calls observation.v1.ObservationService.ReportContest.
-func (c *observationServiceClient) ReportContest(ctx context.Context, req *v1.ReportContestRequest) (*v1.ReportContestResponse, error) {
-	response, err := c.reportContest.CallUnary(ctx, connect.NewRequest(req))
-	if response != nil {
-		return response.Msg, err
-	}
-	return nil, err
-}
-
-// ReportProblem calls observation.v1.ObservationService.ReportProblem.
-func (c *observationServiceClient) ReportProblem(ctx context.Context, req *v1.ReportProblemRequest) (*v1.ReportProblemResponse, error) {
-	response, err := c.reportProblem.CallUnary(ctx, connect.NewRequest(req))
-	if response != nil {
-		return response.Msg, err
-	}
-	return nil, err
+	focusTab *connect.Client[v1.FocusTabRequest, v1.FocusTabResponse]
 }
 
 // FocusTab calls observation.v1.ObservationService.FocusTab.
@@ -119,8 +79,6 @@ func (c *observationServiceClient) FocusTab(ctx context.Context, req *v1.FocusTa
 
 // ObservationServiceHandler is an implementation of the observation.v1.ObservationService service.
 type ObservationServiceHandler interface {
-	ReportContest(context.Context, *v1.ReportContestRequest) (*v1.ReportContestResponse, error)
-	ReportProblem(context.Context, *v1.ReportProblemRequest) (*v1.ReportProblemResponse, error)
 	FocusTab(context.Context, *v1.FocusTabRequest) (*v1.FocusTabResponse, error)
 }
 
@@ -131,18 +89,6 @@ type ObservationServiceHandler interface {
 // and JSON codecs. They also support gzip compression.
 func NewObservationServiceHandler(svc ObservationServiceHandler, opts ...connect.HandlerOption) (string, http.Handler) {
 	observationServiceMethods := v1.File_observation_v1_observation_service_proto.Services().ByName("ObservationService").Methods()
-	observationServiceReportContestHandler := connect.NewUnaryHandlerSimple(
-		ObservationServiceReportContestProcedure,
-		svc.ReportContest,
-		connect.WithSchema(observationServiceMethods.ByName("ReportContest")),
-		connect.WithHandlerOptions(opts...),
-	)
-	observationServiceReportProblemHandler := connect.NewUnaryHandlerSimple(
-		ObservationServiceReportProblemProcedure,
-		svc.ReportProblem,
-		connect.WithSchema(observationServiceMethods.ByName("ReportProblem")),
-		connect.WithHandlerOptions(opts...),
-	)
 	observationServiceFocusTabHandler := connect.NewUnaryHandlerSimple(
 		ObservationServiceFocusTabProcedure,
 		svc.FocusTab,
@@ -151,10 +97,6 @@ func NewObservationServiceHandler(svc ObservationServiceHandler, opts ...connect
 	)
 	return "/observation.v1.ObservationService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
-		case ObservationServiceReportContestProcedure:
-			observationServiceReportContestHandler.ServeHTTP(w, r)
-		case ObservationServiceReportProblemProcedure:
-			observationServiceReportProblemHandler.ServeHTTP(w, r)
 		case ObservationServiceFocusTabProcedure:
 			observationServiceFocusTabHandler.ServeHTTP(w, r)
 		default:
@@ -165,14 +107,6 @@ func NewObservationServiceHandler(svc ObservationServiceHandler, opts ...connect
 
 // UnimplementedObservationServiceHandler returns CodeUnimplemented from all methods.
 type UnimplementedObservationServiceHandler struct{}
-
-func (UnimplementedObservationServiceHandler) ReportContest(context.Context, *v1.ReportContestRequest) (*v1.ReportContestResponse, error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("observation.v1.ObservationService.ReportContest is not implemented"))
-}
-
-func (UnimplementedObservationServiceHandler) ReportProblem(context.Context, *v1.ReportProblemRequest) (*v1.ReportProblemResponse, error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("observation.v1.ObservationService.ReportProblem is not implemented"))
-}
 
 func (UnimplementedObservationServiceHandler) FocusTab(context.Context, *v1.FocusTabRequest) (*v1.FocusTabResponse, error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("observation.v1.ObservationService.FocusTab is not implemented"))
