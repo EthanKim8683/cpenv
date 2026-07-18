@@ -1,12 +1,12 @@
 import { messageSchema } from "./message";
-import { methods } from "./methods";
+import { MethodMap } from "./types";
 
-export function addListener() {
+export function addListener(methods: MethodMap) {
   const onMessage = async (message: any) => {
     const { success, data } = messageSchema.safeParse(message);
     if (!success) return;
 
-    const method = (methods as Record<string, Function>)[data.method];
+    const method = methods[data.method];
     if (!method) {
       throw new Error(`Method '${data.method}' not found`);
     }

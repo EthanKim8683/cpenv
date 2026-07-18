@@ -1,4 +1,4 @@
-import { ProblemIo, ProblemType } from "../../gen/problem/v1/problem_pb";
+import { ProblemIo, ProblemType } from "@/gen/problem/v1/problem_pb";
 
 function scrapeSectionTitles() {
   return Array.from(
