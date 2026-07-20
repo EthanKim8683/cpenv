@@ -6,6 +6,6 @@ export default defineConfig({
     disabled: true,
   },
   manifest: {
-    permissions: ["tabs", "tabGroups"],
+    host_permissions: ["http://localhost/*", "http://127.0.0.1/*"],
   },
 });
