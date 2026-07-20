@@ -1,7 +1,7 @@
 import { messageSchema } from "./message";
 import { MethodMap } from "./types";
 
-export function addListener(methods: MethodMap) {
+export function addMessageRpcListeners(methods: MethodMap) {
   const onMessage = async (message: any) => {
     const { success, data } = messageSchema.safeParse(message);
     if (!success) return;

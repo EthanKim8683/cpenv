@@ -10,7 +10,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file problem/v1/problem.proto.
  */
 export const file_problem_v1_problem: GenFile = /*@__PURE__*/
-  fileDesc("Chhwcm9ibGVtL3YxL3Byb2JsZW0ucHJvdG8SCnByb2JsZW0udjEiLgoNUHJvYmxlbVNhbXBsZRINCgVpbnB1dBgBIAEoCRIOCgZvdXRwdXQYAiABKAkiiwEKB1Byb2JsZW0SCgoCaWQYASADKAkSIQoCaW8YAiABKA4yFS5wcm9ibGVtLnYxLlByb2JsZW1JbxIlCgR0eXBlGAMgASgOMhcucHJvYmxlbS52MS5Qcm9ibGVtVHlwZRIqCgdzYW1wbGVzGAQgAygLMhkucHJvYmxlbS52MS5Qcm9ibGVtU2FtcGxlKn0KC1Byb2JsZW1UeXBlEhwKGFBST0JMRU1fVFlQRV9VTlNQRUNJRklFRBAAEhYKElBST0JMRU1fVFlQRV9CQVRDSBABEhwKGFBST0JMRU1fVFlQRV9JTlRFUkFDVElWRRACEhoKFlBST0JMRU1fVFlQRV9SVU5fVFdJQ0UQAypSCglQcm9ibGVtSW8SGgoWUFJPQkxFTV9JT19VTlNQRUNJRklFRBAAEhQKEFBST0JMRU1fSU9fU1RESU8QARITCg9QUk9CTEVNX0lPX0ZJTEUQAkKfAQoOY29tLnByb2JsZW0udjFCDFByb2JsZW1Qcm90b1ABWjZnaXRodWIuY29tL0V0aGFuS2ltODY4My9jcGVudi9nZW4vcHJvYmxlbS92MTtwcm9ibGVtdjGiAgNQWFiqAgpQcm9ibGVtLlYxygIKUHJvYmxlbVxWMeICFlByb2JsZW1cVjFcR1BCTWV0YWRhdGHqAgtQcm9ibGVtOjpWMWIGcHJvdG8z");
+  fileDesc("Chhwcm9ibGVtL3YxL3Byb2JsZW0ucHJvdG8SCnByb2JsZW0udjEiLgoNUHJvYmxlbVNhbXBsZRINCgVpbnB1dBgBIAEoCRIOCgZvdXRwdXQYAiABKAkiaAoHUHJvYmxlbRIKCgJpZBgBIAEoCRIlCgR0eXBlGAIgASgOMhcucHJvYmxlbS52MS5Qcm9ibGVtVHlwZRIqCgdzYW1wbGVzGAMgAygLMhkucHJvYmxlbS52MS5Qcm9ibGVtU2FtcGxlKo8BCgtQcm9ibGVtVHlwZRIcChhQUk9CTEVNX1RZUEVfVU5TUEVDSUZJRUQQABIcChhQUk9CTEVNX1RZUEVfU1RESU9fQkFUQ0gQARIiCh5QUk9CTEVNX1RZUEVfU1RESU9fSU5URVJBQ1RJVkUQAhIgChxQUk9CTEVNX1RZUEVfU1RESU9fUlVOX1RXSUNFEANCnwEKDmNvbS5wcm9ibGVtLnYxQgxQcm9ibGVtUHJvdG9QAVo2Z2l0aHViLmNvbS9FdGhhbktpbTg2ODMvY3BlbnYvZ2VuL3Byb2JsZW0vdjE7cHJvYmxlbXYxogIDUFhYqgIKUHJvYmxlbS5WMcoCClByb2JsZW1cVjHiAhZQcm9ibGVtXFYxXEdQQk1ldGFkYXRh6gILUHJvYmxlbTo6VjFiBnByb3RvMw");
 
 /**
  * @generated from message problem.v1.ProblemSample
@@ -39,22 +39,17 @@ export const ProblemSampleSchema: GenMessage<ProblemSample> = /*@__PURE__*/
  */
 export type Problem = Message<"problem.v1.Problem"> & {
   /**
-   * @generated from field: repeated string id = 1;
+   * @generated from field: string id = 1;
    */
-  id: string[];
+  id: string;
 
   /**
-   * @generated from field: problem.v1.ProblemIo io = 2;
-   */
-  io: ProblemIo;
-
-  /**
-   * @generated from field: problem.v1.ProblemType type = 3;
+   * @generated from field: problem.v1.ProblemType type = 2;
    */
   type: ProblemType;
 
   /**
-   * @generated from field: repeated problem.v1.ProblemSample samples = 4;
+   * @generated from field: repeated problem.v1.ProblemSample samples = 3;
    */
   samples: ProblemSample[];
 };
@@ -76,19 +71,19 @@ export enum ProblemType {
   UNSPECIFIED = 0,
 
   /**
-   * @generated from enum value: PROBLEM_TYPE_BATCH = 1;
+   * @generated from enum value: PROBLEM_TYPE_STDIO_BATCH = 1;
    */
-  BATCH = 1,
+  STDIO_BATCH = 1,
 
   /**
-   * @generated from enum value: PROBLEM_TYPE_INTERACTIVE = 2;
+   * @generated from enum value: PROBLEM_TYPE_STDIO_INTERACTIVE = 2;
    */
-  INTERACTIVE = 2,
+  STDIO_INTERACTIVE = 2,
 
   /**
-   * @generated from enum value: PROBLEM_TYPE_RUN_TWICE = 3;
+   * @generated from enum value: PROBLEM_TYPE_STDIO_RUN_TWICE = 3;
    */
-  RUN_TWICE = 3,
+  STDIO_RUN_TWICE = 3,
 }
 
 /**
@@ -96,30 +91,4 @@ export enum ProblemType {
  */
 export const ProblemTypeSchema: GenEnum<ProblemType> = /*@__PURE__*/
   enumDesc(file_problem_v1_problem, 0);
-
-/**
- * @generated from enum problem.v1.ProblemIo
- */
-export enum ProblemIo {
-  /**
-   * @generated from enum value: PROBLEM_IO_UNSPECIFIED = 0;
-   */
-  UNSPECIFIED = 0,
-
-  /**
-   * @generated from enum value: PROBLEM_IO_STDIO = 1;
-   */
-  STDIO = 1,
-
-  /**
-   * @generated from enum value: PROBLEM_IO_FILE = 2;
-   */
-  FILE = 2,
-}
-
-/**
- * Describes the enum problem.v1.ProblemIo.
- */
-export const ProblemIoSchema: GenEnum<ProblemIo> = /*@__PURE__*/
-  enumDesc(file_problem_v1_problem, 1);
 

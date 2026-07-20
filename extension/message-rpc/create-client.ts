@@ -1,7 +1,7 @@
 import { CONTENT_RPC_NAMESPACE, Message } from "./message";
 import { MethodMap, Client } from "./types";
 
-export function createClient<T extends MethodMap>(tabId: number) {
+export function createMessageRpcClient<T extends MethodMap>(tabId: number) {
   return new Proxy({} as Client<T>, {
     get(_target, p) {
       return (...args: any[]) => {

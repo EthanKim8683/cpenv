@@ -1,9 +1,9 @@
-import { addListener } from "@/src/message-rpc/add-listener";
-import { methods } from "@/src/content/methods";
+import { addMessageRpcListeners } from "@/message-rpc/add-listeners";
+import { contentMethods } from "@/content/methods";
 
 export default defineContentScript({
   matches: ["https://*.codeforces.com/*"],
   main() {
-    addListener(methods);
+    addMessageRpcListeners(contentMethods);
   },
 });

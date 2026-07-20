@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package focus.v1;
+
+import "problem/v1/problem.proto";
+
+service FocusService {
+  rpc Focus(FocusRequest) returns (FocusResponse);
+}
+
+message FocusRequest {
+  problem.v1.Problem problem = 1;
+}
+
+message FocusResponse {}

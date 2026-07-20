@@ -4,15 +4,9 @@ package problem.v1;
 
 enum ProblemType {
   PROBLEM_TYPE_UNSPECIFIED = 0;
-  PROBLEM_TYPE_BATCH = 1;
-  PROBLEM_TYPE_INTERACTIVE = 2;
-  PROBLEM_TYPE_RUN_TWICE = 3;
-}
-
-enum ProblemIo {
-  PROBLEM_IO_UNSPECIFIED = 0;
-  PROBLEM_IO_STDIO = 1;
-  PROBLEM_IO_FILE = 2;
+  PROBLEM_TYPE_STDIO_BATCH = 1;
+  PROBLEM_TYPE_STDIO_INTERACTIVE = 2;
+  PROBLEM_TYPE_STDIO_RUN_TWICE = 3;
 }
 
 message ProblemSample {
@@ -21,8 +15,7 @@ message ProblemSample {
 }
 
 message Problem {
-  repeated string id = 1;
-  ProblemIo io = 2;
-  ProblemType type = 3;
-	repeated ProblemSample samples = 4;
+  string id = 1;
+  ProblemType type = 2;
+	repeated ProblemSample samples = 3;
 }

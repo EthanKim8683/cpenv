@@ -1,4 +1,4 @@
-import { ProblemIo, ProblemType } from "@/gen/problem/v1/problem_pb";
+import { ProblemType } from "@/gen/problem/v1/problem_pb";
 
 function scrapeSectionTitles() {
   return Array.from(
@@ -21,11 +21,11 @@ function scrapeProblemType() {
     sectionTitles.includes("first run") &&
     sectionTitles.includes("second run")
   ) {
-    return ProblemType.RUN_TWICE;
+    return ProblemType.STDIO_RUN_TWICE;
   } else if (sectionTitles.includes("interaction")) {
-    return ProblemType.INTERACTIVE;
+    return ProblemType.STDIO_INTERACTIVE;
   } else {
-    return ProblemType.BATCH;
+    return ProblemType.STDIO_BATCH;
   }
 }
 
@@ -57,13 +57,11 @@ function scrapeSamples() {
   );
 }
 
-export function scrapeProblem() {
-  const io = ProblemIo.STDIO; // TODO: Explore non-stdio problems
+export function scrapeCodeforcesProblem() {
   const type = scrapeProblemType();
   const samples = scrapeSamples();
 
   return {
-    io,
     type,
     samples,
   };

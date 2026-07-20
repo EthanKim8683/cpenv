@@ -24,25 +24,25 @@ const (
 type ProblemType int32
 
 const (
-	ProblemType_PROBLEM_TYPE_UNSPECIFIED ProblemType = 0
-	ProblemType_PROBLEM_TYPE_BATCH       ProblemType = 1
-	ProblemType_PROBLEM_TYPE_INTERACTIVE ProblemType = 2
-	ProblemType_PROBLEM_TYPE_RUN_TWICE   ProblemType = 3
+	ProblemType_PROBLEM_TYPE_UNSPECIFIED       ProblemType = 0
+	ProblemType_PROBLEM_TYPE_STDIO_BATCH       ProblemType = 1
+	ProblemType_PROBLEM_TYPE_STDIO_INTERACTIVE ProblemType = 2
+	ProblemType_PROBLEM_TYPE_STDIO_RUN_TWICE   ProblemType = 3
 )
 
 // Enum value maps for ProblemType.
 var (
 	ProblemType_name = map[int32]string{
 		0: "PROBLEM_TYPE_UNSPECIFIED",
-		1: "PROBLEM_TYPE_BATCH",
-		2: "PROBLEM_TYPE_INTERACTIVE",
-		3: "PROBLEM_TYPE_RUN_TWICE",
+		1: "PROBLEM_TYPE_STDIO_BATCH",
+		2: "PROBLEM_TYPE_STDIO_INTERACTIVE",
+		3: "PROBLEM_TYPE_STDIO_RUN_TWICE",
 	}
 	ProblemType_value = map[string]int32{
-		"PROBLEM_TYPE_UNSPECIFIED": 0,
-		"PROBLEM_TYPE_BATCH":       1,
-		"PROBLEM_TYPE_INTERACTIVE": 2,
-		"PROBLEM_TYPE_RUN_TWICE":   3,
+		"PROBLEM_TYPE_UNSPECIFIED":       0,
+		"PROBLEM_TYPE_STDIO_BATCH":       1,
+		"PROBLEM_TYPE_STDIO_INTERACTIVE": 2,
+		"PROBLEM_TYPE_STDIO_RUN_TWICE":   3,
 	}
 )
 
@@ -71,55 +71,6 @@ func (x ProblemType) Number() protoreflect.EnumNumber {
 // Deprecated: Use ProblemType.Descriptor instead.
 func (ProblemType) EnumDescriptor() ([]byte, []int) {
 	return file_problem_v1_problem_proto_rawDescGZIP(), []int{0}
-}
-
-type ProblemIo int32
-
-const (
-	ProblemIo_PROBLEM_IO_UNSPECIFIED ProblemIo = 0
-	ProblemIo_PROBLEM_IO_STDIO       ProblemIo = 1
-	ProblemIo_PROBLEM_IO_FILE        ProblemIo = 2
-)
-
-// Enum value maps for ProblemIo.
-var (
-	ProblemIo_name = map[int32]string{
-		0: "PROBLEM_IO_UNSPECIFIED",
-		1: "PROBLEM_IO_STDIO",
-		2: "PROBLEM_IO_FILE",
-	}
-	ProblemIo_value = map[string]int32{
-		"PROBLEM_IO_UNSPECIFIED": 0,
-		"PROBLEM_IO_STDIO":       1,
-		"PROBLEM_IO_FILE":        2,
-	}
-)
-
-func (x ProblemIo) Enum() *ProblemIo {
-	p := new(ProblemIo)
-	*p = x
-	return p
-}
-
-func (x ProblemIo) String() string {
-	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
-}
-
-func (ProblemIo) Descriptor() protoreflect.EnumDescriptor {
-	return file_problem_v1_problem_proto_enumTypes[1].Descriptor()
-}
-
-func (ProblemIo) Type() protoreflect.EnumType {
-	return &file_problem_v1_problem_proto_enumTypes[1]
-}
-
-func (x ProblemIo) Number() protoreflect.EnumNumber {
-	return protoreflect.EnumNumber(x)
-}
-
-// Deprecated: Use ProblemIo.Descriptor instead.
-func (ProblemIo) EnumDescriptor() ([]byte, []int) {
-	return file_problem_v1_problem_proto_rawDescGZIP(), []int{1}
 }
 
 type ProblemSample struct {
@@ -176,10 +127,9 @@ func (x *ProblemSample) GetOutput() string {
 
 type Problem struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            []string               `protobuf:"bytes,1,rep,name=id,proto3" json:"id,omitempty"`
-	Io            ProblemIo              `protobuf:"varint,2,opt,name=io,proto3,enum=problem.v1.ProblemIo" json:"io,omitempty"`
-	Type          ProblemType            `protobuf:"varint,3,opt,name=type,proto3,enum=problem.v1.ProblemType" json:"type,omitempty"`
-	Samples       []*ProblemSample       `protobuf:"bytes,4,rep,name=samples,proto3" json:"samples,omitempty"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Type          ProblemType            `protobuf:"varint,2,opt,name=type,proto3,enum=problem.v1.ProblemType" json:"type,omitempty"`
+	Samples       []*ProblemSample       `protobuf:"bytes,3,rep,name=samples,proto3" json:"samples,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -214,18 +164,11 @@ func (*Problem) Descriptor() ([]byte, []int) {
 	return file_problem_v1_problem_proto_rawDescGZIP(), []int{1}
 }
 
-func (x *Problem) GetId() []string {
+func (x *Problem) GetId() string {
 	if x != nil {
 		return x.Id
 	}
-	return nil
-}
-
-func (x *Problem) GetIo() ProblemIo {
-	if x != nil {
-		return x.Io
-	}
-	return ProblemIo_PROBLEM_IO_UNSPECIFIED
+	return ""
 }
 
 func (x *Problem) GetType() ProblemType {
@@ -250,21 +193,16 @@ const file_problem_v1_problem_proto_rawDesc = "" +
 	"problem.v1\"=\n" +
 	"\rProblemSample\x12\x14\n" +
 	"\x05input\x18\x01 \x01(\tR\x05input\x12\x16\n" +
-	"\x06output\x18\x02 \x01(\tR\x06output\"\xa2\x01\n" +
+	"\x06output\x18\x02 \x01(\tR\x06output\"{\n" +
 	"\aProblem\x12\x0e\n" +
-	"\x02id\x18\x01 \x03(\tR\x02id\x12%\n" +
-	"\x02io\x18\x02 \x01(\x0e2\x15.problem.v1.ProblemIoR\x02io\x12+\n" +
-	"\x04type\x18\x03 \x01(\x0e2\x17.problem.v1.ProblemTypeR\x04type\x123\n" +
-	"\asamples\x18\x04 \x03(\v2\x19.problem.v1.ProblemSampleR\asamples*}\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12+\n" +
+	"\x04type\x18\x02 \x01(\x0e2\x17.problem.v1.ProblemTypeR\x04type\x123\n" +
+	"\asamples\x18\x03 \x03(\v2\x19.problem.v1.ProblemSampleR\asamples*\x8f\x01\n" +
 	"\vProblemType\x12\x1c\n" +
-	"\x18PROBLEM_TYPE_UNSPECIFIED\x10\x00\x12\x16\n" +
-	"\x12PROBLEM_TYPE_BATCH\x10\x01\x12\x1c\n" +
-	"\x18PROBLEM_TYPE_INTERACTIVE\x10\x02\x12\x1a\n" +
-	"\x16PROBLEM_TYPE_RUN_TWICE\x10\x03*R\n" +
-	"\tProblemIo\x12\x1a\n" +
-	"\x16PROBLEM_IO_UNSPECIFIED\x10\x00\x12\x14\n" +
-	"\x10PROBLEM_IO_STDIO\x10\x01\x12\x13\n" +
-	"\x0fPROBLEM_IO_FILE\x10\x02B\x9f\x01\n" +
+	"\x18PROBLEM_TYPE_UNSPECIFIED\x10\x00\x12\x1c\n" +
+	"\x18PROBLEM_TYPE_STDIO_BATCH\x10\x01\x12\"\n" +
+	"\x1ePROBLEM_TYPE_STDIO_INTERACTIVE\x10\x02\x12 \n" +
+	"\x1cPROBLEM_TYPE_STDIO_RUN_TWICE\x10\x03B\x9f\x01\n" +
 	"\x0ecom.problem.v1B\fProblemProtoP\x01Z6github.com/EthanKim8683/cpenv/gen/problem/v1;problemv1\xa2\x02\x03PXX\xaa\x02\n" +
 	"Problem.V1\xca\x02\n" +
 	"Problem\\V1\xe2\x02\x16Problem\\V1\\GPBMetadata\xea\x02\vProblem::V1b\x06proto3"
@@ -281,23 +219,21 @@ func file_problem_v1_problem_proto_rawDescGZIP() []byte {
 	return file_problem_v1_problem_proto_rawDescData
 }
 
-var file_problem_v1_problem_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
+var file_problem_v1_problem_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
 var file_problem_v1_problem_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
 var file_problem_v1_problem_proto_goTypes = []any{
 	(ProblemType)(0),      // 0: problem.v1.ProblemType
-	(ProblemIo)(0),        // 1: problem.v1.ProblemIo
-	(*ProblemSample)(nil), // 2: problem.v1.ProblemSample
-	(*Problem)(nil),       // 3: problem.v1.Problem
+	(*ProblemSample)(nil), // 1: problem.v1.ProblemSample
+	(*Problem)(nil),       // 2: problem.v1.Problem
 }
 var file_problem_v1_problem_proto_depIdxs = []int32{
-	1, // 0: problem.v1.Problem.io:type_name -> problem.v1.ProblemIo
-	0, // 1: problem.v1.Problem.type:type_name -> problem.v1.ProblemType
-	2, // 2: problem.v1.Problem.samples:type_name -> problem.v1.ProblemSample
-	3, // [3:3] is the sub-list for method output_type
-	3, // [3:3] is the sub-list for method input_type
-	3, // [3:3] is the sub-list for extension type_name
-	3, // [3:3] is the sub-list for extension extendee
-	0, // [0:3] is the sub-list for field type_name
+	0, // 0: problem.v1.Problem.type:type_name -> problem.v1.ProblemType
+	1, // 1: problem.v1.Problem.samples:type_name -> problem.v1.ProblemSample
+	2, // [2:2] is the sub-list for method output_type
+	2, // [2:2] is the sub-list for method input_type
+	2, // [2:2] is the sub-list for extension type_name
+	2, // [2:2] is the sub-list for extension extendee
+	0, // [0:2] is the sub-list for field type_name
 }
 
 func init() { file_problem_v1_problem_proto_init() }
@@ -310,7 +246,7 @@ func file_problem_v1_problem_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_problem_v1_problem_proto_rawDesc), len(file_problem_v1_problem_proto_rawDesc)),
-			NumEnums:      2,
+			NumEnums:      1,
 			NumMessages:   2,
 			NumExtensions: 0,
 			NumServices:   0,

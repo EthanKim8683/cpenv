@@ -12,16 +12,16 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file contest/v1/contest.proto.
  */
 export const file_contest_v1_contest: GenFile = /*@__PURE__*/
-  fileDesc("Chhjb250ZXN0L3YxL2NvbnRlc3QucHJvdG8SCmNvbnRlc3QudjEikAEKB0NvbnRlc3QSCgoCaWQYASADKAkSMwoIcHJvYmxlbXMYAiADKAsyIS5jb250ZXN0LnYxLkNvbnRlc3QuUHJvYmxlbXNFbnRyeRpECg1Qcm9ibGVtc0VudHJ5EgsKA2tleRgBIAEoCRIiCgV2YWx1ZRgCIAEoCzITLnByb2JsZW0udjEuUHJvYmxlbToCOAFCnwEKDmNvbS5jb250ZXN0LnYxQgxDb250ZXN0UHJvdG9QAVo2Z2l0aHViLmNvbS9FdGhhbktpbTg2ODMvY3BlbnYvZ2VuL2NvbnRlc3QvdjE7Y29udGVzdHYxogIDQ1hYqgIKQ29udGVzdC5WMcoCCkNvbnRlc3RcVjHiAhZDb250ZXN0XFYxXEdQQk1ldGFkYXRh6gILQ29udGVzdDo6VjFiBnByb3RvMw", [file_problem_v1_problem]);
+  fileDesc("Chhjb250ZXN0L3YxL2NvbnRlc3QucHJvdG8SCmNvbnRlc3QudjEikAEKB0NvbnRlc3QSCgoCaWQYASABKAkSMwoIcHJvYmxlbXMYAiADKAsyIS5jb250ZXN0LnYxLkNvbnRlc3QuUHJvYmxlbXNFbnRyeRpECg1Qcm9ibGVtc0VudHJ5EgsKA2tleRgBIAEoCRIiCgV2YWx1ZRgCIAEoCzITLnByb2JsZW0udjEuUHJvYmxlbToCOAFCnwEKDmNvbS5jb250ZXN0LnYxQgxDb250ZXN0UHJvdG9QAVo2Z2l0aHViLmNvbS9FdGhhbktpbTg2ODMvY3BlbnYvZ2VuL2NvbnRlc3QvdjE7Y29udGVzdHYxogIDQ1hYqgIKQ29udGVzdC5WMcoCCkNvbnRlc3RcVjHiAhZDb250ZXN0XFYxXEdQQk1ldGFkYXRh6gILQ29udGVzdDo6VjFiBnByb3RvMw", [file_problem_v1_problem]);
 
 /**
  * @generated from message contest.v1.Contest
  */
 export type Contest = Message<"contest.v1.Contest"> & {
   /**
-   * @generated from field: repeated string id = 1;
+   * @generated from field: string id = 1;
    */
-  id: string[];
+  id: string;
 
   /**
    * @generated from field: map<string, problem.v1.Problem> problems = 2;
