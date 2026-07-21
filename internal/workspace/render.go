@@ -3,6 +3,9 @@ package workspace
 import (
 	"encoding/json"
 	"fmt"
+	"maps"
+
+	_ "embed"
 
 	problemv1 "github.com/EthanKim8683/cpenv/gen/problem/v1"
 	"github.com/spf13/afero"
@@ -11,6 +14,18 @@ import (
 	"go.starlark.net/syntax"
 	"google.golang.org/protobuf/encoding/protojson"
 )
+
+//go:embed lib.star
+var libStar string
+var libGlobals starlark.StringDict
+
+func mergeStringDicts(dicts ...starlark.StringDict) starlark.StringDict {
+	out := make(starlark.StringDict)
+	for _, dict := range dicts {
+		maps.Copy(out, dict)
+	}
+	return out
+}
 
 func render(scaffoldsFs afero.Fs, scaffoldFile string, problem *problemv1.Problem) (*Entry, error) {
 	thread := &starlark.Thread{}
@@ -36,13 +51,16 @@ func render(scaffoldsFs afero.Fs, scaffoldFile string, problem *problemv1.Proble
 	}
 
 	globals, err := starlark.ExecFileOptions(
-		&syntax.FileOptions{},
+		&syntax.FileOptions{
+			While:           true,
+			TopLevelControl: true,
+		},
 		thread,
 		scaffoldFile,
 		scaffold,
-		starlark.StringDict{
+		mergeStringDicts(libGlobals, starlark.StringDict{
 			"problem": problemValue,
-		},
+		}),
 	)
 	if err != nil {
 		return nil, err
@@ -73,4 +91,18 @@ func render(scaffoldsFs afero.Fs, scaffoldFile string, problem *problemv1.Proble
 		return nil, err
 	}
 	return &entry, nil
+}
+
+func init() {
+	var err error
+	libGlobals, err = starlark.ExecFileOptions(
+		&syntax.FileOptions{},
+		&starlark.Thread{},
+		"lib.star",
+		libStar,
+		nil,
+	)
+	if err != nil {
+		panic(err)
+	}
 }
