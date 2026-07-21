@@ -1,38 +1,31 @@
 package main
 
 import (
-	"context"
-	"fmt"
 	"net/http"
 	"os"
 
-	observationv1 "github.com/EthanKim8683/cpenv/gen/observation/v1"
-	"github.com/EthanKim8683/cpenv/gen/observation/v1/observationv1connect"
+	"github.com/EthanKim8683/cpenv/gen/focus/v1/focusv1connect"
+	"github.com/EthanKim8683/cpenv/gen/submit/v1/submitv1connect"
 	"github.com/EthanKim8683/cpenv/internal/server"
+	"github.com/rs/cors"
 )
 
 func main() {
-	observation := &server.ObservationService{
-		OnReportContest: func(_ context.Context, req *observationv1.ReportContestRequest) error {
-			fmt.Printf("ReportContest: %+v\n", req)
-			return nil
-		},
-		OnReportProblem: func(_ context.Context, req *observationv1.ReportProblemRequest) error {
-			fmt.Printf("ReportProblem: %+v\n", req)
-			return nil
-		},
-		OnFocusTab: func(_ context.Context, req *observationv1.FocusTabRequest) error {
-			fmt.Printf("FocusTab: %+v\n", req)
-			return nil
-		},
-	}
+	focusSvc := &server.FocusService{}
+	submitSvc := &server.SubmitService{}
 
 	mux := http.NewServeMux()
-	mux.Handle(observationv1connect.NewObservationServiceHandler(observation))
+	mux.Handle(focusv1connect.NewFocusServiceHandler(focusSvc))
+	mux.Handle(submitv1connect.NewSubmitServiceHandler(submitSvc))
+
+	handler := cors.New(cors.Options{
+		AllowedOrigins: []string{"*"},
+		AllowedHeaders: []string{"*"},
+	}).Handler(mux)
 
 	server := &http.Server{
 		Addr:    ":" + os.Getenv("PORT"),
-		Handler: mux,
+		Handler: handler,
 	}
 	server.ListenAndServe()
 }

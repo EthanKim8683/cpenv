@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package focus.v1;
+
+import "problem/v1/problem.proto";
+
+service FocusService { rpc Focus(FocusRequest) returns (FocusResponse); }
+
+message FocusRequest {
+  string tab_id = 1;
+  problem.v1.Problem problem = 2;
+}
+
+message FocusResponse {}

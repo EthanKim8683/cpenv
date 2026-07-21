@@ -1,6 +1,6 @@
-import { FocusProblemRequestSchema } from "@/gen/extension/v1/extension_service_pb";
+import { FocusRequestSchema } from "@/gen/focus/v1/focus_service_pb";
 import { ProblemType } from "@/gen/problem/v1/problem_pb";
-import { serverClient } from "@/lib/server";
+import { focusClient } from "@/lib/server";
 import { create } from "@bufbuild/protobuf";
 import { getTabId } from "./tab-id.content";
 
@@ -87,8 +87,8 @@ export default defineContentScript({
     const type = scrapeProblemType();
     const samples = scrapeSamples();
 
-    serverClient.focusProblem(
-      create(FocusProblemRequestSchema, {
+    focusClient.focus(
+      create(FocusRequestSchema, {
         tabId: getTabId(),
         problem: {
           id: `codeforces-${contestId}-${problemIndex}`,

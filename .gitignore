@@ -1,6 +1,4 @@
 .env
-archive/
-scaffolds/
-workspace/
-
-plan.txt
+/archive/
+/scaffolds/
+/workspace/

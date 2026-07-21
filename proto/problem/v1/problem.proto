@@ -17,5 +17,5 @@ message ProblemSample {
 message Problem {
   string id = 1;
   ProblemType type = 2;
-	repeated ProblemSample samples = 3;
+  repeated ProblemSample samples = 3;
 }

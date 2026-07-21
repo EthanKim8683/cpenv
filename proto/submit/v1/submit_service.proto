@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package submit.v1;
+
+service SubmitService {
+  rpc Submit(SubmitRequest) returns (SubmitResponse);
+  rpc Subscribe(SubscribeRequest) returns (stream SubscribeResponse);
+}
+
+message SubmitRequest { string tab_id = 1; }
+
+message SubmitResponse {}
+
+message SubscribeRequest { string tab_id = 1; }
+
+message SubscribeResponse {}
