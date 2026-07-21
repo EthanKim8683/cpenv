@@ -1,14 +1,14 @@
 package workspace
 
-type File struct {
-	Content string `json:"content"`
+type file struct {
+	Content string
 }
 
-type Dir struct {
-	Entries map[string]*Entry `json:"entries"`
+type dir struct {
+	Entries map[string]*entry
 }
 
-type Entry struct {
-	File *File `json:"file"`
-	Dir  *Dir  `json:"dir"`
+type entry struct {
+	File *file
+	Dir  *dir
 }

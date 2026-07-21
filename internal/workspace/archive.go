@@ -6,6 +6,6 @@ import (
 	"github.com/spf13/afero"
 )
 
-func Archive(ctx context.Context, workspaceFs afero.Fs, archiveFs afero.Fs) error {
+func archive(ctx context.Context, workspaceFs afero.Fs, archiveFs afero.Fs) error {
 	return nil
 }

@@ -3,7 +3,6 @@ package workspace
 import (
 	"encoding/json"
 	"fmt"
-	"maps"
 
 	_ "embed"
 
@@ -15,39 +14,41 @@ import (
 	"google.golang.org/protobuf/encoding/protojson"
 )
 
-//go:embed lib.star
-var libStar string
-var libGlobals starlark.StringDict
+//go:embed encode.star
+var encodeStar string
+var encode starlark.Value
 
-func mergeStringDicts(dicts ...starlark.StringDict) starlark.StringDict {
-	out := make(starlark.StringDict)
-	for _, dict := range dicts {
-		maps.Copy(out, dict)
-	}
-	return out
-}
-
-func render(scaffoldsFs afero.Fs, scaffoldFile string, problem *problemv1.Problem) (*Entry, error) {
-	thread := &starlark.Thread{}
-
-	problemJSON, err := protojson.Marshal(problem)
+func encodeProblem(
+	thread *starlark.Thread,
+	problem *problemv1.Problem,
+) (starlark.Value, error) {
+	data, err := protojson.Marshal(problem)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("encode problem: marshal: %w", err)
 	}
 
-	problemValue, err := starlark.Call(
+	value, err := starlark.Call(
 		thread,
 		starlarkjson.Module.Members["decode"],
-		starlark.Tuple{starlark.String(problemJSON)},
+		starlark.Tuple{starlark.String(data)},
 		nil,
 	)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("encode problem: starlark decode: %w", err)
 	}
 
+	return value, nil
+}
+
+func renderWorkspace(
+	thread *starlark.Thread,
+	scaffoldsFs afero.Fs,
+	scaffoldFile string,
+	problemValue starlark.Value,
+) (starlark.Value, error) {
 	scaffold, err := afero.ReadFile(scaffoldsFs, scaffoldFile)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("read scaffold %q: %w", scaffoldFile, err)
 	}
 
 	globals, err := starlark.ExecFileOptions(
@@ -58,51 +59,96 @@ func render(scaffoldsFs afero.Fs, scaffoldFile string, problem *problemv1.Proble
 		thread,
 		scaffoldFile,
 		scaffold,
-		mergeStringDicts(libGlobals, starlark.StringDict{
+		starlark.StringDict{
 			"problem": problemValue,
-		}),
+		},
 	)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("exec scaffold %q: %w", scaffoldFile, err)
 	}
 
-	workspaceValue, ok := globals["workspace"]
+	value, ok := globals["workspace"]
 	if !ok {
-		return nil, fmt.Errorf("workspace not found")
+		return nil, fmt.Errorf("scaffold %q: missing global workspace", scaffoldFile)
 	}
+	return value, nil
+}
 
-	entryJSONValue, err := starlark.Call(
+func decodeWorkspace(
+	thread *starlark.Thread,
+	value starlark.Value,
+) (*entry, error) {
+	value, err := starlark.Call(
 		thread,
-		starlarkjson.Module.Members["encode"],
-		starlark.Tuple{workspaceValue},
+		encode,
+		starlark.Tuple{value},
 		nil,
 	)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("decode workspace: starlark encode: %w", err)
 	}
 
-	entryJSON, ok := starlark.AsString(entryJSONValue)
+	data, ok := starlark.AsString(value)
 	if !ok {
-		return nil, fmt.Errorf("workspace is not a string")
+		return nil, fmt.Errorf("decode workspace: expected string, got %T", value)
 	}
 
-	var entry Entry
-	if err := json.Unmarshal([]byte(entryJSON), &entry); err != nil {
-		return nil, err
+	var entry entry
+	if err := json.Unmarshal([]byte(data), &entry); err != nil {
+		return nil, fmt.Errorf("decode workspace: unmarshal: %w", err)
 	}
 	return &entry, nil
 }
 
-func init() {
-	var err error
-	libGlobals, err = starlark.ExecFileOptions(
-		&syntax.FileOptions{},
-		&starlark.Thread{},
-		"lib.star",
-		libStar,
-		nil,
+func render(
+	scaffoldsFs afero.Fs,
+	scaffoldFile string,
+	problem *problemv1.Problem,
+) (*entry, error) {
+	thread := &starlark.Thread{}
+
+	problemValue, err := encodeProblem(thread, problem)
+	if err != nil {
+		return nil, fmt.Errorf("render %q: %w", scaffoldFile, err)
+	}
+
+	workspaceValue, err := renderWorkspace(
+		thread,
+		scaffoldsFs,
+		scaffoldFile,
+		problemValue,
 	)
 	if err != nil {
-		panic(err)
+		return nil, fmt.Errorf("render %q: %w", scaffoldFile, err)
+	}
+
+	entry, err := decodeWorkspace(thread, workspaceValue)
+	if err != nil {
+		return nil, fmt.Errorf("render %q: %w", scaffoldFile, err)
+	}
+
+	return entry, nil
+}
+
+func init() {
+	globals, err := starlark.ExecFileOptions(
+		&syntax.FileOptions{
+			Recursion: true,
+		},
+		&starlark.Thread{},
+		"encode.star",
+		encodeStar,
+		starlark.StringDict{
+			"json": starlarkjson.Module,
+		},
+	)
+	if err != nil {
+		panic(fmt.Errorf("init render: exec encode.star: %w", err))
+	}
+
+	var ok bool
+	encode, ok = globals["encode"]
+	if !ok {
+		panic("init render: missing global encode")
 	}
 }
