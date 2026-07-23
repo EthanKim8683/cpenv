@@ -13,11 +13,7 @@ import (
 func readFiles(t *testing.T, fs afero.Fs) map[string]string {
 	t.Helper()
 	files := make(map[string]string)
-	require.NoError(t, afero.Walk(fs, ".", func(
-		path string,
-		info os.FileInfo,
-		err error,
-	) error {
+	require.NoError(t, afero.Walk(fs, ".", func(path string, info os.FileInfo, err error) error {
 		require.NoError(t, err)
 		if info.IsDir() {
 			return nil
