@@ -24,7 +24,6 @@ const (
 
 type FocusRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	TabId         string                 `protobuf:"bytes,1,opt,name=tab_id,json=tabId,proto3" json:"tab_id,omitempty"`
 	Problem       *v1.Problem            `protobuf:"bytes,2,opt,name=problem,proto3" json:"problem,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -58,13 +57,6 @@ func (x *FocusRequest) ProtoReflect() protoreflect.Message {
 // Deprecated: Use FocusRequest.ProtoReflect.Descriptor instead.
 func (*FocusRequest) Descriptor() ([]byte, []int) {
 	return file_focus_v1_focus_service_proto_rawDescGZIP(), []int{0}
-}
-
-func (x *FocusRequest) GetTabId() string {
-	if x != nil {
-		return x.TabId
-	}
-	return ""
 }
 
 func (x *FocusRequest) GetProblem() *v1.Problem {
@@ -114,9 +106,8 @@ var File_focus_v1_focus_service_proto protoreflect.FileDescriptor
 
 const file_focus_v1_focus_service_proto_rawDesc = "" +
 	"\n" +
-	"\x1cfocus/v1/focus_service.proto\x12\bfocus.v1\x1a\x18problem/v1/problem.proto\"T\n" +
-	"\fFocusRequest\x12\x15\n" +
-	"\x06tab_id\x18\x01 \x01(\tR\x05tabId\x12-\n" +
+	"\x1cfocus/v1/focus_service.proto\x12\bfocus.v1\x1a\x18problem/v1/problem.proto\"=\n" +
+	"\fFocusRequest\x12-\n" +
 	"\aproblem\x18\x02 \x01(\v2\x13.problem.v1.ProblemR\aproblem\"\x0f\n" +
 	"\rFocusResponse2H\n" +
 	"\fFocusService\x128\n" +

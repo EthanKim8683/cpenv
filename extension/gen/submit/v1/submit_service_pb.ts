@@ -10,16 +10,12 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file submit/v1/submit_service.proto.
  */
 export const file_submit_v1_submit_service: GenFile = /*@__PURE__*/
-  fileDesc("Ch5zdWJtaXQvdjEvc3VibWl0X3NlcnZpY2UucHJvdG8SCXN1Ym1pdC52MSIfCg1TdWJtaXRSZXF1ZXN0Eg4KBnRhYl9pZBgBIAEoCSIQCg5TdWJtaXRSZXNwb25zZSIiChBTdWJzY3JpYmVSZXF1ZXN0Eg4KBnRhYl9pZBgBIAEoCSITChFTdWJzY3JpYmVSZXNwb25zZTKYAQoNU3VibWl0U2VydmljZRI9CgZTdWJtaXQSGC5zdWJtaXQudjEuU3VibWl0UmVxdWVzdBoZLnN1Ym1pdC52MS5TdWJtaXRSZXNwb25zZRJICglTdWJzY3JpYmUSGy5zdWJtaXQudjEuU3Vic2NyaWJlUmVxdWVzdBocLnN1Ym1pdC52MS5TdWJzY3JpYmVSZXNwb25zZTABQp4BCg1jb20uc3VibWl0LnYxQhJTdWJtaXRTZXJ2aWNlUHJvdG9QAVo0Z2l0aHViLmNvbS9FdGhhbktpbTg2ODMvY3BlbnYvZ2VuL3N1Ym1pdC92MTtzdWJtaXR2MaICA1NYWKoCCVN1Ym1pdC5WMcoCCVN1Ym1pdFxWMeICFVN1Ym1pdFxWMVxHUEJNZXRhZGF0YeoCClN1Ym1pdDo6VjFiBnByb3RvMw");
+  fileDesc("Ch5zdWJtaXQvdjEvc3VibWl0X3NlcnZpY2UucHJvdG8SCXN1Ym1pdC52MSIPCg1TdWJtaXRSZXF1ZXN0IhAKDlN1Ym1pdFJlc3BvbnNlIhIKEFN1YnNjcmliZVJlcXVlc3QiEwoRU3Vic2NyaWJlUmVzcG9uc2UymAEKDVN1Ym1pdFNlcnZpY2USPQoGU3VibWl0Ehguc3VibWl0LnYxLlN1Ym1pdFJlcXVlc3QaGS5zdWJtaXQudjEuU3VibWl0UmVzcG9uc2USSAoJU3Vic2NyaWJlEhsuc3VibWl0LnYxLlN1YnNjcmliZVJlcXVlc3QaHC5zdWJtaXQudjEuU3Vic2NyaWJlUmVzcG9uc2UwAUKeAQoNY29tLnN1Ym1pdC52MUISU3VibWl0U2VydmljZVByb3RvUAFaNGdpdGh1Yi5jb20vRXRoYW5LaW04NjgzL2NwZW52L2dlbi9zdWJtaXQvdjE7c3VibWl0djGiAgNTWFiqAglTdWJtaXQuVjHKAglTdWJtaXRcVjHiAhVTdWJtaXRcVjFcR1BCTWV0YWRhdGHqAgpTdWJtaXQ6OlYxYgZwcm90bzM");
 
 /**
  * @generated from message submit.v1.SubmitRequest
  */
 export type SubmitRequest = Message<"submit.v1.SubmitRequest"> & {
-  /**
-   * @generated from field: string tab_id = 1;
-   */
-  tabId: string;
 };
 
 /**
@@ -46,10 +42,6 @@ export const SubmitResponseSchema: GenMessage<SubmitResponse> = /*@__PURE__*/
  * @generated from message submit.v1.SubscribeRequest
  */
 export type SubscribeRequest = Message<"submit.v1.SubscribeRequest"> & {
-  /**
-   * @generated from field: string tab_id = 1;
-   */
-  tabId: string;
 };
 
 /**

@@ -23,7 +23,6 @@ const (
 
 type SubmitRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	TabId         string                 `protobuf:"bytes,1,opt,name=tab_id,json=tabId,proto3" json:"tab_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -56,13 +55,6 @@ func (x *SubmitRequest) ProtoReflect() protoreflect.Message {
 // Deprecated: Use SubmitRequest.ProtoReflect.Descriptor instead.
 func (*SubmitRequest) Descriptor() ([]byte, []int) {
 	return file_submit_v1_submit_service_proto_rawDescGZIP(), []int{0}
-}
-
-func (x *SubmitRequest) GetTabId() string {
-	if x != nil {
-		return x.TabId
-	}
-	return ""
 }
 
 type SubmitResponse struct {
@@ -103,7 +95,6 @@ func (*SubmitResponse) Descriptor() ([]byte, []int) {
 
 type SubscribeRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	TabId         string                 `protobuf:"bytes,1,opt,name=tab_id,json=tabId,proto3" json:"tab_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -136,13 +127,6 @@ func (x *SubscribeRequest) ProtoReflect() protoreflect.Message {
 // Deprecated: Use SubscribeRequest.ProtoReflect.Descriptor instead.
 func (*SubscribeRequest) Descriptor() ([]byte, []int) {
 	return file_submit_v1_submit_service_proto_rawDescGZIP(), []int{2}
-}
-
-func (x *SubscribeRequest) GetTabId() string {
-	if x != nil {
-		return x.TabId
-	}
-	return ""
 }
 
 type SubscribeResponse struct {
@@ -185,12 +169,10 @@ var File_submit_v1_submit_service_proto protoreflect.FileDescriptor
 
 const file_submit_v1_submit_service_proto_rawDesc = "" +
 	"\n" +
-	"\x1esubmit/v1/submit_service.proto\x12\tsubmit.v1\"&\n" +
-	"\rSubmitRequest\x12\x15\n" +
-	"\x06tab_id\x18\x01 \x01(\tR\x05tabId\"\x10\n" +
-	"\x0eSubmitResponse\")\n" +
-	"\x10SubscribeRequest\x12\x15\n" +
-	"\x06tab_id\x18\x01 \x01(\tR\x05tabId\"\x13\n" +
+	"\x1esubmit/v1/submit_service.proto\x12\tsubmit.v1\"\x0f\n" +
+	"\rSubmitRequest\"\x10\n" +
+	"\x0eSubmitResponse\"\x12\n" +
+	"\x10SubscribeRequest\"\x13\n" +
 	"\x11SubscribeResponse2\x98\x01\n" +
 	"\rSubmitService\x12=\n" +
 	"\x06Submit\x12\x18.submit.v1.SubmitRequest\x1a\x19.submit.v1.SubmitResponse\x12H\n" +

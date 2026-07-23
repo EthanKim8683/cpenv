@@ -1,1 +1,0 @@
-workspace = "not a dict"

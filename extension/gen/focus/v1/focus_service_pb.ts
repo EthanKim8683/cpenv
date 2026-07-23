@@ -12,17 +12,12 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file focus/v1/focus_service.proto.
  */
 export const file_focus_v1_focus_service: GenFile = /*@__PURE__*/
-  fileDesc("Chxmb2N1cy92MS9mb2N1c19zZXJ2aWNlLnByb3RvEghmb2N1cy52MSJECgxGb2N1c1JlcXVlc3QSDgoGdGFiX2lkGAEgASgJEiQKB3Byb2JsZW0YAiABKAsyEy5wcm9ibGVtLnYxLlByb2JsZW0iDwoNRm9jdXNSZXNwb25zZTJICgxGb2N1c1NlcnZpY2USOAoFRm9jdXMSFi5mb2N1cy52MS5Gb2N1c1JlcXVlc3QaFy5mb2N1cy52MS5Gb2N1c1Jlc3BvbnNlQpYBCgxjb20uZm9jdXMudjFCEUZvY3VzU2VydmljZVByb3RvUAFaMmdpdGh1Yi5jb20vRXRoYW5LaW04NjgzL2NwZW52L2dlbi9mb2N1cy92MTtmb2N1c3YxogIDRlhYqgIIRm9jdXMuVjHKAghGb2N1c1xWMeICFEZvY3VzXFYxXEdQQk1ldGFkYXRh6gIJRm9jdXM6OlYxYgZwcm90bzM", [file_problem_v1_problem]);
+  fileDesc("Chxmb2N1cy92MS9mb2N1c19zZXJ2aWNlLnByb3RvEghmb2N1cy52MSI0CgxGb2N1c1JlcXVlc3QSJAoHcHJvYmxlbRgCIAEoCzITLnByb2JsZW0udjEuUHJvYmxlbSIPCg1Gb2N1c1Jlc3BvbnNlMkgKDEZvY3VzU2VydmljZRI4CgVGb2N1cxIWLmZvY3VzLnYxLkZvY3VzUmVxdWVzdBoXLmZvY3VzLnYxLkZvY3VzUmVzcG9uc2VClgEKDGNvbS5mb2N1cy52MUIRRm9jdXNTZXJ2aWNlUHJvdG9QAVoyZ2l0aHViLmNvbS9FdGhhbktpbTg2ODMvY3BlbnYvZ2VuL2ZvY3VzL3YxO2ZvY3VzdjGiAgNGWFiqAghGb2N1cy5WMcoCCEZvY3VzXFYx4gIURm9jdXNcVjFcR1BCTWV0YWRhdGHqAglGb2N1czo6VjFiBnByb3RvMw", [file_problem_v1_problem]);
 
 /**
  * @generated from message focus.v1.FocusRequest
  */
 export type FocusRequest = Message<"focus.v1.FocusRequest"> & {
-  /**
-   * @generated from field: string tab_id = 1;
-   */
-  tabId: string;
-
   /**
    * @generated from field: problem.v1.Problem problem = 2;
    */

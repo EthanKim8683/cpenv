@@ -7,10 +7,10 @@ service SubmitService {
   rpc Subscribe(SubscribeRequest) returns (stream SubscribeResponse);
 }
 
-message SubmitRequest { string tab_id = 1; }
+message SubmitRequest {}
 
 message SubmitResponse {}
 
-message SubscribeRequest { string tab_id = 1; }
+message SubscribeRequest {}
 
 message SubscribeResponse {}

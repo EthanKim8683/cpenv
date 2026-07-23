@@ -12,7 +12,7 @@ type FocusService struct {
 }
 
 func (s *FocusService) Focus(ctx context.Context, req *focusv1.FocusRequest) (*focusv1.FocusResponse, error) {
-	fmt.Println("Focus", req.TabId, req.Problem)
+	fmt.Println("Focus", req.Problem)
 	return &focusv1.FocusResponse{}, nil
 }
 

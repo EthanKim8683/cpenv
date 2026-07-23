@@ -1,12 +1,7 @@
-samples = {}
-for i, sample in enumerate(problem["samples"]):
-    samples[i] = {
-        "input": sample["input"],
-        "output": sample["output"],
-    }
-
-workspace = {
+files = {
     "id": problem["id"],
     "type": problem["type"],
-    "samples": samples,
 }
+for i, sample in enumerate(problem["samples"]):
+    files["samples/%d/input" % i] = sample["input"]
+    files["samples/%d/output" % i] = sample["output"]
