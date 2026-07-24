@@ -1,0 +1,23 @@
+DO ONCE
+
+archive folder (from root, to create archive git):
+	git init --bare archive.git
+
+workspace (from within workspace dir):
+	git init
+	git remote add origin ../archive.git
+
+PER PROBLEM
+
+if existing branch:
+	git switch <branch>
+else:
+	git switch --orphan <branch>
+	git rm -rf .
+	git clean
+
+do stuff
+
+git add .
+git commit -m <timestamp>
+git push -u origin <problem-branch> (idempotent)
