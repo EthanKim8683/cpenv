@@ -289,23 +289,20 @@ func TestStore(t *testing.T) {
 			localDir := filepath.Join(dir, "local")
 			baseBranch := "base"
 
-			remoteRepo := initRepo(t, remoteDir, true)
-			localRepo := initRepo(t, localDir, false)
-			setRemote(t, localRepo, remoteName, remoteDir)
+			_ = initRepo(t, remoteDir, true)
+			repo := initRepo(t, localDir, false)
+			setRemote(t, repo, remoteName, remoteDir)
 			writeFiles(t, localDir, map[string]string{
 				"foo": "foo",
 			})
-			addAll(t, localRepo)
-			hash := commit(t, localRepo)
-			createBranch(t, localRepo, baseBranch, hash)
+			addAll(t, repo)
+			hash := commit(t, repo)
+			createBranch(t, repo, baseBranch, hash)
 
-			require.NoError(t, ensureBranch(localRepo, baseBranch))
+			require.NoError(t, ensureBranch(repo, baseBranch))
 
-			localCommit := branchCommit(t, localRepo, baseBranch)
-			assert.Equal(t, hash, localCommit.Hash)
-
-			remoteCommit := branchCommit(t, remoteRepo, baseBranch)
-			assert.Equal(t, hash, remoteCommit.Hash)
+			commit := branchCommit(t, repo, baseBranch)
+			assert.Equal(t, hash, commit.Hash)
 		})
 
 		t.Run("is isolated", func(t *testing.T) {
@@ -316,33 +313,33 @@ func TestStore(t *testing.T) {
 			localDir := filepath.Join(dir, "local")
 			baseBranch := "base"
 
-			remoteRepo := initRepo(t, remoteDir, true)
-			localRepo := initRepo(t, localDir, false)
-			setRemote(t, localRepo, remoteName, remoteDir)
+			_ = initRepo(t, remoteDir, true)
+			repo := initRepo(t, localDir, false)
+			setRemote(t, repo, remoteName, remoteDir)
 			writeFiles(t, localDir, map[string]string{
 				"foo": "foo",
 			})
-			addAll(t, localRepo)
-			_ = commit(t, localRepo)
+			addAll(t, repo)
+			_ = commit(t, repo)
 			writeFiles(t, localDir, map[string]string{
 				"bar": "bar",
 			})
-			addAll(t, localRepo)
+			addAll(t, repo)
 			writeFiles(t, localDir, map[string]string{
 				"baz": "baz",
 			})
 
-			headBefore, err := localRepo.Head()
+			headBefore, err := repo.Head()
 			require.NoError(t, err)
-			statusBefore, err := worktree(t, localRepo).Status()
+			statusBefore, err := worktree(t, repo).Status()
 			require.NoError(t, err)
 			filesBefore := readFiles(t, localDir)
 
-			require.NoError(t, ensureBranch(localRepo, baseBranch))
+			require.NoError(t, ensureBranch(repo, baseBranch))
 
-			headAfter, err := localRepo.Head()
+			headAfter, err := repo.Head()
 			require.NoError(t, err)
-			statusAfter, err := worktree(t, localRepo).Status()
+			statusAfter, err := worktree(t, repo).Status()
 			require.NoError(t, err)
 			filesAfter := readFiles(t, localDir)
 
@@ -350,13 +347,10 @@ func TestStore(t *testing.T) {
 			assert.Equal(t, statusBefore, statusAfter)
 			assert.Equal(t, filesBefore, filesAfter)
 
-			localCommit := branchCommit(t, localRepo, baseBranch)
-			tree, err := localCommit.Tree()
+			commit := branchCommit(t, repo, baseBranch)
+			tree, err := commit.Tree()
 			require.NoError(t, err)
 			assert.Empty(t, tree.Entries)
-
-			remoteCommit := branchCommit(t, remoteRepo, baseBranch)
-			assert.Equal(t, localCommit.Hash, remoteCommit.Hash)
 		})
 	})
 }
