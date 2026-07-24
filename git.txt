@@ -21,3 +21,6 @@ do stuff
 git add .
 git commit -m <timestamp>
 git push -u origin <problem-branch> (idempotent)
+
+
+if the user wants to git fetch something, they do it themselves

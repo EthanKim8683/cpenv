@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/go-git/go-git/v6"
@@ -47,22 +48,23 @@ func (s *store) save() error {
 		return fmt.Errorf("save: get worktree: %w", err)
 	}
 
+	if err := w.AddWithOptions(&git.AddOptions{All: true}); err != nil {
+		return fmt.Errorf("save: add: %w", err)
+	}
+
 	now := time.Now()
-	if _, err := w.Commit(
-		now.Format("3:04 PM (Jan 2, 2006)"),
-		&git.CommitOptions{
-			All: true,
-			Author: &object.Signature{
-				Name:  authorName,
-				Email: authorEmail,
-				When:  now,
-			},
+	if _, err := w.Commit(now.Format("3:04 PM (Jan 2, 2006)"), &git.CommitOptions{
+		Author: &object.Signature{
+			Name:  authorName,
+			Email: authorEmail,
+			When:  now,
 		},
-	); err != nil && !errors.Is(err, git.ErrEmptyCommit) {
+	}); err != nil && !errors.Is(err, git.ErrEmptyCommit) {
 		return fmt.Errorf("save: commit: %w", err)
 	}
 
 	if err := s.repo.Push(&git.PushOptions{
+		Force:      true,
 		RemoteName: remoteName,
 		RefSpecs: []config.RefSpec{
 			config.RefSpec(ref.String() + ":" + ref.String()),
@@ -74,10 +76,10 @@ func (s *store) save() error {
 	return nil
 }
 
-func (s *store) load(problemID string) error {
-	branch := plumbing.NewBranchReferenceName(problemID)
+func (s *store) load(name string) error {
+	branch := plumbing.NewBranchReferenceName(name)
 	if err := branch.Validate(); err != nil {
-		return fmt.Errorf("load: invalid branch name %q: %w", problemID, err)
+		return fmt.Errorf("load: invalid branch name %q: %w", name, err)
 	}
 
 	w, err := s.repo.Worktree()
@@ -90,31 +92,39 @@ func (s *store) load(problemID string) error {
 			Branch: branch,
 			Force:  true,
 		}); err != nil {
-			return fmt.Errorf("load: checkout %q: %w", problemID, err)
+			return fmt.Errorf("load: checkout %q: %w", name, err)
 		}
-		return nil
 	} else if !errors.Is(err, plumbing.ErrReferenceNotFound) {
-		return fmt.Errorf("load: resolve branch %q: %w", problemID, err)
+		return fmt.Errorf("load: resolve branch %q: %w", name, err)
+	} else {
+		baseBranch := plumbing.NewBranchReferenceName(s.options.baseBranch)
+		baseRef, err := s.repo.Reference(baseBranch, true)
+		if err != nil {
+			return fmt.Errorf("load: resolve branch %q: %w", s.options.baseBranch, err)
+		}
+
+		if err := w.Checkout(&git.CheckoutOptions{
+			Branch: branch,
+			Create: true,
+			Force:  true,
+			Hash:   baseRef.Hash(),
+		}); err != nil {
+			return fmt.Errorf("load: checkout %q: %w", name, err)
+		}
 	}
 
-	baseBranch := plumbing.NewBranchReferenceName(s.options.baseBranch)
-	baseRef, err := s.repo.Reference(baseBranch, true)
-	if err != nil {
-		return fmt.Errorf("load: resolve branch %q: %w", s.options.baseBranch, err)
-	}
-
-	if err := w.Checkout(&git.CheckoutOptions{
-		Hash:   baseRef.Hash(),
-		Branch: branch,
-		Create: true,
-	}); err != nil {
-		return fmt.Errorf("load: checkout %q: %w", problemID, err)
+	if err := w.Clean(&git.CleanOptions{Dir: true}); err != nil {
+		return fmt.Errorf("load: clean: %w", err)
 	}
 
 	return nil
 }
 
 func ensureRepo(path string, isBare bool) (*git.Repository, error) {
+	if !filepath.IsAbs(path) {
+		return nil, fmt.Errorf("ensure repo %q: path must be absolute", path)
+	}
+
 	repo, err := git.PlainOpen(path)
 	if errors.Is(err, git.ErrRepositoryNotExists) {
 		if err := os.MkdirAll(path, 0755); err != nil {
@@ -174,57 +184,58 @@ func ensureBranch(repo *git.Repository, name string) error {
 		return fmt.Errorf("ensure branch %q: invalid name: %w", name, err)
 	}
 
-	if _, err := repo.Reference(branch, true); err == nil {
-		return nil
-	} else if !errors.Is(err, plumbing.ErrReferenceNotFound) {
+	if _, err := repo.Reference(branch, true); errors.Is(err, plumbing.ErrReferenceNotFound) {
+		storer := repo.Storer
+
+		tree := &object.Tree{}
+		treeObject := storer.NewEncodedObject()
+		treeObject.SetType(plumbing.TreeObject)
+		if err := tree.Encode(treeObject); err != nil {
+			return fmt.Errorf("ensure branch %q: encode tree: %w", name, err)
+		}
+		treeHash, err := storer.SetEncodedObject(treeObject)
+		if err != nil {
+			return fmt.Errorf("ensure branch %q: save tree object: %w", name, err)
+		}
+
+		now := time.Now()
+		signature := object.Signature{
+			Name:  authorName,
+			Email: authorEmail,
+			When:  now,
+		}
+		commit := &object.Commit{
+			Author:    signature,
+			Committer: signature,
+			Message:   "Ensure branch",
+			TreeHash:  treeHash,
+		}
+		commitObject := storer.NewEncodedObject()
+		commitObject.SetType(plumbing.CommitObject)
+		if err := commit.Encode(commitObject); err != nil {
+			return fmt.Errorf("ensure branch %q: encode commit: %w", name, err)
+		}
+		commitHash, err := storer.SetEncodedObject(commitObject)
+		if err != nil {
+			return fmt.Errorf("ensure branch %q: save commit object: %w", name, err)
+		}
+
+		if err := storer.SetReference(
+			plumbing.NewHashReference(branch, commitHash),
+		); err != nil {
+			return fmt.Errorf("ensure branch %q: set branch to commit %s: %w", name, commitHash, err)
+		}
+	} else if err != nil {
 		return fmt.Errorf("ensure branch %q: resolve: %w", name, err)
 	}
 
-	tree := &object.Tree{}
-	treeObject := repo.Storer.NewEncodedObject()
-	treeObject.SetType(plumbing.TreeObject)
-	if err := tree.Encode(treeObject); err != nil {
-		return fmt.Errorf("ensure branch %q: encode tree: %w", name, err)
-	}
-	treeHash, err := repo.Storer.SetEncodedObject(treeObject)
-	if err != nil {
-		return fmt.Errorf("ensure branch %q: save tree object: %w", name, err)
-	}
-
-	now := time.Now()
-	signature := object.Signature{
-		Name:  authorName,
-		Email: authorEmail,
-		When:  now,
-	}
-	commit := &object.Commit{
-		Author:    signature,
-		Committer: signature,
-		Message:   "Ensure branch",
-		TreeHash:  treeHash,
-	}
-	commitObject := repo.Storer.NewEncodedObject()
-	commitObject.SetType(plumbing.CommitObject)
-	if err := commit.Encode(commitObject); err != nil {
-		return fmt.Errorf("ensure branch %q: encode commit: %w", name, err)
-	}
-	commitHash, err := repo.Storer.SetEncodedObject(commitObject)
-	if err != nil {
-		return fmt.Errorf("ensure branch %q: save commit object: %w", name, err)
-	}
-
-	if err := repo.Storer.SetReference(
-		plumbing.NewHashReference(branch, commitHash),
-	); err != nil {
-		return fmt.Errorf("ensure branch %q: set branch to commit %s: %w", name, commitHash, err)
-	}
-
-	if err = repo.Push(&git.PushOptions{
+	if err := repo.Push(&git.PushOptions{
+		Force:      true,
 		RemoteName: remoteName,
 		RefSpecs: []config.RefSpec{
 			config.RefSpec(branch.String() + ":" + branch.String()),
 		},
-	}); err != nil {
+	}); err != nil && !errors.Is(err, git.NoErrAlreadyUpToDate) {
 		return fmt.Errorf("ensure branch %q: push: %w", name, err)
 	}
 
@@ -250,5 +261,8 @@ func newStore(options storeOptions) (*store, error) {
 		return nil, fmt.Errorf("new store: base branch: %w", err)
 	}
 
-	return &store{repo: repo}, nil
+	return &store{
+		repo:    repo,
+		options: options,
+	}, nil
 }

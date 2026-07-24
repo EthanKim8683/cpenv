@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func readFiles(t *testing.T, fs afero.Fs) map[string]string {
+func readFilesScaffold(t *testing.T, fs afero.Fs) map[string]string {
 	t.Helper()
 	files := make(map[string]string)
 	require.NoError(t, afero.Walk(fs, ".", func(path string, info os.FileInfo, err error) error {
@@ -57,7 +57,7 @@ func TestRender(t *testing.T) {
 			problem,
 		))
 
-		files := readFiles(t, workspaceFs)
+		files := readFilesScaffold(t, workspaceFs)
 		assert.Equal(t, map[string]string{
 			"id":               "id",
 			"type":             "PROBLEM_TYPE_STDIO_BATCH",
