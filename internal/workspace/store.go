@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/go-git/go-git/v6"
-	"github.com/go-git/go-git/v6/config"
 	"github.com/go-git/go-git/v6/plumbing"
 	"github.com/go-git/go-git/v6/plumbing/object"
 )
@@ -16,13 +15,11 @@ import (
 const (
 	authorName  = "cpenv"
 	authorEmail = "cpenv@local"
-	remoteName  = "origin"
 )
 
 type storeOptions struct {
-	archiveDir   string
-	workspaceDir string
-	baseBranch   string
+	path       string
+	baseBranch string
 }
 
 type store struct {
@@ -38,8 +35,7 @@ func (s *store) save() error {
 		return fmt.Errorf("save: resolve HEAD: %w", err)
 	}
 
-	ref := head.Name()
-	if !ref.IsBranch() {
+	if !head.Name().IsBranch() {
 		return errors.New("save: detached HEAD")
 	}
 
@@ -63,15 +59,6 @@ func (s *store) save() error {
 		return fmt.Errorf("save: commit: %w", err)
 	}
 
-	if err := s.repo.Push(&git.PushOptions{
-		RemoteName: remoteName,
-		RefSpecs: []config.RefSpec{
-			config.RefSpec(ref.String() + ":" + ref.String()),
-		},
-	}); err != nil && !errors.Is(err, git.NoErrAlreadyUpToDate) {
-		return fmt.Errorf("save: push: %w", err)
-	}
-
 	return nil
 }
 
@@ -90,22 +77,27 @@ func (s *store) load(name string) error {
 		if err := w.Checkout(&git.CheckoutOptions{Branch: branch}); err != nil {
 			return fmt.Errorf("load: checkout %q: %w", name, err)
 		}
-	} else if !errors.Is(err, plumbing.ErrReferenceNotFound) {
-		return fmt.Errorf("load: resolve branch %q: %w", name, err)
-	} else {
-		baseBranch := plumbing.NewBranchReferenceName(s.options.baseBranch)
-		baseRef, err := s.repo.Reference(baseBranch, true)
-		if err != nil {
-			return fmt.Errorf("load: resolve branch %q: %w", s.options.baseBranch, err)
+
+		if err := w.Clean(&git.CleanOptions{Dir: true}); err != nil {
+			return fmt.Errorf("load: clean: %w", err)
 		}
 
-		if err := w.Checkout(&git.CheckoutOptions{
-			Branch: branch,
-			Create: true,
-			Hash:   baseRef.Hash(),
-		}); err != nil {
-			return fmt.Errorf("load: checkout %q: %w", name, err)
-		}
+		return nil
+	} else if !errors.Is(err, plumbing.ErrReferenceNotFound) {
+		return fmt.Errorf("load: resolve branch %q: %w", name, err)
+	}
+
+	ref, err := s.repo.Reference(plumbing.NewBranchReferenceName(s.options.baseBranch), true)
+	if err != nil {
+		return fmt.Errorf("load: resolve branch %q: %w", s.options.baseBranch, err)
+	}
+
+	if err := w.Checkout(&git.CheckoutOptions{
+		Branch: branch,
+		Create: true,
+		Hash:   ref.Hash(),
+	}); err != nil {
+		return fmt.Errorf("load: checkout %q: %w", name, err)
 	}
 
 	if err := w.Clean(&git.CleanOptions{Dir: true}); err != nil {
@@ -115,62 +107,27 @@ func (s *store) load(name string) error {
 	return nil
 }
 
-func ensureRepo(path string, isBare bool) (*git.Repository, error) {
+func ensureRepo(path string) (*git.Repository, error) {
 	if !filepath.IsAbs(path) {
 		return nil, fmt.Errorf("ensure repo %q: path must be absolute", path)
 	}
 
-	repo, err := git.PlainOpen(path)
-	if errors.Is(err, git.ErrRepositoryNotExists) {
-		if err := os.MkdirAll(path, 0755); err != nil {
-			return nil, fmt.Errorf("ensure repo %q: mkdir: %w", path, err)
-		}
-
-		repo, err = git.PlainInit(path, isBare)
-		if err != nil {
-			return nil, fmt.Errorf("ensure repo %q: init: %w", path, err)
-		}
-
+	if repo, err := git.PlainOpen(path); err == nil {
 		return repo, nil
-	} else if err != nil {
+	} else if !errors.Is(err, git.ErrRepositoryNotExists) {
 		return nil, fmt.Errorf("ensure repo %q: open: %w", path, err)
 	}
 
-	cfg, err := repo.Config()
-	if err != nil {
-		return nil, fmt.Errorf("ensure repo %q: get config: %w", path, err)
+	if err := os.MkdirAll(path, 0755); err != nil {
+		return nil, fmt.Errorf("ensure repo %q: mkdir: %w", path, err)
 	}
 
-	if cfg.Core.IsBare != isBare {
-		return nil, fmt.Errorf("ensure repo %q: bare: expected %t, got %t", path, isBare, cfg.Core.IsBare)
+	repo, err := git.PlainInit(path, false)
+	if err != nil {
+		return nil, fmt.Errorf("ensure repo %q: init: %w", path, err)
 	}
 
 	return repo, nil
-}
-
-func ensureRemote(repo *git.Repository, name, url string) error {
-	remote, err := repo.Remote(name)
-	if errors.Is(err, git.ErrRemoteNotFound) {
-		if _, err = repo.CreateRemote(&config.RemoteConfig{
-			Name: name,
-			URLs: []string{url},
-		}); err != nil {
-			return fmt.Errorf("ensure remote %q: create: %w", name, err)
-		}
-		return nil
-	} else if err != nil {
-		return fmt.Errorf("ensure remote %q: get: %w", name, err)
-	}
-
-	cfg := remote.Config()
-	if len(cfg.URLs) == 0 {
-		return fmt.Errorf("ensure remote %q: missing url", name)
-	}
-	if cfg.URLs[0] != url {
-		return fmt.Errorf("ensure remote %q: url: expected %q, got %q", name, url, cfg.URLs[0])
-	}
-
-	return nil
 }
 
 func ensureBranch(repo *git.Repository, name string) error {
@@ -187,22 +144,21 @@ func ensureBranch(repo *git.Repository, name string) error {
 
 	storer := repo.Storer
 
-	tree := &object.Tree{}
 	treeObject := storer.NewEncodedObject()
 	treeObject.SetType(plumbing.TreeObject)
-	if err := tree.Encode(treeObject); err != nil {
+	if err := (&object.Tree{}).Encode(treeObject); err != nil {
 		return fmt.Errorf("ensure branch %q: encode tree: %w", name, err)
 	}
+
 	treeHash, err := storer.SetEncodedObject(treeObject)
 	if err != nil {
 		return fmt.Errorf("ensure branch %q: save tree object: %w", name, err)
 	}
 
-	now := time.Now()
 	signature := object.Signature{
 		Name:  authorName,
 		Email: authorEmail,
-		When:  now,
+		When:  time.Now(),
 	}
 	commit := &object.Commit{
 		Author:    signature,
@@ -210,11 +166,13 @@ func ensureBranch(repo *git.Repository, name string) error {
 		Message:   "Ensure branch",
 		TreeHash:  treeHash,
 	}
+
 	commitObject := storer.NewEncodedObject()
 	commitObject.SetType(plumbing.CommitObject)
 	if err := commit.Encode(commitObject); err != nil {
 		return fmt.Errorf("ensure branch %q: encode commit: %w", name, err)
 	}
+
 	commitHash, err := storer.SetEncodedObject(commitObject)
 	if err != nil {
 		return fmt.Errorf("ensure branch %q: save commit object: %w", name, err)
@@ -230,17 +188,8 @@ func ensureBranch(repo *git.Repository, name string) error {
 }
 
 func newStore(options storeOptions) (*store, error) {
-	_, err := ensureRepo(options.archiveDir, true)
+	repo, err := ensureRepo(options.path)
 	if err != nil {
-		return nil, fmt.Errorf("new store: archive: %w", err)
-	}
-
-	repo, err := ensureRepo(options.workspaceDir, false)
-	if err != nil {
-		return nil, fmt.Errorf("new store: workspace: %w", err)
-	}
-
-	if err := ensureRemote(repo, remoteName, options.archiveDir); err != nil {
 		return nil, fmt.Errorf("new store: %w", err)
 	}
 

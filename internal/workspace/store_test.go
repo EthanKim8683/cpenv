@@ -1,7 +1,6 @@
 package workspace
 
 import (
-	"fmt"
 	"io/fs"
 	"os"
 	"path/filepath"
@@ -9,7 +8,6 @@ import (
 	"time"
 
 	"github.com/go-git/go-git/v6"
-	"github.com/go-git/go-git/v6/config"
 	"github.com/go-git/go-git/v6/plumbing"
 	"github.com/go-git/go-git/v6/plumbing/object"
 	"github.com/stretchr/testify/assert"
@@ -54,22 +52,12 @@ func readFiles(t *testing.T, dir string) map[string]string {
 	return files
 }
 
-func initRepo(t *testing.T, path string, isBare bool) *git.Repository {
+func initRepo(t *testing.T, path string) *git.Repository {
 	t.Helper()
 
-	repo, err := git.PlainInit(path, isBare)
+	repo, err := git.PlainInit(path, false)
 	require.NoError(t, err)
 	return repo
-}
-
-func setRemote(t *testing.T, repo *git.Repository, name, url string) {
-	t.Helper()
-
-	_, err := repo.CreateRemote(&config.RemoteConfig{
-		Name: name,
-		URLs: []string{url},
-	})
-	require.NoError(t, err)
 }
 
 func worktree(t *testing.T, repo *git.Repository) *git.Worktree {
@@ -89,12 +77,11 @@ func addAll(t *testing.T, repo *git.Repository) {
 func commit(t *testing.T, repo *git.Repository) plumbing.Hash {
 	t.Helper()
 
-	now := time.Now()
 	hash, err := worktree(t, repo).Commit("commit", &git.CommitOptions{
 		Author: &object.Signature{
 			Name:  authorName,
 			Email: authorEmail,
-			When:  now,
+			When:  time.Now(),
 		},
 	})
 	require.NoError(t, err)
@@ -104,17 +91,15 @@ func commit(t *testing.T, repo *git.Repository) plumbing.Hash {
 func createBranch(t *testing.T, repo *git.Repository, name string, hash plumbing.Hash) {
 	t.Helper()
 
-	branch := plumbing.NewBranchReferenceName(name)
 	require.NoError(t, repo.Storer.SetReference(
-		plumbing.NewHashReference(branch, hash),
+		plumbing.NewHashReference(plumbing.NewBranchReferenceName(name), hash),
 	))
 }
 
 func branchCommit(t *testing.T, repo *git.Repository, name string) *object.Commit {
 	t.Helper()
 
-	branch := plumbing.NewBranchReferenceName(name)
-	ref, err := repo.Reference(branch, true)
+	ref, err := repo.Reference(plumbing.NewBranchReferenceName(name), true)
 	require.NoError(t, err)
 
 	commit, err := repo.CommitObject(ref.Hash())
@@ -128,30 +113,27 @@ func TestStore(t *testing.T) {
 	t.Run("core behavior", func(t *testing.T) {
 		t.Parallel()
 
-		dir := t.TempDir()
-		archiveDir := filepath.Join(dir, "archive.git")
-		workspaceDir := filepath.Join(dir, "workspace")
+		path := filepath.Join(t.TempDir(), "repo")
 		baseBranch := "base"
 
 		store, err := newStore(storeOptions{
-			archiveDir:   archiveDir,
-			workspaceDir: workspaceDir,
-			baseBranch:   baseBranch,
+			path:       path,
+			baseBranch: baseBranch,
 		})
 		require.NoError(t, err)
 
 		require.NoError(t, store.load("foo"))
-		writeFiles(t, workspaceDir, map[string]string{
+		writeFiles(t, path, map[string]string{
 			"foo": "foo",
 		})
 		require.NoError(t, store.save())
 
 		require.NoError(t, store.load("bar"))
-		writeFiles(t, workspaceDir, map[string]string{
+		writeFiles(t, path, map[string]string{
 			"bar": "bar",
 		})
 		require.NoError(t, store.save())
-		writeFiles(t, workspaceDir, map[string]string{
+		writeFiles(t, path, map[string]string{
 			"baz": "baz",
 		})
 		require.NoError(t, store.save())
@@ -159,9 +141,9 @@ func TestStore(t *testing.T) {
 		require.NoError(t, store.load("foo"))
 		assert.Equal(t, map[string]string{
 			"foo": "foo",
-		}, readFiles(t, workspaceDir))
+		}, readFiles(t, path))
 
-		writeFiles(t, workspaceDir, map[string]string{
+		writeFiles(t, path, map[string]string{
 			"qux": "qux",
 		})
 		require.NoError(t, store.save())
@@ -170,35 +152,32 @@ func TestStore(t *testing.T) {
 		assert.Equal(t, map[string]string{
 			"bar": "bar",
 			"baz": "baz",
-		}, readFiles(t, workspaceDir))
+		}, readFiles(t, path))
 
 		require.NoError(t, store.load("foo"))
 		assert.Equal(t, map[string]string{
 			"foo": "foo",
 			"qux": "qux",
-		}, readFiles(t, workspaceDir))
+		}, readFiles(t, path))
 	})
 
 	t.Run("base branch behavior", func(t *testing.T) {
 		t.Parallel()
 
-		dir := t.TempDir()
-		archiveDir := filepath.Join(dir, "archive.git")
-		workspaceDir := filepath.Join(dir, "workspace")
+		path := filepath.Join(t.TempDir(), "repo")
 		baseBranch := "base"
 
 		store, err := newStore(storeOptions{
-			archiveDir:   archiveDir,
-			workspaceDir: workspaceDir,
-			baseBranch:   baseBranch,
+			path:       path,
+			baseBranch: baseBranch,
 		})
 		require.NoError(t, err)
 
 		require.NoError(t, store.load("foo"))
-		assert.Equal(t, map[string]string{}, readFiles(t, workspaceDir))
+		assert.Equal(t, map[string]string{}, readFiles(t, path))
 
 		require.NoError(t, store.load(baseBranch))
-		writeFiles(t, workspaceDir, map[string]string{
+		writeFiles(t, path, map[string]string{
 			"base": "base",
 		})
 		require.NoError(t, store.save())
@@ -206,76 +185,30 @@ func TestStore(t *testing.T) {
 		require.NoError(t, store.load("bar"))
 		assert.Equal(t, map[string]string{
 			"base": "base",
-		}, readFiles(t, workspaceDir))
+		}, readFiles(t, path))
 
 		require.NoError(t, store.load("foo"))
-		assert.Equal(t, map[string]string{}, readFiles(t, workspaceDir))
+		assert.Equal(t, map[string]string{}, readFiles(t, path))
 	})
 
 	t.Run("ensure repo", func(t *testing.T) {
 		t.Parallel()
 
-		t.Run("match", func(t *testing.T) {
-			t.Parallel()
+		path := filepath.Join(t.TempDir(), "repo")
 
-			dir := t.TempDir()
-			repoDir := filepath.Join(dir, "repo")
-
-			_ = initRepo(t, repoDir, false)
-
-			_, err := ensureRepo(repoDir, false)
-			assert.NoError(t, err)
+		repo := initRepo(t, path)
+		writeFiles(t, path, map[string]string{
+			"foo": "foo",
 		})
+		addAll(t, repo)
+		hash := commit(t, repo)
 
-		t.Run("mismatch", func(t *testing.T) {
-			t.Parallel()
+		ensuredRepo, err := ensureRepo(path)
+		require.NoError(t, err)
 
-			dir := t.TempDir()
-			repoDir := filepath.Join(dir, "repo")
-
-			_ = initRepo(t, repoDir, true)
-
-			_, err := ensureRepo(repoDir, false)
-			require.Error(t, err)
-			assert.ErrorContains(t, err, "bare: expected false, got true")
-		})
-	})
-
-	t.Run("ensure remote", func(t *testing.T) {
-		t.Parallel()
-
-		t.Run("match", func(t *testing.T) {
-			t.Parallel()
-
-			dir := t.TempDir()
-			remoteDir := filepath.Join(dir, "remote.git")
-			localDir := filepath.Join(dir, "local")
-
-			_ = initRepo(t, remoteDir, true)
-			repo := initRepo(t, localDir, false)
-			setRemote(t, repo, remoteName, remoteDir)
-
-			err := ensureRemote(repo, remoteName, remoteDir)
-			assert.NoError(t, err)
-		})
-
-		t.Run("mismatch", func(t *testing.T) {
-			t.Parallel()
-
-			dir := t.TempDir()
-			remoteDir1 := filepath.Join(dir, "remote1.git")
-			remoteDir2 := filepath.Join(dir, "remote2.git")
-			localDir := filepath.Join(dir, "local")
-
-			_ = initRepo(t, remoteDir1, true)
-			_ = initRepo(t, remoteDir2, true)
-			repo := initRepo(t, localDir, false)
-			setRemote(t, repo, remoteName, remoteDir1)
-
-			err := ensureRemote(repo, remoteName, remoteDir2)
-			require.Error(t, err)
-			assert.ErrorContains(t, err, fmt.Sprintf("expected %q, got %q", remoteDir2, remoteDir1))
-		})
+		head, err := ensuredRepo.Head()
+		require.NoError(t, err)
+		assert.Equal(t, hash, head.Hash())
 	})
 
 	t.Run("ensure branch", func(t *testing.T) {
@@ -284,15 +217,11 @@ func TestStore(t *testing.T) {
 		t.Run("is idempotent", func(t *testing.T) {
 			t.Parallel()
 
-			dir := t.TempDir()
-			remoteDir := filepath.Join(dir, "remote.git")
-			localDir := filepath.Join(dir, "local")
+			path := filepath.Join(t.TempDir(), "repo")
 			baseBranch := "base"
 
-			_ = initRepo(t, remoteDir, true)
-			repo := initRepo(t, localDir, false)
-			setRemote(t, repo, remoteName, remoteDir)
-			writeFiles(t, localDir, map[string]string{
+			repo := initRepo(t, path)
+			writeFiles(t, path, map[string]string{
 				"foo": "foo",
 			})
 			addAll(t, repo)
@@ -308,24 +237,20 @@ func TestStore(t *testing.T) {
 		t.Run("is isolated", func(t *testing.T) {
 			t.Parallel()
 
-			dir := t.TempDir()
-			remoteDir := filepath.Join(dir, "remote.git")
-			localDir := filepath.Join(dir, "local")
+			path := filepath.Join(t.TempDir(), "repo")
 			baseBranch := "base"
 
-			_ = initRepo(t, remoteDir, true)
-			repo := initRepo(t, localDir, false)
-			setRemote(t, repo, remoteName, remoteDir)
-			writeFiles(t, localDir, map[string]string{
+			repo := initRepo(t, path)
+			writeFiles(t, path, map[string]string{
 				"foo": "foo",
 			})
 			addAll(t, repo)
 			_ = commit(t, repo)
-			writeFiles(t, localDir, map[string]string{
+			writeFiles(t, path, map[string]string{
 				"bar": "bar",
 			})
 			addAll(t, repo)
-			writeFiles(t, localDir, map[string]string{
+			writeFiles(t, path, map[string]string{
 				"baz": "baz",
 			})
 
@@ -333,7 +258,7 @@ func TestStore(t *testing.T) {
 			require.NoError(t, err)
 			statusBefore, err := worktree(t, repo).Status()
 			require.NoError(t, err)
-			filesBefore := readFiles(t, localDir)
+			filesBefore := readFiles(t, path)
 
 			require.NoError(t, ensureBranch(repo, baseBranch))
 
@@ -341,7 +266,7 @@ func TestStore(t *testing.T) {
 			require.NoError(t, err)
 			statusAfter, err := worktree(t, repo).Status()
 			require.NoError(t, err)
-			filesAfter := readFiles(t, localDir)
+			filesAfter := readFiles(t, path)
 
 			assert.Equal(t, headBefore, headAfter)
 			assert.Equal(t, statusBefore, statusAfter)
