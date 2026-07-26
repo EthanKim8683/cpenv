@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"sync"
 	"time"
 
 	"github.com/go-git/go-git/v6"
@@ -17,17 +18,17 @@ const (
 	authorEmail = "cpenv@local"
 )
 
-type storeOptions struct {
+type store struct {
+	mu         sync.Mutex
 	path       string
 	baseBranch string
-}
-
-type store struct {
-	options storeOptions
-	repo    *git.Repository
+	repo       *git.Repository
 }
 
 func (s *store) save() error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
 	head, err := s.repo.Head()
 	if errors.Is(err, plumbing.ErrReferenceNotFound) {
 		return fmt.Errorf("save: unborn branch: %w", err)
@@ -62,34 +63,66 @@ func (s *store) save() error {
 	return nil
 }
 
-func (s *store) load(name string) error {
+func (s *store) exists(name string) (bool, error) {
+	branch := plumbing.NewBranchReferenceName(name)
+	if err := branch.Validate(); err != nil {
+		return false, fmt.Errorf("exists: invalid branch name %q: %w", name, err)
+	}
+
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	if _, err := s.repo.Reference(branch, true); err == nil {
+		return true, nil
+	} else if errors.Is(err, plumbing.ErrReferenceNotFound) {
+		return false, nil
+	} else {
+		return false, fmt.Errorf("exists: resolve branch %q: %w", name, err)
+	}
+}
+
+func (s *store) open(name string) error {
 	branch := plumbing.NewBranchReferenceName(name)
 	if err := branch.Validate(); err != nil {
 		return fmt.Errorf("load: invalid branch name %q: %w", name, err)
 	}
+
+	s.mu.Lock()
+	defer s.mu.Unlock()
 
 	w, err := s.repo.Worktree()
 	if err != nil {
 		return fmt.Errorf("load: get worktree: %w", err)
 	}
 
-	if _, err := s.repo.Reference(branch, true); err == nil {
-		if err := w.Checkout(&git.CheckoutOptions{Branch: branch}); err != nil {
-			return fmt.Errorf("load: checkout %q: %w", name, err)
-		}
-
-		if err := w.Clean(&git.CleanOptions{Dir: true}); err != nil {
-			return fmt.Errorf("load: clean: %w", err)
-		}
-
-		return nil
-	} else if !errors.Is(err, plumbing.ErrReferenceNotFound) {
-		return fmt.Errorf("load: resolve branch %q: %w", name, err)
+	if err := w.Checkout(&git.CheckoutOptions{Branch: branch}); err != nil {
+		return fmt.Errorf("load: checkout %q: %w", name, err)
 	}
 
-	ref, err := s.repo.Reference(plumbing.NewBranchReferenceName(s.options.baseBranch), true)
+	if err := w.Clean(&git.CleanOptions{Dir: true}); err != nil {
+		return fmt.Errorf("load: clean: %w", err)
+	}
+
+	return nil
+}
+
+func (s *store) create(name string) error {
+	branch := plumbing.NewBranchReferenceName(name)
+	if err := branch.Validate(); err != nil {
+		return fmt.Errorf("create: invalid branch name %q: %w", name, err)
+	}
+
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	w, err := s.repo.Worktree()
 	if err != nil {
-		return fmt.Errorf("load: resolve branch %q: %w", s.options.baseBranch, err)
+		return fmt.Errorf("create: get worktree: %w", err)
+	}
+
+	ref, err := s.repo.Reference(plumbing.NewBranchReferenceName(s.baseBranch), true)
+	if err != nil {
+		return fmt.Errorf("load: resolve branch %q: %w", s.baseBranch, err)
 	}
 
 	if err := w.Checkout(&git.CheckoutOptions{
@@ -144,13 +177,13 @@ func ensureBranch(repo *git.Repository, name string) error {
 
 	storer := repo.Storer
 
-	treeObject := storer.NewEncodedObject()
-	treeObject.SetType(plumbing.TreeObject)
-	if err := (&object.Tree{}).Encode(treeObject); err != nil {
+	treeObj := storer.NewEncodedObject()
+	treeObj.SetType(plumbing.TreeObject)
+	if err := (&object.Tree{}).Encode(treeObj); err != nil {
 		return fmt.Errorf("ensure branch %q: encode tree: %w", name, err)
 	}
 
-	treeHash, err := storer.SetEncodedObject(treeObject)
+	treeHash, err := storer.SetEncodedObject(treeObj)
 	if err != nil {
 		return fmt.Errorf("ensure branch %q: save tree object: %w", name, err)
 	}
@@ -167,13 +200,13 @@ func ensureBranch(repo *git.Repository, name string) error {
 		TreeHash:  treeHash,
 	}
 
-	commitObject := storer.NewEncodedObject()
-	commitObject.SetType(plumbing.CommitObject)
-	if err := commit.Encode(commitObject); err != nil {
+	commitObj := storer.NewEncodedObject()
+	commitObj.SetType(plumbing.CommitObject)
+	if err := commit.Encode(commitObj); err != nil {
 		return fmt.Errorf("ensure branch %q: encode commit: %w", name, err)
 	}
 
-	commitHash, err := storer.SetEncodedObject(commitObject)
+	commitHash, err := storer.SetEncodedObject(commitObj)
 	if err != nil {
 		return fmt.Errorf("ensure branch %q: save commit object: %w", name, err)
 	}
@@ -187,18 +220,19 @@ func ensureBranch(repo *git.Repository, name string) error {
 	return nil
 }
 
-func newStore(options storeOptions) (*store, error) {
-	repo, err := ensureRepo(options.path)
+func newStore(path, baseBranch string) (*store, error) {
+	repo, err := ensureRepo(path)
 	if err != nil {
 		return nil, fmt.Errorf("new store: %w", err)
 	}
 
-	if err := ensureBranch(repo, options.baseBranch); err != nil {
+	if err := ensureBranch(repo, baseBranch); err != nil {
 		return nil, fmt.Errorf("new store: base branch: %w", err)
 	}
 
 	return &store{
-		repo:    repo,
-		options: options,
+		path:       path,
+		baseBranch: baseBranch,
+		repo:       repo,
 	}, nil
 }

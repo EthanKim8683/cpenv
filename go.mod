@@ -9,12 +9,12 @@ tool (
 
 require (
 	connectrpc.com/connect v1.20.0
+	github.com/bep/debounce v1.2.1
 	github.com/caarlos0/env/v11 v11.4.1
+	github.com/fsnotify/fsnotify v1.10.1
 	github.com/go-git/go-git/v6 v6.0.0-alpha.4
 	github.com/rs/cors v1.11.1
-	github.com/spf13/afero v1.15.0
 	github.com/stretchr/testify v1.11.1
-	go.starlark.net v0.0.0-20260708150628-5395d018f003
 	google.golang.org/protobuf v1.36.11
 )
 
@@ -36,7 +36,6 @@ require (
 	golang.org/x/net v0.54.0 // indirect
 	golang.org/x/sync v0.20.0 // indirect
 	golang.org/x/sys v0.47.0 // indirect
-	golang.org/x/text v0.37.0 // indirect
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

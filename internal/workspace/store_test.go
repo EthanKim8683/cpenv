@@ -116,10 +116,7 @@ func TestStore(t *testing.T) {
 		path := filepath.Join(t.TempDir(), "repo")
 		baseBranch := "base"
 
-		store, err := newStore(storeOptions{
-			path:       path,
-			baseBranch: baseBranch,
-		})
+		store, err := newStore(path, baseBranch)
 		require.NoError(t, err)
 
 		require.NoError(t, store.load("foo"))
@@ -167,10 +164,7 @@ func TestStore(t *testing.T) {
 		path := filepath.Join(t.TempDir(), "repo")
 		baseBranch := "base"
 
-		store, err := newStore(storeOptions{
-			path:       path,
-			baseBranch: baseBranch,
-		})
+		store, err := newStore(path, baseBranch)
 		require.NoError(t, err)
 
 		require.NoError(t, store.load("foo"))
