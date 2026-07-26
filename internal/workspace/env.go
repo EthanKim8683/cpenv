@@ -1,8 +1,10 @@
 package workspace
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
+	"os"
 	"path/filepath"
 
 	problemv1 "github.com/EthanKim8683/cpenv/gen/problem/v1"
@@ -12,6 +14,29 @@ import (
 	"go.starlark.net/syntax"
 	"google.golang.org/protobuf/encoding/protojson"
 )
+
+const problemPath = "problem.json"
+
+type Env struct {
+	fs      afero.Fs
+	problem *problemv1.Problem
+}
+
+// TODO: comments
+func clearFs(fs afero.Fs) error {
+	entries, err := afero.ReadDir(fs, ".")
+	if err != nil {
+		return err
+	}
+
+	for _, entry := range entries {
+		if err := fs.RemoveAll(entry.Name()); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
 
 func encodeProblem(thread *starlark.Thread, problem *problemv1.Problem) (starlark.Value, error) {
 	data, err := protojson.Marshal(problem)
@@ -120,15 +145,14 @@ func writeFiles(fs afero.Fs, files map[string]string) error {
 	return nil
 }
 
-func initEnv(
-	envFs afero.Fs,
-	templatesFs afero.Fs,
-	templateName string,
-	problem *problemv1.Problem,
-) error {
+func (e *Env) Init(templatesFs afero.Fs, templateName string) error {
 	thread := &starlark.Thread{}
 
-	problemValue, err := encodeProblem(thread, problem)
+	if err := clearFs(e.fs); err != nil {
+		return err
+	}
+
+	problemValue, err := encodeProblem(thread, e.problem)
 	if err != nil {
 		return fmt.Errorf("problem: %w", err)
 	}
@@ -148,9 +172,45 @@ func initEnv(
 		return fmt.Errorf("template %q: %w", templateName, err)
 	}
 
-	if err = writeFiles(envFs, files); err != nil {
+	if err = writeFiles(e.fs, files); err != nil {
 		return fmt.Errorf("template %q: %w", templateName, err)
 	}
 
 	return nil
+}
+
+func (e *Env) Exists() (bool, error) {
+	if _, err := e.fs.Stat(problemPath); err == nil {
+		return true, nil
+	} else if os.IsNotExist(err) {
+		return false, nil
+	} else {
+		return false, err
+	}
+}
+
+func (e *Env) Submit(path string) error {
+	return nil
+}
+
+func NewEnv(fs afero.Fs, problem *problemv1.Problem) *Env {
+	return &Env{fs: fs, problem: problem}
+}
+
+func LoadEnv(fs afero.Fs) (*Env, error) {
+	data, err := afero.ReadFile(fs, problemPath)
+	if err != nil {
+		return nil, err
+	}
+
+	var problem problemv1.Problem
+	if err := json.Unmarshal(data, &problem); err != nil {
+		return nil, err
+	}
+
+	env := &Env{
+		fs:      fs,
+		problem: &problem,
+	}
+	return env, nil
 }
