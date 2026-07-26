@@ -1,109 +1,110 @@
 package workspace
 
 import (
-	"context"
-	"errors"
+	"encoding/json"
 	"fmt"
-	"log/slog"
+	"os"
 	"path/filepath"
-	"slices"
-	"strings"
 	"sync"
 
-	"github.com/fsnotify/fsnotify"
+	problemv1 "github.com/EthanKim8683/cpenv/gen/problem/v1"
+	"github.com/spf13/afero"
 )
 
-type Workspace struct {
-	log     *slog.Logger
-	path    string
-	store   *store
-	mu      sync.Mutex
-	watcher *fsnotify.Watcher
+const statePath = "state.json"
+const metadataPath = "metadata.json"
+const focusDir = "focus"
+const envsDir = "envs"
+
+type state struct {
+	TemplateName string
 }
 
-func (w *Workspace) Open(name string) error {
+type metadata struct {
+	problem *problemv1.Problem
+}
+
+type Workspace struct {
+	mu              sync.Mutex
+	templatesFs     afero.Fs
+	workspaceFs     afero.Fs
+	workspaceLinker afero.Linker
+}
+
+func (w *Workspace) state() (*state, error) {
+	content, err := afero.ReadFile(w.workspaceFs, statePath)
+	if err != nil {
+		return nil, err
+	}
+
+	var state state
+	if err := json.Unmarshal(content, &state); err != nil {
+		return nil, err
+	}
+
+	return &state, nil
+}
+
+func (w *Workspace) Focus(problem *problemv1.Problem) error {
 	w.mu.Lock()
 	defer w.mu.Unlock()
 
-	if w.watcher != nil {
-		w.watcher.Close()
-		w.watcher = nil
+	path := filepath.Join(envsDir, problem.Id)
+	if _, err := w.workspaceFs.Stat(path); os.IsNotExist(err) {
+		if err := w.workspaceFs.MkdirAll(path, 0755); err != nil {
+			return fmt.Errorf("mkdir: %w", problem.Id, err)
+		}
+
+		// get state
+		state := &state{}
+
+		if err := initEnv(
+			afero.NewBasePathFs(w.workspaceFs, path),
+			w.templatesFs,
+			state.TemplateName,
+			problem,
+		); err != nil {
+			return fmt.Errorf("focus %s: %w", problem.Id, err)
+		}
+
+		// write metadata
+		metadata := &metadata{
+			problem: problem,
+		}
+	} else if err != nil {
+		return fmt.Errorf("focus %s: stat: %w", problem.Id, err)
 	}
 
-	if err := w.store.save(); err != nil {
-		return fmt.Errorf("open: save: %w", err)
+	if err := w.workspaceFs.Remove(path); err != nil {
+		return fmt.Errorf("focus %s: remove: %w", problem.Id, err)
 	}
 
-	if err := w.store.load(name); err != nil {
-		return fmt.Errorf("open: load: %w", err)
+	if err := w.workspaceLinker.SymlinkIfPossible(path, path); err != nil {
+		return fmt.Errorf("focus %s: symlink: %w", problem.Id, err)
 	}
 
 	return nil
 }
 
-func (w *Workspace) Watch(ctx context.Context) error {
-	watcher, err := fsnotify.NewWatcher()
-	if err != nil {
-		return fmt.Errorf("watch: new watcher: %w", err)
-	}
-	defer watcher.Close()
+func (w *Workspace) Init(templatePath string) error {
+	w.mu.Lock()
+	defer w.mu.Unlock()
 
-	if err := watcher.Add(w.path); err != nil {
-		return fmt.Errorf("watch: add workspace path: %w", err)
+	if _, err := w.workspaceFs.Stat(focusDir); err != nil {
+		return fmt.Errorf("init: stat %q: %w", focusDir, err)
 	}
 
-	for {
-		select {
-		case <-ctx.Done():
-			return nil
-		case event, ok := <-watcher.Events:
-			if !ok {
-				return errors.New("watch: watcher closed unexpectedly")
-			}
+	// read metadata
+	metadata := &metadata{}
 
-			relPath, err := filepath.Rel(w.path, event.Name)
-			if err != nil {
-				w.log.Debug("error handling event", "path", event.Name, "error", err)
-				continue
-			}
-
-			relPath = filepath.ToSlash(relPath)
-			if slices.Contains(strings.Split(relPath, "/"), ".git") {
-				continue
-			}
-
-			if event.Op == fsnotify.Chmod {
-				continue
-			}
-
-			save()
-		case err, ok := <-watcher.Errors:
-			if !ok {
-				return errors.New("watch: watcher closed unexpectedly")
-			}
-
-			if errors.Is(err, fsnotify.ErrEventOverflow) {
-				w.log.Warn("event overflow; saving")
-				save()
-				continue
-			}
-
-			w.log.Error("error watching workspace", "error", err)
-		}
-	}
-}
-
-func NewWorkspace(log *slog.Logger, path, baseBranch string) (*Workspace, error) {
-	log = log.With("component", "workspace", "path", path)
-
-	store, err := newStore(path, baseBranch)
-	if err != nil {
-		return nil, fmt.Errorf("new workspace: new store: %w", err)
+	if err := initEnv(
+		afero.NewBasePathFs(w.workspaceFs, focusDir),
+		w.templatesFs,
+		templatePath,
+		metadata.problem,
+	); err != nil {
+		return fmt.Errorf("init: %w", err)
 	}
 
-	return &Workspace{
-		log:   log,
-		path:  path,
-		store: store,
-	}, nil
+	return nil
 }

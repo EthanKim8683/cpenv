@@ -3,9 +3,8 @@ package config
 import "github.com/caarlos0/env/v11"
 
 type Config struct {
-	ArchiveDir   string `env:"ARCHIVE_DIR"`
-	ScaffoldsDir string `env:"SCAFFOLDS_DIR"`
-	WorkspaceDir string `env:"WORKSPACE_DIR"`
+	TemplatesPath string `env:"TEMPLATES_PATH"`
+	WorkspacePath string `env:"WORKSPACE_PATH"`
 }
 
 func Load() (*Config, error) {
