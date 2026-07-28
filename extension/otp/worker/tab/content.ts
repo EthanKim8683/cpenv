@@ -1,17 +1,8 @@
 import { WorkerMessageSchema } from "./shared";
-import type { Worker } from "../types";
 
-export abstract class TabWorker {
-  abstract requestHandler(
-    req: unknown,
-  ): Promise<(() => Promise<unknown>) | null>;
-
-  kill(): void {
-    window.close();
-  }
+export interface TabWorker {
+  requestHandler(req: unknown): Promise<(() => Promise<unknown>) | null>;
 }
-
-({}) as TabWorker satisfies Worker;
 
 export function exposeTabWorker(worker: TabWorker) {
   browser.runtime.onMessage.addListener((message) => {
