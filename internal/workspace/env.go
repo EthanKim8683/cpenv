@@ -22,7 +22,6 @@ type Env struct {
 	problem *problemv1.Problem
 }
 
-// TODO: comments
 func clearFs(fs afero.Fs) error {
 	entries, err := afero.ReadDir(fs, ".")
 	if err != nil {
