@@ -1,5 +1,4 @@
-import type { Worker } from "../worker/types";
-import type { Spec } from "../spec";
+import type { Spec, Worker } from "../worker";
 import assert from "assert";
 import { BusMessageSchema } from "./shared";
 
@@ -8,7 +7,7 @@ export type HandleOptions = {
   handleTimeoutMs?: number;
 };
 
-export class Bus {
+class Bus {
   private readonly specs: Spec[] = [];
   private readonly workers: Map<Worker, NodeJS.Timeout> = new Map();
 
@@ -72,13 +71,13 @@ export class Bus {
   }
 }
 
-export function exposeBus(bus: Bus) {
-  browser.runtime.onMessage.addListener(
-    (message): Promise<unknown> | undefined => {
-      const { success, data } = BusMessageSchema.safeParse(message);
-      if (!success) return;
+export const bus = new Bus();
 
-      return bus.handle(data.req, data.opts);
-    },
-  );
-}
+browser.runtime.onMessage.addListener(
+  (message): Promise<unknown> | undefined => {
+    const { success, data } = BusMessageSchema.safeParse(message);
+    if (!success) return;
+
+    return bus.handle(data.req, data.opts);
+  },
+);

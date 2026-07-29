@@ -1,7 +1,7 @@
 import type { HandleOptions } from "./background";
 import { BUS_NAMESPACE, type BusMessage } from "./shared";
 
-export class BusProxy {
+class BusProxy {
   handle(req: unknown, opts?: HandleOptions): Promise<unknown> {
     return browser.runtime.sendMessage({
       ns: BUS_NAMESPACE,
@@ -10,3 +10,5 @@ export class BusProxy {
     } satisfies BusMessage);
   }
 }
+
+export const bus = new BusProxy();

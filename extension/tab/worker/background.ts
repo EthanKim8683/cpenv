@@ -1,5 +1,5 @@
 import { WORKER_NAMESPACE, type WorkerMessage } from "./shared";
-import type { Worker } from "../types";
+import type { Worker } from "@/supervision/worker";
 
 export class TabWorkerProxy {
   constructor(private readonly tabId: number) {}
