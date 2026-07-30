@@ -11,6 +11,7 @@ import (
 	"github.com/EthanKim8683/cpenv/internal/template"
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
+	"google.golang.org/protobuf/encoding/protojson"
 )
 
 // alias focus="cd \"$(cpx focus)\""
@@ -65,6 +66,17 @@ var focusCmd = &cobra.Command{
 			}
 
 			fs := afero.NewBasePathFs(afero.NewOsFs(), path)
+
+			data, err := protojson.Marshal(problem)
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "cpenv: %v\n", err)
+				os.Exit(1)
+			}
+
+			if err := afero.WriteFile(fs, "problem.json", data, 0644); err != nil {
+				fmt.Fprintf(os.Stderr, "cpenv: %v\n", err)
+				os.Exit(1)
+			}
 
 			if err := template.Render(templatesFs, templateName, fs, problem); err != nil {
 				fmt.Fprintf(os.Stderr, "cpenv: %v\n", err)

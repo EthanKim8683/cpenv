@@ -101,7 +101,7 @@ async function submit(sourceFile: File) {
   formData.set("programTypeId", getProgramTypeId(sourceFile));
   formData.set("sourceFile", sourceFile);
 
-  const response = await fetch(formElement.action, {
+  const response = await fetch(window.location.href, {
     method: "POST",
     body: formData,
     credentials: "include",
