@@ -1,31 +1,42 @@
 package main
 
-// import (
-// 	"net/http"
-// 	"os"
+import (
+	"log"
+	"net/http"
+	"os"
 
-// 	"github.com/EthanKim8683/cpenv/gen/focus/v1/focusv1connect"
-// 	"github.com/EthanKim8683/cpenv/gen/submit/v1/submitv1connect"
-// 	"github.com/EthanKim8683/cpenv/internal/server"
-// 	"github.com/rs/cors"
-// )
+	"github.com/EthanKim8683/cpenv/gen/focus/v1/focusv1connect"
+	"github.com/EthanKim8683/cpenv/internal/config"
+	"github.com/EthanKim8683/cpenv/internal/server"
+	"github.com/EthanKim8683/cpenv/internal/state"
+	"github.com/rs/cors"
+)
 
-// func main() {
-// 	focusSvc := &server.FocusService{}
-// 	submitSvc := &server.SubmitService{}
+func main() {
+	cfg, err := config.Load()
+	if err != nil {
+		log.Fatalf("cpenv: config: %v", err)
+	}
 
-// 	mux := http.NewServeMux()
-// 	mux.Handle(focusv1connect.NewFocusServiceHandler(focusSvc))
-// 	mux.Handle(submitv1connect.NewSubmitServiceHandler(submitSvc))
+	stateStore := state.NewStore(cfg.StatePath)
 
-// 	handler := cors.New(cors.Options{
-// 		AllowedOrigins: []string{"*"},
-// 		AllowedHeaders: []string{"*"},
-// 	}).Handler(mux)
+	focusSvc := &server.FocusService{
+		StateStore: stateStore,
+	}
+	// submitSvc := &server.SubmitService{}
 
-// 	server := &http.Server{
-// 		Addr:    ":" + os.Getenv("PORT"),
-// 		Handler: handler,
-// 	}
-// 	server.ListenAndServe()
-// }
+	mux := http.NewServeMux()
+	mux.Handle(focusv1connect.NewFocusServiceHandler(focusSvc))
+	// mux.Handle(submitv1connect.NewSubmitServiceHandler(submitSvc))
+
+	handler := cors.New(cors.Options{
+		AllowedOrigins: []string{"*"},
+		AllowedHeaders: []string{"*"},
+	}).Handler(mux)
+
+	server := &http.Server{
+		Addr:    ":" + os.Getenv("PORT"),
+		Handler: handler,
+	}
+	server.ListenAndServe()
+}

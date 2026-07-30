@@ -24,7 +24,7 @@ const (
 
 type FocusRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Problem       *v1.Problem            `protobuf:"bytes,2,opt,name=problem,proto3" json:"problem,omitempty"`
+	Problem       *v1.Problem            `protobuf:"bytes,1,opt,name=problem,proto3" json:"problem,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -108,7 +108,7 @@ const file_focus_v1_focus_service_proto_rawDesc = "" +
 	"\n" +
 	"\x1cfocus/v1/focus_service.proto\x12\bfocus.v1\x1a\x18problem/v1/problem.proto\"=\n" +
 	"\fFocusRequest\x12-\n" +
-	"\aproblem\x18\x02 \x01(\v2\x13.problem.v1.ProblemR\aproblem\"\x0f\n" +
+	"\aproblem\x18\x01 \x01(\v2\x13.problem.v1.ProblemR\aproblem\"\x0f\n" +
 	"\rFocusResponse2H\n" +
 	"\fFocusService\x128\n" +
 	"\x05Focus\x12\x16.focus.v1.FocusRequest\x1a\x17.focus.v1.FocusResponseB\x96\x01\n" +

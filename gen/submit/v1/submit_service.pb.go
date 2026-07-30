@@ -23,6 +23,8 @@ const (
 
 type SubmitRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
+	ProblemId     string                 `protobuf:"bytes,1,opt,name=problem_id,json=problemId,proto3" json:"problem_id,omitempty"`
+	Path          string                 `protobuf:"bytes,2,opt,name=path,proto3" json:"path,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -55,6 +57,20 @@ func (x *SubmitRequest) ProtoReflect() protoreflect.Message {
 // Deprecated: Use SubmitRequest.ProtoReflect.Descriptor instead.
 func (*SubmitRequest) Descriptor() ([]byte, []int) {
 	return file_submit_v1_submit_service_proto_rawDescGZIP(), []int{0}
+}
+
+func (x *SubmitRequest) GetProblemId() string {
+	if x != nil {
+		return x.ProblemId
+	}
+	return ""
+}
+
+func (x *SubmitRequest) GetPath() string {
+	if x != nil {
+		return x.Path
+	}
+	return ""
 }
 
 type SubmitResponse struct {
@@ -95,6 +111,7 @@ func (*SubmitResponse) Descriptor() ([]byte, []int) {
 
 type SubscribeRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
+	ProblemId     string                 `protobuf:"bytes,1,opt,name=problem_id,json=problemId,proto3" json:"problem_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -129,8 +146,17 @@ func (*SubscribeRequest) Descriptor() ([]byte, []int) {
 	return file_submit_v1_submit_service_proto_rawDescGZIP(), []int{2}
 }
 
+func (x *SubscribeRequest) GetProblemId() string {
+	if x != nil {
+		return x.ProblemId
+	}
+	return ""
+}
+
 type SubscribeResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
+	FileName      string                 `protobuf:"bytes,2,opt,name=file_name,json=fileName,proto3" json:"file_name,omitempty"`
+	Content       []byte                 `protobuf:"bytes,3,opt,name=content,proto3" json:"content,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -165,15 +191,36 @@ func (*SubscribeResponse) Descriptor() ([]byte, []int) {
 	return file_submit_v1_submit_service_proto_rawDescGZIP(), []int{3}
 }
 
+func (x *SubscribeResponse) GetFileName() string {
+	if x != nil {
+		return x.FileName
+	}
+	return ""
+}
+
+func (x *SubscribeResponse) GetContent() []byte {
+	if x != nil {
+		return x.Content
+	}
+	return nil
+}
+
 var File_submit_v1_submit_service_proto protoreflect.FileDescriptor
 
 const file_submit_v1_submit_service_proto_rawDesc = "" +
 	"\n" +
-	"\x1esubmit/v1/submit_service.proto\x12\tsubmit.v1\"\x0f\n" +
-	"\rSubmitRequest\"\x10\n" +
-	"\x0eSubmitResponse\"\x12\n" +
-	"\x10SubscribeRequest\"\x13\n" +
-	"\x11SubscribeResponse2\x98\x01\n" +
+	"\x1esubmit/v1/submit_service.proto\x12\tsubmit.v1\"B\n" +
+	"\rSubmitRequest\x12\x1d\n" +
+	"\n" +
+	"problem_id\x18\x01 \x01(\tR\tproblemId\x12\x12\n" +
+	"\x04path\x18\x02 \x01(\tR\x04path\"\x10\n" +
+	"\x0eSubmitResponse\"1\n" +
+	"\x10SubscribeRequest\x12\x1d\n" +
+	"\n" +
+	"problem_id\x18\x01 \x01(\tR\tproblemId\"J\n" +
+	"\x11SubscribeResponse\x12\x1b\n" +
+	"\tfile_name\x18\x02 \x01(\tR\bfileName\x12\x18\n" +
+	"\acontent\x18\x03 \x01(\fR\acontent2\x98\x01\n" +
 	"\rSubmitService\x12=\n" +
 	"\x06Submit\x12\x18.submit.v1.SubmitRequest\x1a\x19.submit.v1.SubmitResponse\x12H\n" +
 	"\tSubscribe\x12\x1b.submit.v1.SubscribeRequest\x1a\x1c.submit.v1.SubscribeResponse0\x01B\x9e\x01\n" +

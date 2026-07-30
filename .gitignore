@@ -1,3 +1,5 @@
 .env
+
 /templates/
-/workspace/
+/envs/
+/state.json

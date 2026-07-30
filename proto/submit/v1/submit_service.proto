@@ -7,10 +7,18 @@ service SubmitService {
   rpc Subscribe(SubscribeRequest) returns (stream SubscribeResponse);
 }
 
-message SubmitRequest {}
+message SubmitRequest {
+  string problem_id = 1;
+  string path = 2;
+}
 
 message SubmitResponse {}
 
-message SubscribeRequest {}
+message SubscribeRequest {
+  string problem_id = 1;
+}
 
-message SubscribeResponse {}
+message SubscribeResponse {
+  string file_name = 2;
+  bytes content = 3;
+}
