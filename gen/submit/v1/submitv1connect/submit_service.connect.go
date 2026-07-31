@@ -37,12 +37,15 @@ const (
 	SubmitServiceSubmitProcedure = "/submit.v1.SubmitService/Submit"
 	// SubmitServiceSubscribeProcedure is the fully-qualified name of the SubmitService's Subscribe RPC.
 	SubmitServiceSubscribeProcedure = "/submit.v1.SubmitService/Subscribe"
+	// SubmitServiceCallbackProcedure is the fully-qualified name of the SubmitService's Callback RPC.
+	SubmitServiceCallbackProcedure = "/submit.v1.SubmitService/Callback"
 )
 
 // SubmitServiceClient is a client for the submit.v1.SubmitService service.
 type SubmitServiceClient interface {
 	Submit(context.Context, *v1.SubmitRequest) (*v1.SubmitResponse, error)
 	Subscribe(context.Context, *v1.SubscribeRequest) (*connect.ServerStreamForClient[v1.SubscribeResponse], error)
+	Callback(context.Context, *v1.CallbackRequest) (*v1.CallbackResponse, error)
 }
 
 // NewSubmitServiceClient constructs a client for the submit.v1.SubmitService service. By default,
@@ -68,6 +71,12 @@ func NewSubmitServiceClient(httpClient connect.HTTPClient, baseURL string, opts 
 			connect.WithSchema(submitServiceMethods.ByName("Subscribe")),
 			connect.WithClientOptions(opts...),
 		),
+		callback: connect.NewClient[v1.CallbackRequest, v1.CallbackResponse](
+			httpClient,
+			baseURL+SubmitServiceCallbackProcedure,
+			connect.WithSchema(submitServiceMethods.ByName("Callback")),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
@@ -75,6 +84,7 @@ func NewSubmitServiceClient(httpClient connect.HTTPClient, baseURL string, opts 
 type submitServiceClient struct {
 	submit    *connect.Client[v1.SubmitRequest, v1.SubmitResponse]
 	subscribe *connect.Client[v1.SubscribeRequest, v1.SubscribeResponse]
+	callback  *connect.Client[v1.CallbackRequest, v1.CallbackResponse]
 }
 
 // Submit calls submit.v1.SubmitService.Submit.
@@ -91,10 +101,20 @@ func (c *submitServiceClient) Subscribe(ctx context.Context, req *v1.SubscribeRe
 	return c.subscribe.CallServerStream(ctx, connect.NewRequest(req))
 }
 
+// Callback calls submit.v1.SubmitService.Callback.
+func (c *submitServiceClient) Callback(ctx context.Context, req *v1.CallbackRequest) (*v1.CallbackResponse, error) {
+	response, err := c.callback.CallUnary(ctx, connect.NewRequest(req))
+	if response != nil {
+		return response.Msg, err
+	}
+	return nil, err
+}
+
 // SubmitServiceHandler is an implementation of the submit.v1.SubmitService service.
 type SubmitServiceHandler interface {
 	Submit(context.Context, *v1.SubmitRequest) (*v1.SubmitResponse, error)
 	Subscribe(context.Context, *v1.SubscribeRequest, *connect.ServerStream[v1.SubscribeResponse]) error
+	Callback(context.Context, *v1.CallbackRequest) (*v1.CallbackResponse, error)
 }
 
 // NewSubmitServiceHandler builds an HTTP handler from the service implementation. It returns the
@@ -116,12 +136,20 @@ func NewSubmitServiceHandler(svc SubmitServiceHandler, opts ...connect.HandlerOp
 		connect.WithSchema(submitServiceMethods.ByName("Subscribe")),
 		connect.WithHandlerOptions(opts...),
 	)
+	submitServiceCallbackHandler := connect.NewUnaryHandlerSimple(
+		SubmitServiceCallbackProcedure,
+		svc.Callback,
+		connect.WithSchema(submitServiceMethods.ByName("Callback")),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/submit.v1.SubmitService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case SubmitServiceSubmitProcedure:
 			submitServiceSubmitHandler.ServeHTTP(w, r)
 		case SubmitServiceSubscribeProcedure:
 			submitServiceSubscribeHandler.ServeHTTP(w, r)
+		case SubmitServiceCallbackProcedure:
+			submitServiceCallbackHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -137,4 +165,8 @@ func (UnimplementedSubmitServiceHandler) Submit(context.Context, *v1.SubmitReque
 
 func (UnimplementedSubmitServiceHandler) Subscribe(context.Context, *v1.SubscribeRequest, *connect.ServerStream[v1.SubscribeResponse]) error {
 	return connect.NewError(connect.CodeUnimplemented, errors.New("submit.v1.SubmitService.Subscribe is not implemented"))
+}
+
+func (UnimplementedSubmitServiceHandler) Callback(context.Context, *v1.CallbackRequest) (*v1.CallbackResponse, error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("submit.v1.SubmitService.Callback is not implemented"))
 }

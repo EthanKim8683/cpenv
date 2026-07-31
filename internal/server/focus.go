@@ -18,19 +18,19 @@ type FocusService struct {
 	StateStore StateStore
 }
 
-func (s *FocusService) Focus(ctx context.Context, req *focusv1.FocusRequest) (*focusv1.FocusResponse, error) {
+func (s *FocusService) SetFocus(ctx context.Context, req *focusv1.SetFocusRequest) (*focusv1.SetFocusResponse, error) {
 	state, err := s.StateStore.Load()
 	if err != nil {
-		return nil, fmt.Errorf("focus: %w", err)
+		return nil, fmt.Errorf("set focus: %w", err)
 	}
 
-	state.FocusedProblem = req.Problem
+	state.Focus = req.Focus
 
 	if err := s.StateStore.Save(state); err != nil {
-		return nil, fmt.Errorf("focus: %w", err)
+		return nil, fmt.Errorf("set focus: %w", err)
 	}
 
-	return &focusv1.FocusResponse{}, nil
+	return &focusv1.SetFocusResponse{}, nil
 }
 
 var _ focusv1connect.FocusServiceHandler = (*FocusService)(nil)

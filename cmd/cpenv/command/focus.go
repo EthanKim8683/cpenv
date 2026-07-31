@@ -33,7 +33,7 @@ var focusCmd = &cobra.Command{
 			os.Exit(1)
 		}
 
-		problem := state.FocusedProblem
+		problem := state.Focus.Problem
 		if problem == nil {
 			fmt.Fprintf(os.Stderr, "cpenv: no focused problem\n")
 			os.Exit(1)

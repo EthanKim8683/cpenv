@@ -4,44 +4,44 @@
 
 import type { GenFile, GenMessage, GenService } from "@bufbuild/protobuf/codegenv2";
 import { fileDesc, messageDesc, serviceDesc } from "@bufbuild/protobuf/codegenv2";
-import type { Problem } from "../../problem/v1/problem_pb";
-import { file_problem_v1_problem } from "../../problem/v1/problem_pb";
+import type { Focus } from "./focus_pb";
+import { file_focus_v1_focus } from "./focus_pb";
 import type { Message } from "@bufbuild/protobuf";
 
 /**
  * Describes the file focus/v1/focus_service.proto.
  */
 export const file_focus_v1_focus_service: GenFile = /*@__PURE__*/
-  fileDesc("Chxmb2N1cy92MS9mb2N1c19zZXJ2aWNlLnByb3RvEghmb2N1cy52MSI0CgxGb2N1c1JlcXVlc3QSJAoHcHJvYmxlbRgBIAEoCzITLnByb2JsZW0udjEuUHJvYmxlbSIPCg1Gb2N1c1Jlc3BvbnNlMkgKDEZvY3VzU2VydmljZRI4CgVGb2N1cxIWLmZvY3VzLnYxLkZvY3VzUmVxdWVzdBoXLmZvY3VzLnYxLkZvY3VzUmVzcG9uc2VClgEKDGNvbS5mb2N1cy52MUIRRm9jdXNTZXJ2aWNlUHJvdG9QAVoyZ2l0aHViLmNvbS9FdGhhbktpbTg2ODMvY3BlbnYvZ2VuL2ZvY3VzL3YxO2ZvY3VzdjGiAgNGWFiqAghGb2N1cy5WMcoCCEZvY3VzXFYx4gIURm9jdXNcVjFcR1BCTWV0YWRhdGHqAglGb2N1czo6VjFiBnByb3RvMw", [file_problem_v1_problem]);
+  fileDesc("Chxmb2N1cy92MS9mb2N1c19zZXJ2aWNlLnByb3RvEghmb2N1cy52MSIxCg9TZXRGb2N1c1JlcXVlc3QSHgoFZm9jdXMYASABKAsyDy5mb2N1cy52MS5Gb2N1cyISChBTZXRGb2N1c1Jlc3BvbnNlMlEKDEZvY3VzU2VydmljZRJBCghTZXRGb2N1cxIZLmZvY3VzLnYxLlNldEZvY3VzUmVxdWVzdBoaLmZvY3VzLnYxLlNldEZvY3VzUmVzcG9uc2VClgEKDGNvbS5mb2N1cy52MUIRRm9jdXNTZXJ2aWNlUHJvdG9QAVoyZ2l0aHViLmNvbS9FdGhhbktpbTg2ODMvY3BlbnYvZ2VuL2ZvY3VzL3YxO2ZvY3VzdjGiAgNGWFiqAghGb2N1cy5WMcoCCEZvY3VzXFYx4gIURm9jdXNcVjFcR1BCTWV0YWRhdGHqAglGb2N1czo6VjFiBnByb3RvMw", [file_focus_v1_focus]);
 
 /**
- * @generated from message focus.v1.FocusRequest
+ * @generated from message focus.v1.SetFocusRequest
  */
-export type FocusRequest = Message<"focus.v1.FocusRequest"> & {
+export type SetFocusRequest = Message<"focus.v1.SetFocusRequest"> & {
   /**
-   * @generated from field: problem.v1.Problem problem = 1;
+   * @generated from field: focus.v1.Focus focus = 1;
    */
-  problem?: Problem | undefined;
+  focus?: Focus | undefined;
 };
 
 /**
- * Describes the message focus.v1.FocusRequest.
- * Use `create(FocusRequestSchema)` to create a new message.
+ * Describes the message focus.v1.SetFocusRequest.
+ * Use `create(SetFocusRequestSchema)` to create a new message.
  */
-export const FocusRequestSchema: GenMessage<FocusRequest> = /*@__PURE__*/
+export const SetFocusRequestSchema: GenMessage<SetFocusRequest> = /*@__PURE__*/
   messageDesc(file_focus_v1_focus_service, 0);
 
 /**
- * @generated from message focus.v1.FocusResponse
+ * @generated from message focus.v1.SetFocusResponse
  */
-export type FocusResponse = Message<"focus.v1.FocusResponse"> & {
+export type SetFocusResponse = Message<"focus.v1.SetFocusResponse"> & {
 };
 
 /**
- * Describes the message focus.v1.FocusResponse.
- * Use `create(FocusResponseSchema)` to create a new message.
+ * Describes the message focus.v1.SetFocusResponse.
+ * Use `create(SetFocusResponseSchema)` to create a new message.
  */
-export const FocusResponseSchema: GenMessage<FocusResponse> = /*@__PURE__*/
+export const SetFocusResponseSchema: GenMessage<SetFocusResponse> = /*@__PURE__*/
   messageDesc(file_focus_v1_focus_service, 1);
 
 /**
@@ -49,12 +49,12 @@ export const FocusResponseSchema: GenMessage<FocusResponse> = /*@__PURE__*/
  */
 export const FocusService: GenService<{
   /**
-   * @generated from rpc focus.v1.FocusService.Focus
+   * @generated from rpc focus.v1.FocusService.SetFocus
    */
-  focus: {
+  setFocus: {
     methodKind: "unary";
-    input: typeof FocusRequestSchema;
-    output: typeof FocusResponseSchema;
+    input: typeof SetFocusRequestSchema;
+    output: typeof SetFocusResponseSchema;
   },
 }> = /*@__PURE__*/
   serviceDesc(file_focus_v1_focus_service, 0);

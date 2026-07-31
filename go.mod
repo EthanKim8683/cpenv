@@ -10,6 +10,7 @@ tool (
 require (
 	connectrpc.com/connect v1.20.0
 	github.com/caarlos0/env/v11 v11.4.1
+	github.com/google/uuid v1.6.0
 	github.com/rs/cors v1.11.1
 	github.com/spf13/afero v1.15.0
 	github.com/spf13/cobra v1.10.2

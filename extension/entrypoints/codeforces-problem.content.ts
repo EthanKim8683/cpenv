@@ -1,8 +1,12 @@
-import { FocusRequestSchema } from "@/gen/focus/v1/focus_service_pb";
+import { Focus, FocusSchema } from "@/gen/focus/v1/focus_pb";
+import { SetFocusRequestSchema } from "@/gen/focus/v1/focus_service_pb";
 import { ProblemType } from "@/gen/problem/v1/problem_pb";
-import { SubscribeRequestSchema } from "@/gen/submit/v1/submit_service_pb";
+import {
+  SubscribeRequestSchema,
+  CallbackRequestSchema,
+} from "@/gen/submit/v1/submit_service_pb";
 import { focusClient, submitClient } from "@/lib/server";
-import { create } from "@bufbuild/protobuf";
+import { create, MessageInitShape } from "@bufbuild/protobuf";
 
 function scrapeSectionTitles() {
   return Array.from(
@@ -95,6 +99,8 @@ function getProgramTypeId(sourceFile: File) {
 }
 
 async function submit(sourceFile: File) {
+  throw new Error("Not implemented");
+
   const formElement = document.querySelector(".submitForm") as HTMLFormElement;
   const formData = new FormData(formElement);
 
@@ -125,21 +131,32 @@ export default defineContentScript({
       /codeforces\.com\/contest\/(\d+)\/problem\/(\w+)/.exec(url) ??
       /codeforces\.com\/problemset\/problem\/(\d+)\/(\w+)/.exec(url);
     const [, contestId, problemIndex] = match!;
-
     const id = `codeforces-${contestId}-${problemIndex}`.toLowerCase();
-    const type = scrapeProblemType();
-    const samples = scrapeSamples();
 
-    const handleVisibilityChange = () => {
+    let focus: MessageInitShape<typeof FocusSchema> = {};
+    try {
+      const type = scrapeProblemType();
+      const samples = scrapeSamples();
+
+      focus = {
+        problem: {
+          id,
+          type,
+          samples,
+        },
+      };
+    } catch (caughtError: unknown) {
+      focus = {
+        error: String(caughtError),
+      };
+    }
+
+    const handleVisibilityChange = async () => {
       if (document.visibilityState !== "visible") return;
 
-      focusClient.focus(
-        create(FocusRequestSchema, {
-          problem: {
-            id,
-            type,
-            samples,
-          },
+      await focusClient.setFocus(
+        create(SetFocusRequestSchema, {
+          focus,
         }),
       );
     };
@@ -147,16 +164,29 @@ export default defineContentScript({
     handleVisibilityChange();
     document.addEventListener("visibilitychange", handleVisibilityChange);
 
-    for await (const response of submitClient.subscribe(
+    for await (const {
+      callbackId,
+      content,
+      fileName,
+    } of submitClient.subscribe(
       create(SubscribeRequestSchema, {
         problemId: id,
       }),
     )) {
-      const sourceFile = new File(
-        [new Uint8Array(response.content)],
-        response.fileName,
+      let error: string | undefined;
+      try {
+        const sourceFile = new File([new Uint8Array(content)], fileName);
+        await submit(sourceFile);
+      } catch (caughtError: unknown) {
+        error = String(caughtError);
+      }
+
+      await submitClient.callback(
+        create(CallbackRequestSchema, {
+          callbackId,
+          error,
+        }),
       );
-      submit(sourceFile);
     }
   },
 });

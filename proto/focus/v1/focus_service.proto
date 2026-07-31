@@ -2,10 +2,12 @@ syntax = "proto3";
 
 package focus.v1;
 
-import "problem/v1/problem.proto";
+import "focus/v1/focus.proto";
 
-service FocusService { rpc Focus(FocusRequest) returns (FocusResponse); }
+service FocusService {
+  rpc SetFocus(SetFocusRequest) returns (SetFocusResponse);
+}
 
-message FocusRequest { problem.v1.Problem problem = 1; }
+message SetFocusRequest { focus.v1.Focus focus = 1; }
 
-message FocusResponse {}
+message SetFocusResponse {}

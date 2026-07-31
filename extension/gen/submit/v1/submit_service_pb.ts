@@ -10,7 +10,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file submit/v1/submit_service.proto.
  */
 export const file_submit_v1_submit_service: GenFile = /*@__PURE__*/
-  fileDesc("Ch5zdWJtaXQvdjEvc3VibWl0X3NlcnZpY2UucHJvdG8SCXN1Ym1pdC52MSIxCg1TdWJtaXRSZXF1ZXN0EhIKCnByb2JsZW1faWQYASABKAkSDAoEcGF0aBgCIAEoCSIQCg5TdWJtaXRSZXNwb25zZSImChBTdWJzY3JpYmVSZXF1ZXN0EhIKCnByb2JsZW1faWQYASABKAkiNwoRU3Vic2NyaWJlUmVzcG9uc2USEQoJZmlsZV9uYW1lGAIgASgJEg8KB2NvbnRlbnQYAyABKAwymAEKDVN1Ym1pdFNlcnZpY2USPQoGU3VibWl0Ehguc3VibWl0LnYxLlN1Ym1pdFJlcXVlc3QaGS5zdWJtaXQudjEuU3VibWl0UmVzcG9uc2USSAoJU3Vic2NyaWJlEhsuc3VibWl0LnYxLlN1YnNjcmliZVJlcXVlc3QaHC5zdWJtaXQudjEuU3Vic2NyaWJlUmVzcG9uc2UwAUKeAQoNY29tLnN1Ym1pdC52MUISU3VibWl0U2VydmljZVByb3RvUAFaNGdpdGh1Yi5jb20vRXRoYW5LaW04NjgzL2NwZW52L2dlbi9zdWJtaXQvdjE7c3VibWl0djGiAgNTWFiqAglTdWJtaXQuVjHKAglTdWJtaXRcVjHiAhVTdWJtaXRcVjFcR1BCTWV0YWRhdGHqAgpTdWJtaXQ6OlYxYgZwcm90bzM");
+  fileDesc("Ch5zdWJtaXQvdjEvc3VibWl0X3NlcnZpY2UucHJvdG8SCXN1Ym1pdC52MSIxCg1TdWJtaXRSZXF1ZXN0EhIKCnByb2JsZW1faWQYASABKAkSDAoEcGF0aBgCIAEoCSIQCg5TdWJtaXRSZXNwb25zZSImChBTdWJzY3JpYmVSZXF1ZXN0EhIKCnByb2JsZW1faWQYASABKAkiTAoRU3Vic2NyaWJlUmVzcG9uc2USEwoLY2FsbGJhY2tfaWQYASABKAkSEQoJZmlsZV9uYW1lGAIgASgJEg8KB2NvbnRlbnQYAyABKAwiNQoPQ2FsbGJhY2tSZXF1ZXN0EhMKC2NhbGxiYWNrX2lkGAEgASgJEg0KBWVycm9yGAIgASgJIhIKEENhbGxiYWNrUmVzcG9uc2Uy3QEKDVN1Ym1pdFNlcnZpY2USPQoGU3VibWl0Ehguc3VibWl0LnYxLlN1Ym1pdFJlcXVlc3QaGS5zdWJtaXQudjEuU3VibWl0UmVzcG9uc2USSAoJU3Vic2NyaWJlEhsuc3VibWl0LnYxLlN1YnNjcmliZVJlcXVlc3QaHC5zdWJtaXQudjEuU3Vic2NyaWJlUmVzcG9uc2UwARJDCghDYWxsYmFjaxIaLnN1Ym1pdC52MS5DYWxsYmFja1JlcXVlc3QaGy5zdWJtaXQudjEuQ2FsbGJhY2tSZXNwb25zZUKeAQoNY29tLnN1Ym1pdC52MUISU3VibWl0U2VydmljZVByb3RvUAFaNGdpdGh1Yi5jb20vRXRoYW5LaW04NjgzL2NwZW52L2dlbi9zdWJtaXQvdjE7c3VibWl0djGiAgNTWFiqAglTdWJtaXQuVjHKAglTdWJtaXRcVjHiAhVTdWJtaXRcVjFcR1BCTWV0YWRhdGHqAgpTdWJtaXQ6OlYxYgZwcm90bzM");
 
 /**
  * @generated from message submit.v1.SubmitRequest
@@ -69,6 +69,11 @@ export const SubscribeRequestSchema: GenMessage<SubscribeRequest> = /*@__PURE__*
  */
 export type SubscribeResponse = Message<"submit.v1.SubscribeResponse"> & {
   /**
+   * @generated from field: string callback_id = 1;
+   */
+  callbackId: string;
+
+  /**
    * @generated from field: string file_name = 2;
    */
   fileName: string;
@@ -85,6 +90,41 @@ export type SubscribeResponse = Message<"submit.v1.SubscribeResponse"> & {
  */
 export const SubscribeResponseSchema: GenMessage<SubscribeResponse> = /*@__PURE__*/
   messageDesc(file_submit_v1_submit_service, 3);
+
+/**
+ * @generated from message submit.v1.CallbackRequest
+ */
+export type CallbackRequest = Message<"submit.v1.CallbackRequest"> & {
+  /**
+   * @generated from field: string callback_id = 1;
+   */
+  callbackId: string;
+
+  /**
+   * @generated from field: string error = 2;
+   */
+  error: string;
+};
+
+/**
+ * Describes the message submit.v1.CallbackRequest.
+ * Use `create(CallbackRequestSchema)` to create a new message.
+ */
+export const CallbackRequestSchema: GenMessage<CallbackRequest> = /*@__PURE__*/
+  messageDesc(file_submit_v1_submit_service, 4);
+
+/**
+ * @generated from message submit.v1.CallbackResponse
+ */
+export type CallbackResponse = Message<"submit.v1.CallbackResponse"> & {
+};
+
+/**
+ * Describes the message submit.v1.CallbackResponse.
+ * Use `create(CallbackResponseSchema)` to create a new message.
+ */
+export const CallbackResponseSchema: GenMessage<CallbackResponse> = /*@__PURE__*/
+  messageDesc(file_submit_v1_submit_service, 5);
 
 /**
  * @generated from service submit.v1.SubmitService
@@ -105,6 +145,14 @@ export const SubmitService: GenService<{
     methodKind: "server_streaming";
     input: typeof SubscribeRequestSchema;
     output: typeof SubscribeResponseSchema;
+  },
+  /**
+   * @generated from rpc submit.v1.SubmitService.Callback
+   */
+  callback: {
+    methodKind: "unary";
+    input: typeof CallbackRequestSchema;
+    output: typeof CallbackResponseSchema;
   },
 }> = /*@__PURE__*/
   serviceDesc(file_submit_v1_submit_service, 0);

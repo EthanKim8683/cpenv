@@ -3,7 +3,7 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import { FocusRequest, FocusResponse } from "./focus_service_pb.js";
+import { SetFocusRequest, SetFocusResponse } from "./focus_service_pb.js";
 import { MethodKind } from "@bufbuild/protobuf";
 
 /**
@@ -13,12 +13,12 @@ export const FocusService = {
   typeName: "focus.v1.FocusService",
   methods: {
     /**
-     * @generated from rpc focus.v1.FocusService.Focus
+     * @generated from rpc focus.v1.FocusService.SetFocus
      */
-    focus: {
-      name: "Focus",
-      I: FocusRequest,
-      O: FocusResponse,
+    setFocus: {
+      name: "SetFocus",
+      I: SetFocusRequest,
+      O: SetFocusResponse,
       kind: MethodKind.Unary,
     },
   }

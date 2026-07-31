@@ -7,7 +7,6 @@
 package focusv1
 
 import (
-	v1 "github.com/EthanKim8683/cpenv/gen/problem/v1"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
@@ -22,27 +21,27 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-type FocusRequest struct {
+type SetFocusRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Problem       *v1.Problem            `protobuf:"bytes,1,opt,name=problem,proto3" json:"problem,omitempty"`
+	Focus         *Focus                 `protobuf:"bytes,1,opt,name=focus,proto3" json:"focus,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *FocusRequest) Reset() {
-	*x = FocusRequest{}
+func (x *SetFocusRequest) Reset() {
+	*x = SetFocusRequest{}
 	mi := &file_focus_v1_focus_service_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *FocusRequest) String() string {
+func (x *SetFocusRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*FocusRequest) ProtoMessage() {}
+func (*SetFocusRequest) ProtoMessage() {}
 
-func (x *FocusRequest) ProtoReflect() protoreflect.Message {
+func (x *SetFocusRequest) ProtoReflect() protoreflect.Message {
 	mi := &file_focus_v1_focus_service_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -54,38 +53,38 @@ func (x *FocusRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use FocusRequest.ProtoReflect.Descriptor instead.
-func (*FocusRequest) Descriptor() ([]byte, []int) {
+// Deprecated: Use SetFocusRequest.ProtoReflect.Descriptor instead.
+func (*SetFocusRequest) Descriptor() ([]byte, []int) {
 	return file_focus_v1_focus_service_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *FocusRequest) GetProblem() *v1.Problem {
+func (x *SetFocusRequest) GetFocus() *Focus {
 	if x != nil {
-		return x.Problem
+		return x.Focus
 	}
 	return nil
 }
 
-type FocusResponse struct {
+type SetFocusResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *FocusResponse) Reset() {
-	*x = FocusResponse{}
+func (x *SetFocusResponse) Reset() {
+	*x = SetFocusResponse{}
 	mi := &file_focus_v1_focus_service_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *FocusResponse) String() string {
+func (x *SetFocusResponse) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*FocusResponse) ProtoMessage() {}
+func (*SetFocusResponse) ProtoMessage() {}
 
-func (x *FocusResponse) ProtoReflect() protoreflect.Message {
+func (x *SetFocusResponse) ProtoReflect() protoreflect.Message {
 	mi := &file_focus_v1_focus_service_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -97,8 +96,8 @@ func (x *FocusResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use FocusResponse.ProtoReflect.Descriptor instead.
-func (*FocusResponse) Descriptor() ([]byte, []int) {
+// Deprecated: Use SetFocusResponse.ProtoReflect.Descriptor instead.
+func (*SetFocusResponse) Descriptor() ([]byte, []int) {
 	return file_focus_v1_focus_service_proto_rawDescGZIP(), []int{1}
 }
 
@@ -106,12 +105,12 @@ var File_focus_v1_focus_service_proto protoreflect.FileDescriptor
 
 const file_focus_v1_focus_service_proto_rawDesc = "" +
 	"\n" +
-	"\x1cfocus/v1/focus_service.proto\x12\bfocus.v1\x1a\x18problem/v1/problem.proto\"=\n" +
-	"\fFocusRequest\x12-\n" +
-	"\aproblem\x18\x01 \x01(\v2\x13.problem.v1.ProblemR\aproblem\"\x0f\n" +
-	"\rFocusResponse2H\n" +
-	"\fFocusService\x128\n" +
-	"\x05Focus\x12\x16.focus.v1.FocusRequest\x1a\x17.focus.v1.FocusResponseB\x96\x01\n" +
+	"\x1cfocus/v1/focus_service.proto\x12\bfocus.v1\x1a\x14focus/v1/focus.proto\"8\n" +
+	"\x0fSetFocusRequest\x12%\n" +
+	"\x05focus\x18\x01 \x01(\v2\x0f.focus.v1.FocusR\x05focus\"\x12\n" +
+	"\x10SetFocusResponse2Q\n" +
+	"\fFocusService\x12A\n" +
+	"\bSetFocus\x12\x19.focus.v1.SetFocusRequest\x1a\x1a.focus.v1.SetFocusResponseB\x96\x01\n" +
 	"\fcom.focus.v1B\x11FocusServiceProtoP\x01Z2github.com/EthanKim8683/cpenv/gen/focus/v1;focusv1\xa2\x02\x03FXX\xaa\x02\bFocus.V1\xca\x02\bFocus\\V1\xe2\x02\x14Focus\\V1\\GPBMetadata\xea\x02\tFocus::V1b\x06proto3"
 
 var (
@@ -128,14 +127,14 @@ func file_focus_v1_focus_service_proto_rawDescGZIP() []byte {
 
 var file_focus_v1_focus_service_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
 var file_focus_v1_focus_service_proto_goTypes = []any{
-	(*FocusRequest)(nil),  // 0: focus.v1.FocusRequest
-	(*FocusResponse)(nil), // 1: focus.v1.FocusResponse
-	(*v1.Problem)(nil),    // 2: problem.v1.Problem
+	(*SetFocusRequest)(nil),  // 0: focus.v1.SetFocusRequest
+	(*SetFocusResponse)(nil), // 1: focus.v1.SetFocusResponse
+	(*Focus)(nil),            // 2: focus.v1.Focus
 }
 var file_focus_v1_focus_service_proto_depIdxs = []int32{
-	2, // 0: focus.v1.FocusRequest.problem:type_name -> problem.v1.Problem
-	0, // 1: focus.v1.FocusService.Focus:input_type -> focus.v1.FocusRequest
-	1, // 2: focus.v1.FocusService.Focus:output_type -> focus.v1.FocusResponse
+	2, // 0: focus.v1.SetFocusRequest.focus:type_name -> focus.v1.Focus
+	0, // 1: focus.v1.FocusService.SetFocus:input_type -> focus.v1.SetFocusRequest
+	1, // 2: focus.v1.FocusService.SetFocus:output_type -> focus.v1.SetFocusResponse
 	2, // [2:3] is the sub-list for method output_type
 	1, // [1:2] is the sub-list for method input_type
 	1, // [1:1] is the sub-list for extension type_name
@@ -148,6 +147,7 @@ func file_focus_v1_focus_service_proto_init() {
 	if File_focus_v1_focus_service_proto != nil {
 		return
 	}
+	file_focus_v1_focus_proto_init()
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{

@@ -3,7 +3,7 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import { SubmitRequest, SubmitResponse, SubscribeRequest, SubscribeResponse } from "./submit_service_pb.js";
+import { CallbackRequest, CallbackResponse, SubmitRequest, SubmitResponse, SubscribeRequest, SubscribeResponse } from "./submit_service_pb.js";
 import { MethodKind } from "@bufbuild/protobuf";
 
 /**
@@ -29,6 +29,15 @@ export const SubmitService = {
       I: SubscribeRequest,
       O: SubscribeResponse,
       kind: MethodKind.ServerStreaming,
+    },
+    /**
+     * @generated from rpc submit.v1.SubmitService.Callback
+     */
+    callback: {
+      name: "Callback",
+      I: CallbackRequest,
+      O: CallbackResponse,
+      kind: MethodKind.Unary,
     },
   }
 } as const;

@@ -1,1 +1,2 @@
 - make submit errors propagate back to caller
+- flesh out server lib a little more for error handling
