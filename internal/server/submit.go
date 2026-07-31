@@ -14,46 +14,51 @@ import (
 	submitv1connect "github.com/EthanKim8683/cpenv/gen/submit/v1/submitv1connect"
 )
 
-type safeStream struct {
+type subscriber struct {
 	mu     sync.Mutex
 	stream *connect.ServerStream[submitv1.SubscribeResponse]
+	cancel context.CancelCauseFunc
 }
 
-func (s *safeStream) send(msg *submitv1.SubscribeResponse) error {
+func (s *subscriber) send(msg *submitv1.SubscribeResponse) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	return s.stream.Send(msg)
+	if err := s.stream.Send(msg); err != nil {
+		s.cancel(fmt.Errorf("send: %w", err))
+		return err
+	}
+	return nil
 }
 
 type SubmitService struct {
 	mu        sync.Mutex
-	streams   map[string]map[*safeStream]struct{}
+	subs      map[string]map[*subscriber]struct{}
 	callbacks map[string]chan string
 }
 
-func (s *SubmitService) addStream(problemID string, stream *safeStream) {
+func (s *SubmitService) addSubscriber(problemID string, sub *subscriber) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	if _, ok := s.streams[problemID]; !ok {
-		s.streams[problemID] = make(map[*safeStream]struct{})
+	if _, ok := s.subs[problemID]; !ok {
+		s.subs[problemID] = make(map[*subscriber]struct{})
 	}
-	s.streams[problemID][stream] = struct{}{}
+	s.subs[problemID][sub] = struct{}{}
 }
 
-func (s *SubmitService) removeStream(problemID string, stream *safeStream) {
+func (s *SubmitService) removeSubscriber(problemID string, sub *subscriber) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	delete(s.streams[problemID], stream)
-	if len(s.streams[problemID]) == 0 {
-		delete(s.streams, problemID)
+	delete(s.subs[problemID], sub)
+	if len(s.subs[problemID]) == 0 {
+		delete(s.subs, problemID)
 	}
 }
 
-func (s *SubmitService) anyStream(problemID string) *safeStream {
+func (s *SubmitService) anySubscriber(problemID string) *subscriber {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	for stream := range s.streams[problemID] {
-		return stream
+	for sub := range s.subs[problemID] {
+		return sub
 	}
 	return nil
 }
@@ -80,37 +85,36 @@ func (s *SubmitService) takeCallback(cbID string) chan string {
 
 func (s *SubmitService) Submit(ctx context.Context, req *submitv1.SubmitRequest) (*submitv1.SubmitResponse, error) {
 	if !filepath.IsAbs(req.Path) {
-		return nil, fmt.Errorf("submit: path is not absolute: %s", req.Path)
+		return nil, fmt.Errorf("submit %q: path %q is not absolute", req.ProblemId, req.Path)
 	}
 
 	data, err := os.ReadFile(req.Path)
 	if err != nil {
-		return nil, fmt.Errorf("submit: read file: %w", err)
+		return nil, fmt.Errorf("submit %q: %w", req.ProblemId, err)
 	}
 
 	cbID, cb := s.makeCallback()
 	defer s.takeCallback(cbID)
 
-	stream := s.anyStream(req.ProblemId)
-	if stream == nil {
-		return nil, fmt.Errorf("submit: no subscribers: %s", req.ProblemId)
+	sub := s.anySubscriber(req.ProblemId)
+	if sub == nil {
+		return nil, fmt.Errorf("submit %q: no subscribers", req.ProblemId)
 	}
 
-	if err := stream.send(&submitv1.SubscribeResponse{
+	if err := sub.send(&submitv1.SubscribeResponse{
 		CallbackId: cbID,
 		Path:       req.Path,
 		Data:       data,
 	}); err != nil {
-		s.removeStream(req.ProblemId, stream)
-		return nil, fmt.Errorf("submit: forward to subscriber: %w", err)
+		return nil, fmt.Errorf("submit %q: subscriber: %w", req.ProblemId, err)
 	}
 
 	select {
 	case <-ctx.Done():
-		return nil, fmt.Errorf("submit: context done: %w", ctx.Err())
+		return nil, fmt.Errorf("submit %q: %w", req.ProblemId, ctx.Err())
 	case errMsg := <-cb:
 		if errMsg != "" {
-			return nil, fmt.Errorf("submit: extension: %s", errMsg)
+			return nil, fmt.Errorf("submit %q: extension: %s", req.ProblemId, errMsg)
 		}
 	}
 
@@ -118,17 +122,28 @@ func (s *SubmitService) Submit(ctx context.Context, req *submitv1.SubmitRequest)
 }
 
 func (s *SubmitService) Subscribe(ctx context.Context, req *submitv1.SubscribeRequest, stream *connect.ServerStream[submitv1.SubscribeResponse]) error {
-	ss := &safeStream{stream: stream}
-	s.addStream(req.ProblemId, ss)
-	defer s.removeStream(req.ProblemId, ss)
-	<-ctx.Done()
-	return nil
+	errCtx, cancel := context.WithCancelCause(context.Background())
+	defer cancel(nil)
+
+	sub := &subscriber{
+		stream: stream,
+		cancel: cancel,
+	}
+	s.addSubscriber(req.ProblemId, sub)
+	defer s.removeSubscriber(req.ProblemId, sub)
+
+	select {
+	case <-ctx.Done():
+		return nil
+	case <-errCtx.Done():
+		return fmt.Errorf("subscribe %q: %w", req.ProblemId, context.Cause(errCtx))
+	}
 }
 
 func (s *SubmitService) Callback(_ context.Context, req *submitv1.CallbackRequest) (*submitv1.CallbackResponse, error) {
 	cb := s.takeCallback(req.CallbackId)
 	if cb == nil {
-		return nil, fmt.Errorf("callback: callback not found: %s", req.CallbackId)
+		return nil, fmt.Errorf("callback %q: not found", req.CallbackId)
 	}
 
 	cb <- req.Error
@@ -140,7 +155,7 @@ var _ submitv1connect.SubmitServiceHandler = (*SubmitService)(nil)
 
 func NewSubmitService() *SubmitService {
 	return &SubmitService{
-		streams:   make(map[string]map[*safeStream]struct{}),
+		subs:      make(map[string]map[*subscriber]struct{}),
 		callbacks: make(map[string]chan string),
 	}
 }

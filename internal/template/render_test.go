@@ -36,7 +36,7 @@ func TestRender(t *testing.T) {
 
 	templatesFs := afero.NewBasePathFs(afero.NewOsFs(), "./testdata")
 
-	t.Run("happy path", func(t *testing.T) {
+	t.Run("successful render", func(t *testing.T) {
 		t.Parallel()
 
 		fs := afero.NewMemMapFs()
@@ -58,7 +58,7 @@ func TestRender(t *testing.T) {
 
 		require.NoError(t, template.Render(
 			templatesFs,
-			"happy-path.star",
+			"successful-render.star",
 			fs,
 			problem,
 		))
@@ -84,7 +84,7 @@ func TestRender(t *testing.T) {
 			nil,
 		)
 		assert.Error(t, err)
-		assert.ErrorContains(t, err, "render: template \"decode-error.star\": ")
+		assert.ErrorContains(t, err, "render \"decode-error.star\": ")
 		assert.ErrorContains(t, err, "file 0: expected string path, got int")
 		assert.ErrorContains(t, err, "file 0: expected string content, got int")
 		assert.ErrorContains(t, err, "file 2: expected string path, got int")

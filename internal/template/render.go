@@ -106,7 +106,7 @@ func writeFiles(fs afero.Fs, files map[string]string) error {
 		path = filepath.Clean(path)
 
 		if !filepath.IsLocal(path) || path == "." {
-			return fmt.Errorf("invalid path %q", path)
+			return fmt.Errorf("path %q is not local", path)
 		}
 
 		if err := fs.MkdirAll(filepath.Dir(path), 0755); err != nil {
@@ -130,7 +130,7 @@ func Render(
 
 	problemValue, err := encodeProblem(thread, problem)
 	if err != nil {
-		return fmt.Errorf("render: problem: %w", err)
+		return fmt.Errorf("render %q: problem: %w", templateName, err)
 	}
 
 	filesValue, err := execTemplate(
@@ -140,16 +140,16 @@ func Render(
 		problemValue,
 	)
 	if err != nil {
-		return fmt.Errorf("render: template %q: %w", templateName, err)
+		return fmt.Errorf("render %q: %w", templateName, err)
 	}
 
 	files, err := decodeFiles(filesValue)
 	if err != nil {
-		return fmt.Errorf("render: template %q: %w", templateName, err)
+		return fmt.Errorf("render %q: %w", templateName, err)
 	}
 
 	if err := writeFiles(fs, files); err != nil {
-		return fmt.Errorf("render: template %q: %w", templateName, err)
+		return fmt.Errorf("render %q: %w", templateName, err)
 	}
 
 	return nil
