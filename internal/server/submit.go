@@ -14,165 +14,133 @@ import (
 	submitv1connect "github.com/EthanKim8683/cpenv/gen/submit/v1/submitv1connect"
 )
 
-type job struct {
-	path     string
-	callback chan error
+type safeStream struct {
+	mu     sync.Mutex
+	stream *connect.ServerStream[submitv1.SubscribeResponse]
 }
 
-type worker chan *job
-
-func (w worker) send(ctx context.Context, path string) chan error {
-	cb := make(chan error, 1)
-	select {
-	case <-ctx.Done():
-		cb <- fmt.Errorf("send: context done: %w", ctx.Err())
-	case w <- &job{
-		path:     path,
-		callback: cb,
-	}:
-	}
-	return cb
-}
-
-// SubmitService ...
-type SubmitService struct {
-	mu        sync.Mutex
-	workers   map[string]map[worker]struct{}
-	callbacks map[string]chan error
-}
-
-func (s *SubmitService) worker(problemID string) worker {
+func (s *safeStream) send(msg *submitv1.SubscribeResponse) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	for w := range s.workers[problemID] {
-		return w
+	return s.stream.Send(msg)
+}
+
+type SubmitService struct {
+	mu        sync.Mutex
+	streams   map[string]map[*safeStream]struct{}
+	callbacks map[string]chan string
+}
+
+func (s *SubmitService) addStream(problemID string, stream *safeStream) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if _, ok := s.streams[problemID]; !ok {
+		s.streams[problemID] = make(map[*safeStream]struct{})
+	}
+	s.streams[problemID][stream] = struct{}{}
+}
+
+func (s *SubmitService) removeStream(problemID string, stream *safeStream) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	delete(s.streams[problemID], stream)
+	if len(s.streams[problemID]) == 0 {
+		delete(s.streams, problemID)
+	}
+}
+
+func (s *SubmitService) anyStream(problemID string) *safeStream {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	for stream := range s.streams[problemID] {
+		return stream
 	}
 	return nil
 }
 
-// Submit ...
+func (s *SubmitService) makeCallback() (string, chan string) {
+	cbID := uuid.New().String()
+	cb := make(chan string, 1)
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	s.callbacks[cbID] = cb
+	return cbID, cb
+}
+
+func (s *SubmitService) takeCallback(cbID string) chan string {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	cb, ok := s.callbacks[cbID]
+	if !ok {
+		return nil
+	}
+	delete(s.callbacks, cbID)
+	return cb
+}
+
 func (s *SubmitService) Submit(ctx context.Context, req *submitv1.SubmitRequest) (*submitv1.SubmitResponse, error) {
 	if !filepath.IsAbs(req.Path) {
 		return nil, fmt.Errorf("submit: path is not absolute: %s", req.Path)
 	}
 
-	worker := s.worker(req.ProblemId)
-	if worker == nil {
+	data, err := os.ReadFile(req.Path)
+	if err != nil {
+		return nil, fmt.Errorf("submit: read file: %w", err)
+	}
+
+	cbID, cb := s.makeCallback()
+	defer s.takeCallback(cbID)
+
+	stream := s.anyStream(req.ProblemId)
+	if stream == nil {
 		return nil, fmt.Errorf("submit: no subscribers: %s", req.ProblemId)
+	}
+
+	if err := stream.send(&submitv1.SubscribeResponse{
+		CallbackId: cbID,
+		Path:       req.Path,
+		Data:       data,
+	}); err != nil {
+		s.removeStream(req.ProblemId, stream)
+		return nil, fmt.Errorf("submit: forward to subscriber: %w", err)
 	}
 
 	select {
 	case <-ctx.Done():
 		return nil, fmt.Errorf("submit: context done: %w", ctx.Err())
-	case err := <-worker.send(ctx, req.Path):
-		if err != nil {
-			return nil, fmt.Errorf("submit: %w", err)
+	case errMsg := <-cb:
+		if errMsg != "" {
+			return nil, fmt.Errorf("submit: extension: %s", errMsg)
 		}
 	}
 
 	return &submitv1.SubmitResponse{}, nil
 }
 
-func (s *SubmitService) addWorker(problemID string, w worker) {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	if _, ok := s.workers[problemID]; !ok {
-		s.workers[problemID] = make(map[worker]struct{})
-	}
-	s.workers[problemID][w] = struct{}{}
-}
-
-func (s *SubmitService) deleteWorker(problemID string, w worker) {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	delete(s.workers[problemID], w)
-	if len(s.workers[problemID]) == 0 {
-		delete(s.workers, problemID)
-	}
-}
-
-func (s *SubmitService) setCallback(cbID string, cb chan error) {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	s.callbacks[cbID] = cb
-}
-
-func (s *SubmitService) deleteCallback(cbID string) chan error {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	cb, ok := s.callbacks[cbID]
-	if ok {
-		delete(s.callbacks, cbID)
-	}
-	return cb
-}
-
-// Subscribe ...
 func (s *SubmitService) Subscribe(ctx context.Context, req *submitv1.SubscribeRequest, stream *connect.ServerStream[submitv1.SubscribeResponse]) error {
-	w := make(chan *job)
-	s.addWorker(req.ProblemId, w)
-	defer s.deleteWorker(req.ProblemId, w)
-
-	handleJob := func(job *job) error {
-		content, err := os.ReadFile(job.path)
-		if err != nil {
-			return err
-		}
-
-		cb := make(chan error, 1)
-		cbID := uuid.New().String()
-		s.setCallback(cbID, cb)
-		defer s.deleteCallback(cbID)
-
-		if err := stream.Send(&submitv1.SubscribeResponse{
-			CallbackId: cbID,
-			Content:    content,
-			FileName:   job.path,
-		}); err != nil {
-			return err
-		}
-
-		select {
-		case err := <-cb:
-			return err
-		case <-ctx.Done():
-			return fmt.Errorf("subscribe: context done: %w", ctx.Err())
-		}
-	}
-
-	for {
-		select {
-		case job := <-w:
-			job.callback <- handleJob(job)
-		case <-ctx.Done():
-			return nil
-		}
-	}
+	ss := &safeStream{stream: stream}
+	s.addStream(req.ProblemId, ss)
+	defer s.removeStream(req.ProblemId, ss)
+	<-ctx.Done()
+	return nil
 }
 
-// Callback ...
 func (s *SubmitService) Callback(_ context.Context, req *submitv1.CallbackRequest) (*submitv1.CallbackResponse, error) {
-	cb := s.deleteCallback(req.CallbackId)
+	cb := s.takeCallback(req.CallbackId)
 	if cb == nil {
 		return nil, fmt.Errorf("callback: callback not found: %s", req.CallbackId)
 	}
 
-	var err error
-	if req.Error != "" {
-		err = fmt.Errorf("extension: %s", req.Error)
-	}
-
-	cb <- err
+	cb <- req.Error
 
 	return &submitv1.CallbackResponse{}, nil
 }
 
 var _ submitv1connect.SubmitServiceHandler = (*SubmitService)(nil)
 
-// NewSubmitService ...
 func NewSubmitService() *SubmitService {
 	return &SubmitService{
-		workers:   make(map[string]map[worker]struct{}),
-		callbacks: make(map[string]chan error),
+		streams:   make(map[string]map[*safeStream]struct{}),
+		callbacks: make(map[string]chan string),
 	}
 }

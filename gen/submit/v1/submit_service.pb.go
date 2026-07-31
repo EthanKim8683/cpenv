@@ -156,8 +156,8 @@ func (x *SubscribeRequest) GetProblemId() string {
 type SubscribeResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	CallbackId    string                 `protobuf:"bytes,1,opt,name=callback_id,json=callbackId,proto3" json:"callback_id,omitempty"`
-	FileName      string                 `protobuf:"bytes,2,opt,name=file_name,json=fileName,proto3" json:"file_name,omitempty"`
-	Content       []byte                 `protobuf:"bytes,3,opt,name=content,proto3" json:"content,omitempty"`
+	Path          string                 `protobuf:"bytes,2,opt,name=path,proto3" json:"path,omitempty"`
+	Data          []byte                 `protobuf:"bytes,3,opt,name=data,proto3" json:"data,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -199,16 +199,16 @@ func (x *SubscribeResponse) GetCallbackId() string {
 	return ""
 }
 
-func (x *SubscribeResponse) GetFileName() string {
+func (x *SubscribeResponse) GetPath() string {
 	if x != nil {
-		return x.FileName
+		return x.Path
 	}
 	return ""
 }
 
-func (x *SubscribeResponse) GetContent() []byte {
+func (x *SubscribeResponse) GetData() []byte {
 	if x != nil {
-		return x.Content
+		return x.Data
 	}
 	return nil
 }
@@ -313,12 +313,12 @@ const file_submit_v1_submit_service_proto_rawDesc = "" +
 	"\x0eSubmitResponse\"1\n" +
 	"\x10SubscribeRequest\x12\x1d\n" +
 	"\n" +
-	"problem_id\x18\x01 \x01(\tR\tproblemId\"k\n" +
+	"problem_id\x18\x01 \x01(\tR\tproblemId\"\\\n" +
 	"\x11SubscribeResponse\x12\x1f\n" +
 	"\vcallback_id\x18\x01 \x01(\tR\n" +
-	"callbackId\x12\x1b\n" +
-	"\tfile_name\x18\x02 \x01(\tR\bfileName\x12\x18\n" +
-	"\acontent\x18\x03 \x01(\fR\acontent\"H\n" +
+	"callbackId\x12\x12\n" +
+	"\x04path\x18\x02 \x01(\tR\x04path\x12\x12\n" +
+	"\x04data\x18\x03 \x01(\fR\x04data\"H\n" +
 	"\x0fCallbackRequest\x12\x1f\n" +
 	"\vcallback_id\x18\x01 \x01(\tR\n" +
 	"callbackId\x12\x14\n" +

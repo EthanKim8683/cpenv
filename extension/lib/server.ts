@@ -54,18 +54,14 @@ export function createProblemMain({
     handleVisibilityChange();
     document.addEventListener("visibilitychange", handleVisibilityChange);
 
-    for await (const {
-      callbackId,
-      content,
-      fileName,
-    } of submitClient.subscribe(
+    for await (const { callbackId, path, data } of submitClient.subscribe(
       create(SubscribeRequestSchema, {
         problemId: getProblemId(),
       }),
     )) {
       let error: string | undefined;
       try {
-        await submit(new File([new Uint8Array(content)], fileName));
+        await submit(new File([new Uint8Array(data)], path));
       } catch (caughtError: unknown) {
         error = String(caughtError);
       }
