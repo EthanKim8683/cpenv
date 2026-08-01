@@ -7,8 +7,8 @@ import (
 	"path/filepath"
 
 	problemv1 "github.com/EthanKim8683/cpenv/gen/problem/v1"
-	"github.com/EthanKim8683/cpenv/internal/env"
 	"github.com/EthanKim8683/cpenv/internal/template"
+	"github.com/EthanKim8683/cpenv/internal/workspace"
 	"github.com/spf13/afero"
 )
 
@@ -88,7 +88,7 @@ func (a *App) Focus(tmpl string) (string, error) {
 		return "", fmt.Errorf("focus: %w", err)
 	}
 
-	dir := filepath.Join(a.Cfg.EnvsDir, problem.Id)
+	dir := filepath.Join(a.Cfg.WorkspacesDir, problem.Id)
 
 	if _, err := os.Stat(dir); err == nil {
 		return dir, nil
@@ -98,7 +98,7 @@ func (a *App) Focus(tmpl string) (string, error) {
 
 	fs := afero.NewBasePathFs(afero.NewOsFs(), dir)
 
-	if _, err := env.Create(fs, problem); err != nil {
+	if _, err := workspace.Create(fs, problem); err != nil {
 		return "", fmt.Errorf("focus: %w", err)
 	}
 

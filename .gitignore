@@ -1,5 +1,7 @@
 .env
 
+/bin/
+
 /templates/
-/workspace/
+/workspaces/
 /state.json

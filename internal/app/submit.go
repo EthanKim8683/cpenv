@@ -8,7 +8,7 @@ import (
 
 	submitv1 "github.com/EthanKim8683/cpenv/gen/submit/v1"
 	"github.com/EthanKim8683/cpenv/gen/submit/v1/submitv1connect"
-	"github.com/EthanKim8683/cpenv/internal/env"
+	"github.com/EthanKim8683/cpenv/internal/workspace"
 	"github.com/spf13/afero"
 )
 
@@ -47,7 +47,7 @@ func (a *App) Submit(ctx context.Context, subFile string) error {
 
 	fs := afero.NewBasePathFs(afero.NewOsFs(), dir)
 
-	e, err := env.Open(fs)
+	ws, err := workspace.Open(fs)
 	if err != nil {
 		return fmt.Errorf("submit: %w", err)
 	}
@@ -70,7 +70,7 @@ func (a *App) Submit(ctx context.Context, subFile string) error {
 	}
 
 	if _, err := client.Submit(ctx, &submitv1.SubmitRequest{
-		ProblemId: e.Problem().Id,
+		ProblemId: ws.Problem().Id,
 		FileName:  filepath.Base(subFile),
 		Content:   content,
 	}); err != nil {

@@ -17,7 +17,7 @@ func TestFocus(t *testing.T) {
 	t.Parallel()
 
 	templatesDir := "./testdata"
-	envsDir := filepath.Join(t.TempDir(), "envs")
+	workspacesDir := filepath.Join(t.TempDir(), "workspaces")
 	statePath := filepath.Join(t.TempDir(), "state.json")
 
 	stateStore := state.NewFileStore(statePath)
@@ -32,13 +32,13 @@ func TestFocus(t *testing.T) {
 
 	app := &app.App{
 		Cfg: &config.Config{
-			TemplatesDir: templatesDir,
-			EnvsDir:      envsDir,
+			TemplatesDir:  templatesDir,
+			WorkspacesDir: workspacesDir,
 		},
 		StateStore: stateStore,
 	}
 
 	dir, err := app.Focus("")
 	assert.NoError(t, err)
-	assert.Equal(t, filepath.Join(envsDir, "id"), dir)
+	assert.Equal(t, filepath.Join(workspacesDir, "id"), dir)
 }
