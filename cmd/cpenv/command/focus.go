@@ -26,7 +26,7 @@ var focusCmd = &cobra.Command{
 			os.Exit(1)
 		}
 
-		store := state.NewStore(cfg.StatePath)
+		store := state.NewFileStore(cfg.StatePath)
 		state, err := store.Load()
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "cpenv: %v\n", err)

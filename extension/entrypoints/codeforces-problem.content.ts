@@ -108,8 +108,6 @@ function getProgramTypeId(sourceFile: File) {
 }
 
 async function submit(sourceFile: File) {
-  throw new Error("Not implemented");
-
   const formElement = document.querySelector(".submitForm") as HTMLFormElement;
   const formData = new FormData(formElement);
 

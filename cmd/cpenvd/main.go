@@ -1,9 +1,13 @@
 package main
 
 import (
+	"context"
+	"errors"
 	"log"
 	"net/http"
 	"os"
+	"os/signal"
+	"syscall"
 
 	"github.com/EthanKim8683/cpenv/gen/focus/v1/focusv1connect"
 	"github.com/EthanKim8683/cpenv/gen/submit/v1/submitv1connect"
@@ -16,10 +20,10 @@ import (
 func main() {
 	cfg, err := config.Load()
 	if err != nil {
-		log.Fatalf("cpenv: config: %v", err)
+		log.Fatalf("cpenvd: %v", err)
 	}
 
-	stateStore := state.NewStore(cfg.StatePath)
+	stateStore := state.NewFileStore(cfg.StatePath)
 
 	focusSvc := &server.FocusService{
 		StateStore: stateStore,
@@ -35,9 +39,23 @@ func main() {
 		AllowedHeaders: []string{"*"},
 	}).Handler(mux)
 
-	server := &http.Server{
-		Addr:    ":" + os.Getenv("PORT"),
+	srv := &http.Server{
+		Addr:    "localhost:" + cfg.Port,
 		Handler: handler,
 	}
-	server.ListenAndServe()
+
+	go func() {
+		if err := srv.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
+			log.Fatalf("cpenvd: %v", err)
+		}
+	}()
+
+	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+	defer stop()
+
+	<-ctx.Done()
+
+	if err := srv.Shutdown(context.Background()); err != nil {
+		log.Fatalf("cpenvd: %v", err)
+	}
 }

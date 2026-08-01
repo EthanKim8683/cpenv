@@ -9,16 +9,11 @@ import (
 	"github.com/EthanKim8683/cpenv/internal/state"
 )
 
-type StateStore interface {
-	Load() (*state.State, error)
-	Save(state *state.State) error
-}
-
 type FocusService struct {
-	StateStore StateStore
+	StateStore state.Store
 }
 
-func (s *FocusService) SetFocus(ctx context.Context, req *focusv1.SetFocusRequest) (*focusv1.SetFocusResponse, error) {
+func (s *FocusService) SetFocus(_ context.Context, req *focusv1.SetFocusRequest) (*focusv1.SetFocusResponse, error) {
 	state, err := s.StateStore.Load()
 	if err != nil {
 		return nil, fmt.Errorf("set focus: %w", err)

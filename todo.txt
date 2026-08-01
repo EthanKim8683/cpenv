@@ -1,2 +1,2 @@
-- improve code quality of server and cli
+- improve code quality of cli
 - write vjudge and atcoder scrapers
