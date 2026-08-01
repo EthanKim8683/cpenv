@@ -3,8 +3,6 @@ package server
 import (
 	"context"
 	"fmt"
-	"os"
-	"path/filepath"
 	"sync"
 
 	"github.com/google/uuid"
@@ -84,15 +82,6 @@ func (s *SubmitService) takeCallback(cbID string) chan string {
 }
 
 func (s *SubmitService) Submit(ctx context.Context, req *submitv1.SubmitRequest) (*submitv1.SubmitResponse, error) {
-	if !filepath.IsAbs(req.Path) {
-		return nil, fmt.Errorf("submit %q: path %q is not absolute", req.ProblemId, req.Path)
-	}
-
-	data, err := os.ReadFile(req.Path)
-	if err != nil {
-		return nil, fmt.Errorf("submit %q: %w", req.ProblemId, err)
-	}
-
 	cbID, cb := s.makeCallback()
 	defer s.takeCallback(cbID)
 
@@ -103,8 +92,8 @@ func (s *SubmitService) Submit(ctx context.Context, req *submitv1.SubmitRequest)
 
 	if err := sub.send(&submitv1.SubscribeResponse{
 		CallbackId: cbID,
-		Path:       req.Path,
-		Data:       data,
+		FileName:   req.FileName,
+		Content:    req.Content,
 	}); err != nil {
 		return nil, fmt.Errorf("submit %q: subscriber: %w", req.ProblemId, err)
 	}

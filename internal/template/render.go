@@ -56,7 +56,7 @@ func execTemplate(
 		},
 	)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("starlark: %w", err)
 	}
 
 	value, ok := globals["files"]
@@ -130,7 +130,7 @@ func Render(
 
 	problemValue, err := encodeProblem(thread, problem)
 	if err != nil {
-		return fmt.Errorf("render %q: problem: %w", templateName, err)
+		return fmt.Errorf("render %q: encode problem: %w", templateName, err)
 	}
 
 	filesValue, err := execTemplate(
@@ -140,16 +140,16 @@ func Render(
 		problemValue,
 	)
 	if err != nil {
-		return fmt.Errorf("render %q: %w", templateName, err)
+		return fmt.Errorf("render %q: exec template: %w", templateName, err)
 	}
 
 	files, err := decodeFiles(filesValue)
 	if err != nil {
-		return fmt.Errorf("render %q: %w", templateName, err)
+		return fmt.Errorf("render %q: decode files: %w", templateName, err)
 	}
 
 	if err := writeFiles(fs, files); err != nil {
-		return fmt.Errorf("render %q: %w", templateName, err)
+		return fmt.Errorf("render %q: write files: %w", templateName, err)
 	}
 
 	return nil

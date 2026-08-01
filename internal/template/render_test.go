@@ -84,7 +84,7 @@ func TestRender(t *testing.T) {
 			nil,
 		)
 		assert.Error(t, err)
-		assert.ErrorContains(t, err, "render \"decode-error.star\": ")
+		assert.ErrorContains(t, err, "render \"decode-error.star\": decode files: ")
 		assert.ErrorContains(t, err, "file 0: expected string path, got int")
 		assert.ErrorContains(t, err, "file 0: expected string content, got int")
 		assert.ErrorContains(t, err, "file 2: expected string path, got int")

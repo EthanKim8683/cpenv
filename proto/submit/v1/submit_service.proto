@@ -10,7 +10,8 @@ service SubmitService {
 
 message SubmitRequest {
   string problem_id = 1;
-  string path = 2;
+  string file_name = 2;
+  bytes content = 3;
 }
 
 message SubmitResponse {}
@@ -21,8 +22,8 @@ message SubscribeRequest {
 
 message SubscribeResponse {
   string callback_id = 1;
-  string path = 2;
-  bytes data = 3;
+  string file_name = 2;
+  bytes content = 3;
 }
 
 message CallbackRequest {

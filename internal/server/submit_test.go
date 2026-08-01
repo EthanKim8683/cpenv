@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
-	"os"
 	"path/filepath"
 	"strings"
 	"sync"
@@ -85,9 +84,8 @@ func TestSubmitService(t *testing.T) {
 	srv := httptest.NewServer(mux)
 	t.Cleanup(srv.Close)
 
-	path := filepath.Join(t.TempDir(), "path")
-	data := []byte("data")
-	require.NoError(t, os.WriteFile(path, data, 0644))
+	fileName := filepath.Join(t.TempDir(), "fileName")
+	content := []byte("content")
 
 	t.Run("successful submit", func(t *testing.T) {
 		t.Parallel()
@@ -107,8 +105,8 @@ func TestSubmitService(t *testing.T) {
 					ProblemId: problemID,
 				},
 				func(req *submitv1.SubscribeResponse) *submitv1.CallbackRequest {
-					assert.Equal(t, path, req.Path)
-					assert.Equal(t, data, req.Data)
+					assert.Equal(t, fileName, req.FileName)
+					assert.Equal(t, content, req.Content)
 					return &submitv1.CallbackRequest{
 						CallbackId: req.CallbackId,
 					}
@@ -120,7 +118,8 @@ func TestSubmitService(t *testing.T) {
 
 			assert.NoError(t, eventuallySubmit(t, cli, &submitv1.SubmitRequest{
 				ProblemId: problemID,
-				Path:      path,
+				FileName:  fileName,
+				Content:   content,
 			}))
 
 			cancel()
@@ -137,7 +136,8 @@ func TestSubmitService(t *testing.T) {
 
 		_, err := cli.Submit(t.Context(), &submitv1.SubmitRequest{
 			ProblemId: problemID,
-			Path:      path,
+			FileName:  fileName,
+			Content:   content,
 		})
 		assert.ErrorContains(t, err, "no subscribers")
 	})
@@ -149,7 +149,7 @@ func TestSubmitService(t *testing.T) {
 		t.Cleanup(cancel)
 
 		problemID := t.Name()
-		errMsg := t.Name()
+		errMsg := "error message"
 
 		var wg sync.WaitGroup
 		wg.Go(func() {
@@ -173,7 +173,8 @@ func TestSubmitService(t *testing.T) {
 
 			err := eventuallySubmit(t, cli, &submitv1.SubmitRequest{
 				ProblemId: problemID,
-				Path:      path,
+				FileName:  fileName,
+				Content:   content,
 			})
 			assert.ErrorContains(t, err, fmt.Sprintf("extension: %s", errMsg))
 
@@ -220,7 +221,8 @@ func TestSubmitService(t *testing.T) {
 				submitWG.Go(func() {
 					assert.NoError(t, eventuallySubmit(t, cli, &submitv1.SubmitRequest{
 						ProblemId: problemID,
-						Path:      path,
+						FileName:  fileName,
+						Content:   content,
 					}))
 				})
 			}

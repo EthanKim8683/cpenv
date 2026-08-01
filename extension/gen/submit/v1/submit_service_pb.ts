@@ -10,7 +10,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file submit/v1/submit_service.proto.
  */
 export const file_submit_v1_submit_service: GenFile = /*@__PURE__*/
-  fileDesc("Ch5zdWJtaXQvdjEvc3VibWl0X3NlcnZpY2UucHJvdG8SCXN1Ym1pdC52MSIxCg1TdWJtaXRSZXF1ZXN0EhIKCnByb2JsZW1faWQYASABKAkSDAoEcGF0aBgCIAEoCSIQCg5TdWJtaXRSZXNwb25zZSImChBTdWJzY3JpYmVSZXF1ZXN0EhIKCnByb2JsZW1faWQYASABKAkiRAoRU3Vic2NyaWJlUmVzcG9uc2USEwoLY2FsbGJhY2tfaWQYASABKAkSDAoEcGF0aBgCIAEoCRIMCgRkYXRhGAMgASgMIjUKD0NhbGxiYWNrUmVxdWVzdBITCgtjYWxsYmFja19pZBgBIAEoCRINCgVlcnJvchgCIAEoCSISChBDYWxsYmFja1Jlc3BvbnNlMt0BCg1TdWJtaXRTZXJ2aWNlEj0KBlN1Ym1pdBIYLnN1Ym1pdC52MS5TdWJtaXRSZXF1ZXN0Ghkuc3VibWl0LnYxLlN1Ym1pdFJlc3BvbnNlEkgKCVN1YnNjcmliZRIbLnN1Ym1pdC52MS5TdWJzY3JpYmVSZXF1ZXN0Ghwuc3VibWl0LnYxLlN1YnNjcmliZVJlc3BvbnNlMAESQwoIQ2FsbGJhY2sSGi5zdWJtaXQudjEuQ2FsbGJhY2tSZXF1ZXN0Ghsuc3VibWl0LnYxLkNhbGxiYWNrUmVzcG9uc2VCngEKDWNvbS5zdWJtaXQudjFCElN1Ym1pdFNlcnZpY2VQcm90b1ABWjRnaXRodWIuY29tL0V0aGFuS2ltODY4My9jcGVudi9nZW4vc3VibWl0L3YxO3N1Ym1pdHYxogIDU1hYqgIJU3VibWl0LlYxygIJU3VibWl0XFYx4gIVU3VibWl0XFYxXEdQQk1ldGFkYXRh6gIKU3VibWl0OjpWMWIGcHJvdG8z");
+  fileDesc("Ch5zdWJtaXQvdjEvc3VibWl0X3NlcnZpY2UucHJvdG8SCXN1Ym1pdC52MSJHCg1TdWJtaXRSZXF1ZXN0EhIKCnByb2JsZW1faWQYASABKAkSEQoJZmlsZV9uYW1lGAIgASgJEg8KB2NvbnRlbnQYAyABKAwiEAoOU3VibWl0UmVzcG9uc2UiJgoQU3Vic2NyaWJlUmVxdWVzdBISCgpwcm9ibGVtX2lkGAEgASgJIkwKEVN1YnNjcmliZVJlc3BvbnNlEhMKC2NhbGxiYWNrX2lkGAEgASgJEhEKCWZpbGVfbmFtZRgCIAEoCRIPCgdjb250ZW50GAMgASgMIjUKD0NhbGxiYWNrUmVxdWVzdBITCgtjYWxsYmFja19pZBgBIAEoCRINCgVlcnJvchgCIAEoCSISChBDYWxsYmFja1Jlc3BvbnNlMt0BCg1TdWJtaXRTZXJ2aWNlEj0KBlN1Ym1pdBIYLnN1Ym1pdC52MS5TdWJtaXRSZXF1ZXN0Ghkuc3VibWl0LnYxLlN1Ym1pdFJlc3BvbnNlEkgKCVN1YnNjcmliZRIbLnN1Ym1pdC52MS5TdWJzY3JpYmVSZXF1ZXN0Ghwuc3VibWl0LnYxLlN1YnNjcmliZVJlc3BvbnNlMAESQwoIQ2FsbGJhY2sSGi5zdWJtaXQudjEuQ2FsbGJhY2tSZXF1ZXN0Ghsuc3VibWl0LnYxLkNhbGxiYWNrUmVzcG9uc2VCngEKDWNvbS5zdWJtaXQudjFCElN1Ym1pdFNlcnZpY2VQcm90b1ABWjRnaXRodWIuY29tL0V0aGFuS2ltODY4My9jcGVudi9nZW4vc3VibWl0L3YxO3N1Ym1pdHYxogIDU1hYqgIJU3VibWl0LlYxygIJU3VibWl0XFYx4gIVU3VibWl0XFYxXEdQQk1ldGFkYXRh6gIKU3VibWl0OjpWMWIGcHJvdG8z");
 
 /**
  * @generated from message submit.v1.SubmitRequest
@@ -22,9 +22,14 @@ export type SubmitRequest = Message<"submit.v1.SubmitRequest"> & {
   problemId: string;
 
   /**
-   * @generated from field: string path = 2;
+   * @generated from field: string file_name = 2;
    */
-  path: string;
+  fileName: string;
+
+  /**
+   * @generated from field: bytes content = 3;
+   */
+  content: Uint8Array;
 };
 
 /**
@@ -74,14 +79,14 @@ export type SubscribeResponse = Message<"submit.v1.SubscribeResponse"> & {
   callbackId: string;
 
   /**
-   * @generated from field: string path = 2;
+   * @generated from field: string file_name = 2;
    */
-  path: string;
+  fileName: string;
 
   /**
-   * @generated from field: bytes data = 3;
+   * @generated from field: bytes content = 3;
    */
-  data: Uint8Array;
+  content: Uint8Array;
 };
 
 /**
