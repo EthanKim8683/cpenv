@@ -1,34 +1,30 @@
 package command
 
 import (
+	"net/http"
+
+	"github.com/EthanKim8683/cpenv/internal/app"
 	"github.com/EthanKim8683/cpenv/internal/config"
 	"github.com/EthanKim8683/cpenv/internal/state"
-	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
 )
 
-type app struct {
-	cfg   *config.Config
-	store state.Store
-}
-
-func (a *app) templatesFs() afero.Fs {
-	return afero.NewBasePathFs(afero.NewOsFs(), a.cfg.TemplatesDir)
-}
-
-var a *app
+var a *app.App
 
 var rootCmd = &cobra.Command{
 	Use: "cpenv",
-	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
+	PersistentPreRunE: func(_ *cobra.Command, _ []string) error {
 		cfg, err := config.Load()
 		if err != nil {
 			return err
 		}
 
-		a = &app{
-			cfg:   cfg,
-			store: state.NewFileStore(cfg.StatePath),
+		stateStore := state.NewFileStore(cfg.StatePath)
+
+		a = &app.App{
+			Cfg:        cfg,
+			StateStore: stateStore,
+			HTTPClient: http.DefaultClient,
 		}
 
 		return nil

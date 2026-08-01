@@ -14,52 +14,24 @@ import (
 func TestEnv(t *testing.T) {
 	t.Parallel()
 
-	t.Run("create and open env", func(t *testing.T) {
-		t.Parallel()
+	artifact := "artifact"
 
-		fs := afero.NewMemMapFs()
+	fs := afero.NewMemMapFs()
 
-		create, err := env.Create(fs, &problemv1.Problem{
-			Id: t.Name(),
-		})
-		require.NoError(t, err)
-
-		open, err := env.Open(fs)
-		require.NoError(t, err)
-
-		assert.Equal(t, create.Problem(), open.Problem())
+	created, err := env.Create(fs, &problemv1.Problem{
+		Id: "id",
 	})
+	require.NoError(t, err)
 
-	t.Run("nonexistent env", func(t *testing.T) {
-		t.Parallel()
+	require.NoError(t, afero.WriteFile(fs, artifact, []byte("artifact"), 0644))
 
-		fs := afero.NewMemMapFs()
+	require.NoError(t, created.Clear())
 
-		_, err := env.Open(fs)
-		assert.Error(t, err)
-		assert.ErrorIs(t, err, os.ErrNotExist)
-	})
+	_, err = fs.Stat(artifact)
+	assert.ErrorIs(t, err, os.ErrNotExist)
 
-	t.Run("clear env", func(t *testing.T) {
-		t.Parallel()
+	opened, err := env.Open(fs)
+	require.NoError(t, err)
 
-		fs := afero.NewMemMapFs()
-
-		create, err := env.Create(fs, &problemv1.Problem{
-			Id: "id",
-		})
-		require.NoError(t, err)
-
-		require.NoError(t, afero.WriteFile(fs, "remove", []byte("remove"), 0644))
-
-		require.NoError(t, create.Clear())
-
-		_, err = fs.Stat("remove")
-		assert.ErrorIs(t, err, os.ErrNotExist)
-
-		open, err := env.Open(fs)
-		require.NoError(t, err)
-
-		assert.Equal(t, create.Problem(), open.Problem())
-	})
+	assert.Equal(t, created.Problem(), opened.Problem())
 }

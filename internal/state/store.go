@@ -34,6 +34,32 @@ func (s *fileStore) Load() (*State, error) {
 	return &state, nil
 }
 
+func atomicWrite(path string, data []byte) error {
+	tmp, err := os.CreateTemp(filepath.Dir(path), "*")
+	if err != nil {
+		return err
+	}
+	tmpPath := tmp.Name()
+
+	if _, err := tmp.Write(data); err != nil {
+		_ = tmp.Close()
+		_ = os.Remove(tmpPath)
+		return err
+	}
+
+	if err := tmp.Close(); err != nil {
+		_ = os.Remove(tmpPath)
+		return err
+	}
+
+	if err := os.Rename(tmpPath, path); err != nil {
+		_ = os.Remove(tmpPath)
+		return err
+	}
+
+	return nil
+}
+
 func (s *fileStore) Save(state *State) error {
 	data, err := json.Marshal(state)
 	if err != nil {
@@ -44,31 +70,13 @@ func (s *fileStore) Save(state *State) error {
 		return fmt.Errorf("save state: %w", err)
 	}
 
-	f, err := os.CreateTemp(filepath.Dir(s.path), "*")
-	if err != nil {
-		return fmt.Errorf("save state: %w", err)
-	}
-	tmpPath := f.Name()
-
-	if _, err := f.Write(data); err != nil {
-		_ = f.Close()
-		_ = os.Remove(tmpPath)
-		return fmt.Errorf("save state: %w", err)
-	}
-
-	if err := f.Close(); err != nil {
-		_ = os.Remove(tmpPath)
-		return fmt.Errorf("save state: %w", err)
-	}
-
-	if err := os.Rename(tmpPath, s.path); err != nil {
-		_ = os.Remove(tmpPath)
+	if err := atomicWrite(s.path, data); err != nil {
 		return fmt.Errorf("save state: %w", err)
 	}
 
 	return nil
 }
 
-func NewFileStore(path string) *fileStore {
+func NewFileStore(path string) Store {
 	return &fileStore{path: path}
 }

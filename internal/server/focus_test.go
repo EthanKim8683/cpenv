@@ -27,12 +27,12 @@ func (s *fakeStateStore) Save(state *state.State) error {
 func TestFocusService(t *testing.T) {
 	t.Parallel()
 
-	lastUsedTemplateName := t.Name()
+	tmpl := "template"
 
 	store := &fakeStateStore{
 		state: &state.State{
-			Focus:                nil,
-			LastUsedTemplateName: lastUsedTemplateName,
+			Focus:    nil,
+			Template: tmpl,
 		},
 	}
 
@@ -51,7 +51,7 @@ func TestFocusService(t *testing.T) {
 	})
 	require.NoError(t, err)
 	assert.Equal(t, &state.State{
-		Focus:                focus,
-		LastUsedTemplateName: lastUsedTemplateName,
+		Focus:    focus,
+		Template: tmpl,
 	}, store.state)
 }

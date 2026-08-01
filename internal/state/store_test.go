@@ -12,24 +12,27 @@ import (
 )
 
 func TestFileStore(t *testing.T) {
+	t.Parallel()
+
 	path := filepath.Join(t.TempDir(), "state.json")
 
 	store := state.NewFileStore(path)
 
-	load, err := store.Load()
+	loaded, err := store.Load()
 	require.NoError(t, err)
-	assert.Empty(t, load)
+	assert.Empty(t, loaded)
 
-	save := &state.State{
+	saved := &state.State{
 		Focus: &focusv1.Focus{
 			Problem: &problemv1.Problem{
 				Id: t.Name(),
 			},
 		},
+		Template: "template",
 	}
-	require.NoError(t, store.Save(save))
+	require.NoError(t, store.Save(saved))
 
-	load, err = store.Load()
+	loaded, err = store.Load()
 	require.NoError(t, err)
-	assert.Equal(t, save, load)
+	assert.Equal(t, saved, loaded)
 }

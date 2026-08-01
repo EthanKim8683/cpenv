@@ -32,27 +32,17 @@ func encodeProblem(thread *starlark.Thread, problem *problemv1.Problem) (starlar
 	return value, nil
 }
 
-func execTemplate(
-	thread *starlark.Thread,
-	templatesFs afero.Fs,
-	templateName string,
-	problemValue starlark.Value,
-) (starlark.Value, error) {
-	template, err := afero.ReadFile(templatesFs, templateName)
-	if err != nil {
-		return nil, err
-	}
-
+func execTemplate(thread *starlark.Thread, tmpl string, src []byte, problem starlark.Value) (starlark.Value, error) {
 	globals, err := starlark.ExecFileOptions(
 		&syntax.FileOptions{
 			While:           true,
 			TopLevelControl: true,
 		},
 		thread,
-		templateName,
-		template,
+		tmpl,
+		src,
 		starlark.StringDict{
-			"problem": problemValue,
+			"problem": problem,
 		},
 	)
 	if err != nil {
@@ -66,10 +56,10 @@ func execTemplate(
 	return value, nil
 }
 
-func decodeFiles(filesValue starlark.Value) (map[string]string, error) {
-	dict, ok := filesValue.(*starlark.Dict)
+func decodeFiles(value starlark.Value) (map[string]string, error) {
+	dict, ok := value.(*starlark.Dict)
 	if !ok {
-		return nil, fmt.Errorf("expected dict, got %s", filesValue.Type())
+		return nil, fmt.Errorf("expected dict, got %s", value.Type())
 	}
 
 	files := make(map[string]string)
@@ -120,36 +110,28 @@ func writeFiles(fs afero.Fs, files map[string]string) error {
 	return nil
 }
 
-func Render(
-	templatesFs afero.Fs,
-	templateName string,
-	fs afero.Fs,
-	problem *problemv1.Problem,
-) error {
-	thread := &starlark.Thread{}
+func Render(fs afero.Fs, tmpl string, src []byte, problem *problemv1.Problem) error {
+	thread := &starlark.Thread{
+		Name: tmpl,
+	}
 
 	problemValue, err := encodeProblem(thread, problem)
 	if err != nil {
-		return fmt.Errorf("render %q: encode problem: %w", templateName, err)
+		return fmt.Errorf("render %q: encode problem: %w", tmpl, err)
 	}
 
-	filesValue, err := execTemplate(
-		thread,
-		templatesFs,
-		templateName,
-		problemValue,
-	)
+	filesValue, err := execTemplate(thread, tmpl, src, problemValue)
 	if err != nil {
-		return fmt.Errorf("render %q: exec template: %w", templateName, err)
+		return fmt.Errorf("render %q: exec template: %w", tmpl, err)
 	}
 
 	files, err := decodeFiles(filesValue)
 	if err != nil {
-		return fmt.Errorf("render %q: decode files: %w", templateName, err)
+		return fmt.Errorf("render %q: decode files: %w", tmpl, err)
 	}
 
 	if err := writeFiles(fs, files); err != nil {
-		return fmt.Errorf("render %q: write files: %w", templateName, err)
+		return fmt.Errorf("render %q: write files: %w", tmpl, err)
 	}
 
 	return nil

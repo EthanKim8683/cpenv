@@ -84,7 +84,7 @@ func TestSubmitService(t *testing.T) {
 	srv := httptest.NewServer(mux)
 	t.Cleanup(srv.Close)
 
-	fileName := filepath.Join(t.TempDir(), "fileName")
+	fileName := filepath.Join(t.TempDir(), "file name")
 	content := []byte("content")
 
 	t.Run("successful submit", func(t *testing.T) {

@@ -2,6 +2,7 @@ package template_test
 
 import (
 	"os"
+	"path/filepath"
 	"testing"
 
 	problemv1 "github.com/EthanKim8683/cpenv/gen/problem/v1"
@@ -10,6 +11,15 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
+
+func readTemplate(t *testing.T, name string) []byte {
+	t.Helper()
+
+	src, err := os.ReadFile(filepath.Join("testdata", name))
+	require.NoError(t, err)
+
+	return src
+}
 
 func readFiles(t *testing.T, fs afero.Fs) map[string]string {
 	t.Helper()
@@ -34,13 +44,12 @@ func readFiles(t *testing.T, fs afero.Fs) map[string]string {
 func TestRender(t *testing.T) {
 	t.Parallel()
 
-	templatesFs := afero.NewBasePathFs(afero.NewOsFs(), "./testdata")
-
 	t.Run("successful render", func(t *testing.T) {
 		t.Parallel()
 
 		fs := afero.NewMemMapFs()
 
+		tmpl := "successful-render.star"
 		problem := &problemv1.Problem{
 			Id:   "id",
 			Type: problemv1.ProblemType_PROBLEM_TYPE_STDIO_BATCH,
@@ -57,9 +66,9 @@ func TestRender(t *testing.T) {
 		}
 
 		require.NoError(t, template.Render(
-			templatesFs,
-			"successful-render.star",
 			fs,
+			tmpl,
+			readTemplate(t, tmpl),
 			problem,
 		))
 
@@ -77,10 +86,12 @@ func TestRender(t *testing.T) {
 	t.Run("decode error", func(t *testing.T) {
 		t.Parallel()
 
+		tmpl := "decode-error.star"
+
 		err := template.Render(
-			templatesFs,
-			"decode-error.star",
 			afero.NewMemMapFs(),
+			tmpl,
+			readTemplate(t, tmpl),
 			nil,
 		)
 		assert.Error(t, err)

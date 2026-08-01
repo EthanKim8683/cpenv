@@ -8,7 +8,7 @@ import (
 )
 
 type App struct {
-	cfg        *config.Config
-	store      state.Store
-	httpClient *http.Client
+	Cfg        *config.Config
+	StateStore state.Store
+	HTTPClient *http.Client
 }

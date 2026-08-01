@@ -1,6 +1,7 @@
 package env
 
 import (
+	"errors"
 	"fmt"
 
 	problemv1 "github.com/EthanKim8683/cpenv/gen/problem/v1"
@@ -9,7 +10,7 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
-const problemPath = "problem.json"
+const problemFile = "problem.json"
 
 type Env struct {
 	fs      afero.Fs
@@ -26,22 +27,23 @@ func (e *Env) Clear() error {
 		return fmt.Errorf("clear env: %w", err)
 	}
 
+	var errs error
 	for _, entry := range entries {
-		name := entry.Name()
-		if name == problemPath {
+		if entry.Name() == problemFile {
 			continue
 		}
 
-		if err := e.fs.RemoveAll(name); err != nil {
-			return fmt.Errorf("clear env: %w", err)
-		}
+		errs = errors.Join(errs, e.fs.RemoveAll(entry.Name()))
+	}
+	if errs != nil {
+		return fmt.Errorf("clear env: %w", errs)
 	}
 
 	return nil
 }
 
 func Open(fs afero.Fs) (*Env, error) {
-	data, err := afero.ReadFile(fs, problemPath)
+	data, err := afero.ReadFile(fs, problemFile)
 	if err != nil {
 		return nil, fmt.Errorf("open env: %w", err)
 	}
@@ -63,12 +65,16 @@ func Create(fs afero.Fs, problem *problemv1.Problem) (*Env, error) {
 		return nil, fmt.Errorf("create env: %w", err)
 	}
 
-	if err := afero.WriteFile(fs, problemPath, data, 0644); err != nil {
+	if err := fs.MkdirAll(".", 0755); err != nil {
+		return nil, fmt.Errorf("create env: %w", err)
+	}
+
+	if err := afero.WriteFile(fs, problemFile, data, 0644); err != nil {
 		return nil, fmt.Errorf("create env: %w", err)
 	}
 
 	return &Env{
 		fs:      fs,
-		problem: proto.Clone(problem).(*problemv1.Problem),
+		problem: proto.CloneOf(problem),
 	}, nil
 }
