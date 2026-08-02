@@ -18,7 +18,7 @@ func TestFileStore(t *testing.T) {
 
 	store := state.NewFileStore(path)
 
-	empty, err := store.Load()
+	loaded, err := store.Load()
 	require.NoError(t, err)
 	assert.Empty(t, loaded)
 
