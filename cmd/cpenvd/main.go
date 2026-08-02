@@ -8,6 +8,7 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
 	"github.com/EthanKim8683/cpenv/gen/focus/v1/focusv1connect"
 	"github.com/EthanKim8683/cpenv/gen/submit/v1/submitv1connect"
@@ -54,8 +55,12 @@ func main() {
 	defer stop()
 
 	<-ctx.Done()
+	stop()
 
-	if err := srv.Shutdown(context.Background()); err != nil {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	if err := srv.Shutdown(ctx); err != nil {
 		log.Fatalf("cpenvd: %v", err)
 	}
 }
