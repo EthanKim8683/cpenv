@@ -12,13 +12,8 @@ import (
 	"github.com/spf13/afero"
 )
 
-func (a *App) defaultSubmissionFile() (string, error) {
-	dir, err := os.Getwd()
-	if err != nil {
-		return "", err
-	}
-
-	matches, err := filepath.Glob(filepath.Join(dir, "sol.*"))
+func (a *App) defaultSolFile() (string, error) {
+	matches, err := filepath.Glob(filepath.Join(a.WorkingDir, "sol.*"))
 	if err != nil {
 		return "", err
 	}
@@ -34,44 +29,49 @@ func (a *App) defaultSubmissionFile() (string, error) {
 	return matches[0], nil
 }
 
-func (a *App) Submit(ctx context.Context, subFile string) error {
-	client := submitv1connect.NewSubmitServiceClient(
-		a.httpClient,
-		"http://localhost:"+a.cfg.Port,
-	)
+func (a *App) resolveSolFile(solFile string) (string, error) {
+	if solFile == "" {
+		solFile, err := a.defaultSolFile()
+		if err != nil {
+			return "", fmt.Errorf("submit: %w", err)
+		}
 
-	dir, err := os.Getwd()
-	if err != nil {
-		return fmt.Errorf("submit: %w", err)
+		return solFile, nil
 	}
 
-	fs := afero.NewBasePathFs(afero.NewOsFs(), dir)
+	if filepath.IsAbs(solFile) {
+		return solFile, nil
+	}
+
+	return filepath.Join(a.WorkingDir, solFile), nil
+}
+
+func (a *App) Submit(ctx context.Context, solFile string) error {
+	client := submitv1connect.NewSubmitServiceClient(
+		a.HTTPClient,
+		"http://localhost:"+a.Cfg.Port,
+	)
+
+	fs := afero.NewBasePathFs(afero.NewOsFs(), a.WorkingDir)
 
 	ws, err := workspace.Open(fs)
 	if err != nil {
 		return fmt.Errorf("submit: %w", err)
 	}
 
-	if subFile == "" {
-		subFile, err = a.defaultSubmissionFile()
-		if err != nil {
-			return fmt.Errorf("submit: %w", err)
-		}
-	} else if !filepath.IsAbs(subFile) {
-		subFile, err = filepath.Abs(subFile)
-		if err != nil {
-			return fmt.Errorf("submit: %w", err)
-		}
+	solFile, err = a.resolveSolFile(solFile)
+	if err != nil {
+		return fmt.Errorf("submit: %w", err)
 	}
 
-	content, err := os.ReadFile(subFile)
+	content, err := os.ReadFile(solFile)
 	if err != nil {
 		return fmt.Errorf("submit: %w", err)
 	}
 
 	if _, err := client.Submit(ctx, &submitv1.SubmitRequest{
 		ProblemId: ws.Problem().Id,
-		FileName:  filepath.Base(subFile),
+		FileName:  filepath.Base(solFile),
 		Content:   content,
 	}); err != nil {
 		return fmt.Errorf("submit: %w", err)

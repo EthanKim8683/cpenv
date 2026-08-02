@@ -65,12 +65,7 @@ func TestRender(t *testing.T) {
 			},
 		}
 
-		require.NoError(t, template.Render(
-			fs,
-			tmpl,
-			readTemplate(t, tmpl),
-			problem,
-		))
+		require.NoError(t, template.Render(fs, tmpl, readTemplate(t, tmpl), problem))
 
 		files := readFiles(t, fs)
 		assert.Equal(t, map[string]string{
@@ -88,12 +83,7 @@ func TestRender(t *testing.T) {
 
 		tmpl := "decode-error.star"
 
-		err := template.Render(
-			afero.NewMemMapFs(),
-			tmpl,
-			readTemplate(t, tmpl),
-			nil,
-		)
+		err := template.Render(afero.NewMemMapFs(), tmpl, readTemplate(t, tmpl), nil)
 		assert.Error(t, err)
 		assert.ErrorContains(t, err, "render \"decode-error.star\": decode files: ")
 		assert.ErrorContains(t, err, "file 0: expected string path, got int")

@@ -111,9 +111,7 @@ func writeFiles(fs afero.Fs, files map[string]string) error {
 }
 
 func Render(fs afero.Fs, tmpl string, src []byte, problem *problemv1.Problem) error {
-	thread := &starlark.Thread{
-		Name: tmpl,
-	}
+	thread := &starlark.Thread{}
 
 	problemValue, err := encodeProblem(thread, problem)
 	if err != nil {

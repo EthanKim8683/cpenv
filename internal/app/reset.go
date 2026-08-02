@@ -2,19 +2,13 @@ package app
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/EthanKim8683/cpenv/internal/workspace"
 	"github.com/spf13/afero"
 )
 
 func (a *App) Reset(tmpl string) error {
-	dir, err := os.Getwd()
-	if err != nil {
-		return fmt.Errorf("reset: %w", err)
-	}
-
-	fs := afero.NewBasePathFs(afero.NewOsFs(), dir)
+	fs := afero.NewBasePathFs(afero.NewOsFs(), a.WorkingDir)
 
 	ws, err := workspace.Open(fs)
 	if err != nil {
@@ -22,6 +16,11 @@ func (a *App) Reset(tmpl string) error {
 	}
 
 	if err := ws.Clear(); err != nil {
+		return fmt.Errorf("reset: %w", err)
+	}
+
+	tmpl, err = a.resolveTemplate(tmpl)
+	if err != nil {
 		return fmt.Errorf("reset: %w", err)
 	}
 

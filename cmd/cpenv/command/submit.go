@@ -10,12 +10,12 @@ var submitCmd = &cobra.Command{
 	Use:  "submit",
 	Args: cobra.MaximumNArgs(1),
 	RunE: func(_ *cobra.Command, args []string) error {
-		var subFile string
+		var solFile string
 		if len(args) > 0 {
-			subFile = args[0]
+			solFile = args[0]
 		}
 
-		if err := a.Submit(context.Background(), subFile); err != nil {
+		if err := a.Submit(context.Background(), solFile); err != nil {
 			return err
 		}
 

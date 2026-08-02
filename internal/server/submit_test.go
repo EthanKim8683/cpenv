@@ -3,234 +3,172 @@ package server_test
 import (
 	"context"
 	"errors"
-	"fmt"
 	"net/http"
 	"net/http/httptest"
-	"path/filepath"
 	"strings"
 	"sync"
-	"sync/atomic"
 	"testing"
 	"time"
 
 	submitv1 "github.com/EthanKim8683/cpenv/gen/submit/v1"
 	submitv1connect "github.com/EthanKim8683/cpenv/gen/submit/v1/submitv1connect"
 	"github.com/EthanKim8683/cpenv/internal/server"
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
-func serveSubscriber(
-	t *testing.T,
-	ctx context.Context,
-	srv *httptest.Server,
-	req *submitv1.SubscribeRequest,
-	cb func(req *submitv1.SubscribeResponse) *submitv1.CallbackRequest,
-) {
-	t.Helper()
-
-	ext := submitv1connect.NewSubmitServiceClient(srv.Client(), srv.URL)
-
-	stream, err := ext.Subscribe(ctx, req)
-	if errors.Is(err, context.Canceled) {
-		return
-	}
-	require.NoError(t, err)
-
-	t.Cleanup(func() {
-		err := stream.Close()
-		if errors.Is(err, context.Canceled) {
-			return
-		}
-		require.NoError(t, err)
-	})
-
-	for {
-		if !stream.Receive() {
-			return
-		}
-
-		_, err = ext.Callback(ctx, cb(stream.Msg()))
-		if errors.Is(err, context.Canceled) {
-			return
-		}
-		require.NoError(t, err)
-	}
-}
-
-func eventuallySubmit(
-	t *testing.T,
-	cli submitv1connect.SubmitServiceClient,
-	req *submitv1.SubmitRequest,
-) error {
-	t.Helper()
-
-	var err error
-	require.Eventually(t, func() bool {
-		_, err = cli.Submit(t.Context(), req)
-		return !(err != nil && strings.Contains(err.Error(), "no subscribers"))
-	}, 2*time.Second, 100*time.Millisecond)
-	return err
-}
+type subscribeFunc func(cb func(req *submitv1.SubscribeResponse) *submitv1.CallbackRequest)
+type submitFunc func(fileName string, content []byte) error
 
 func TestSubmitService(t *testing.T) {
 	t.Parallel()
 
-	svc := server.NewSubmitService()
-
-	mux := http.NewServeMux()
-	mux.Handle(submitv1connect.NewSubmitServiceHandler(svc))
-
-	srv := httptest.NewServer(mux)
-	t.Cleanup(srv.Close)
-
-	fileName := filepath.Join(t.TempDir(), "file name")
-	content := []byte("content")
-
-	t.Run("successful submit", func(t *testing.T) {
-		t.Parallel()
-
-		ctx, cancel := context.WithCancel(t.Context())
-		t.Cleanup(cancel)
-
-		problemID := t.Name()
-
-		var wg sync.WaitGroup
-		wg.Go(func() {
-			serveSubscriber(
-				t,
-				ctx,
-				srv,
-				&submitv1.SubscribeRequest{
-					ProblemId: problemID,
-				},
-				func(req *submitv1.SubscribeResponse) *submitv1.CallbackRequest {
-					assert.Equal(t, fileName, req.FileName)
-					assert.Equal(t, content, req.Content)
+	tests := map[string]struct {
+		extension func(t *testing.T, subscribe subscribeFunc)
+		cli       func(t *testing.T, submit submitFunc)
+	}{
+		"successful submission": {
+			extension: func(t *testing.T, subscribe subscribeFunc) {
+				subscribe(func(req *submitv1.SubscribeResponse) *submitv1.CallbackRequest {
+					assert.Equal(t, "filename", req.FileName)
+					assert.Equal(t, []byte("content"), req.Content)
 					return &submitv1.CallbackRequest{
 						CallbackId: req.CallbackId,
 					}
-				},
-			)
-		})
-		wg.Go(func() {
-			cli := submitv1connect.NewSubmitServiceClient(srv.Client(), srv.URL)
-
-			assert.NoError(t, eventuallySubmit(t, cli, &submitv1.SubmitRequest{
-				ProblemId: problemID,
-				FileName:  fileName,
-				Content:   content,
-			}))
-
-			cancel()
-		})
-		wg.Wait()
-	})
-
-	t.Run("no subscribers", func(t *testing.T) {
-		t.Parallel()
-
-		problemID := t.Name()
-
-		cli := submitv1connect.NewSubmitServiceClient(srv.Client(), srv.URL)
-
-		_, err := cli.Submit(t.Context(), &submitv1.SubmitRequest{
-			ProblemId: problemID,
-			FileName:  fileName,
-			Content:   content,
-		})
-		assert.ErrorContains(t, err, "no subscribers")
-	})
-
-	t.Run("extension error", func(t *testing.T) {
-		t.Parallel()
-
-		ctx, cancel := context.WithCancel(t.Context())
-		t.Cleanup(cancel)
-
-		problemID := t.Name()
-		errMsg := "error message"
-
-		var wg sync.WaitGroup
-		wg.Go(func() {
-			serveSubscriber(
-				t,
-				ctx,
-				srv,
-				&submitv1.SubscribeRequest{
-					ProblemId: problemID,
-				},
-				func(req *submitv1.SubscribeResponse) *submitv1.CallbackRequest {
+				})
+			},
+			cli: func(t *testing.T, submit submitFunc) {
+				assert.NoError(t, submit("filename", []byte("content")))
+			},
+		},
+		"no subscribers": {
+			extension: func(t *testing.T, subscribe subscribeFunc) {},
+			cli: func(t *testing.T, submit submitFunc) {
+				assert.ErrorContains(t, submit("", nil), "no subscribers")
+			},
+		},
+		"extension error": {
+			extension: func(t *testing.T, subscribe subscribeFunc) {
+				subscribe(func(req *submitv1.SubscribeResponse) *submitv1.CallbackRequest {
 					return &submitv1.CallbackRequest{
 						CallbackId: req.CallbackId,
-						Error:      errMsg,
+						Error:      "error message",
 					}
-				},
-			)
-		})
-		wg.Go(func() {
-			cli := submitv1connect.NewSubmitServiceClient(srv.Client(), srv.URL)
-
-			err := eventuallySubmit(t, cli, &submitv1.SubmitRequest{
-				ProblemId: problemID,
-				FileName:  fileName,
-				Content:   content,
-			})
-			assert.ErrorContains(t, err, fmt.Sprintf("extension: %s", errMsg))
-
-			cancel()
-		})
-		wg.Wait()
-	})
-
-	t.Run("multiple subscribers and concurrent submits", func(t *testing.T) {
-		t.Parallel()
-
-		ctx, cancel := context.WithCancel(t.Context())
-		t.Cleanup(cancel)
-
-		problemID := t.Name()
-		subscribers := 10
-		submits := 20
-
-		var count atomic.Int32
-		var wg sync.WaitGroup
-		for range subscribers {
-			wg.Go(func() {
-				serveSubscriber(
-					t,
-					ctx,
-					srv,
-					&submitv1.SubscribeRequest{
-						ProblemId: problemID,
-					},
-					func(req *submitv1.SubscribeResponse) *submitv1.CallbackRequest {
-						count.Add(1)
+				})
+			},
+			cli: func(t *testing.T, submit submitFunc) {
+				assert.ErrorContains(t, submit("", nil), "extension: error message")
+			},
+		},
+		"stress test": {
+			extension: func(t *testing.T, subscribe subscribeFunc) {
+				for range 10 {
+					subscribe(func(req *submitv1.SubscribeResponse) *submitv1.CallbackRequest {
 						return &submitv1.CallbackRequest{
 							CallbackId: req.CallbackId,
+							Error:      req.FileName,
 						}
-					},
-				)
-			})
-		}
-		wg.Go(func() {
-			cli := submitv1connect.NewSubmitServiceClient(srv.Client(), srv.URL)
+					})
+				}
+			},
+			cli: func(t *testing.T, submit submitFunc) {
+				var wg sync.WaitGroup
+				for range 20 {
+					wg.Go(func() {
+						id := uuid.New().String()
+						assert.ErrorContains(t, submit(id, nil), id)
+					})
+				}
+				wg.Wait()
+			},
+		},
+	}
+	for name, test := range tests {
+		t.Run(name, func(t *testing.T) {
+			t.Parallel()
 
-			var submitWG sync.WaitGroup
-			for range submits {
-				submitWG.Go(func() {
-					assert.NoError(t, eventuallySubmit(t, cli, &submitv1.SubmitRequest{
+			svc := server.NewSubmitService()
+
+			mux := http.NewServeMux()
+			mux.Handle(submitv1connect.NewSubmitServiceHandler(svc))
+
+			srv := httptest.NewServer(mux)
+			t.Cleanup(srv.Close)
+
+			ctx, cancel := context.WithCancel(t.Context())
+			t.Cleanup(cancel)
+
+			problemID := t.Name()
+
+			var wg sync.WaitGroup
+			subscribe := func(cb func(req *submitv1.SubscribeResponse) *submitv1.CallbackRequest) {
+				wg.Go(func() {
+					ext := submitv1connect.NewSubmitServiceClient(srv.Client(), srv.URL)
+
+					stream, err := ext.Subscribe(ctx, &submitv1.SubscribeRequest{
+						ProblemId: problemID,
+					})
+					if errors.Is(err, context.Canceled) {
+						return
+					}
+					require.NoError(t, err)
+
+					t.Cleanup(func() {
+						err := stream.Close()
+						if errors.Is(err, context.Canceled) {
+							return
+						}
+						require.NoError(t, err)
+					})
+
+					for {
+						if !stream.Receive() {
+							return
+						}
+
+						_, err = ext.Callback(ctx, cb(stream.Msg()))
+						if errors.Is(err, context.Canceled) {
+							return
+						}
+						require.NoError(t, err)
+					}
+				})
+			}
+
+			submit := func(fileName string, content []byte) error {
+				tick := 100 * time.Millisecond
+				timeout := 1 * time.Second
+
+				cli := submitv1connect.NewSubmitServiceClient(srv.Client(), srv.URL)
+
+				deadline := time.Now().Add(timeout)
+				var err error
+				for {
+					if time.Now().After(deadline) {
+						break
+					}
+
+					if _, err = cli.Submit(ctx, &submitv1.SubmitRequest{
 						ProblemId: problemID,
 						FileName:  fileName,
 						Content:   content,
-					}))
-				})
-			}
-			submitWG.Wait()
+					}); err == nil || !strings.Contains(err.Error(), "no subscribers") {
+						break
+					}
 
+					time.Sleep(tick)
+				}
+				return err
+			}
+
+			if test.extension != nil {
+				test.extension(t, subscribe)
+			}
+			if test.cli != nil {
+				test.cli(t, submit)
+			}
 			cancel()
 		})
-		wg.Wait()
-		assert.Equal(t, submits, int(count.Load()))
-	})
+	}
 }

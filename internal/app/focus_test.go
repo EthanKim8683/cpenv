@@ -1,143 +1,115 @@
-package app_test
+package app
 
 import (
-	"os"
 	"path/filepath"
+	"slices"
 	"testing"
 
-	focusv1 "github.com/EthanKim8683/cpenv/gen/focus/v1"
-	problemv1 "github.com/EthanKim8683/cpenv/gen/problem/v1"
-	"github.com/EthanKim8683/cpenv/internal/app"
 	"github.com/EthanKim8683/cpenv/internal/config"
 	"github.com/EthanKim8683/cpenv/internal/state"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
 
-func TestFocus(t *testing.T) {
+func TestDefaultTemplate(t *testing.T) {
 	t.Parallel()
 
-	wd, err := os.Getwd()
-	require.NoError(t, err)
-
-	tmplDir := filepath.Join(wd, "testdata", "known-templates")
-	wsDir := filepath.Join(t.TempDir(), "workspaces")
-
-	t.Run("uses focused problem", func(t *testing.T) {
+	t.Run("state template", func(t *testing.T) {
 		t.Parallel()
 
-		problemID := t.Name()
 		statePath := filepath.Join(t.TempDir(), "state.json")
+		stateTmpl := "state"
 
 		stateStore := state.NewFileStore(statePath)
-		require.NoError(t, stateStore.Save(&state.State{
-			Focus: &focusv1.Focus{
-				Problem: &problemv1.Problem{
-					Id: problemID,
-				},
-			},
-		}))
+		stateStore.Save(&state.State{
+			Template: stateTmpl,
+		})
 
-		app := app.NewApp(&config.Config{
-			StatePath:     statePath,
-			TemplatesDir:  tmplDir,
-			WorkspacesDir: wsDir,
-		}, nil)
+		a := &App{
+			StateStore: stateStore,
+		}
 
-		dir, err := app.Focus("1.star")
+		tmpl, err := a.defaultTemplate()
 		assert.NoError(t, err)
-		assert.Equal(t, filepath.Join(wsDir, problemID), dir)
+		assert.Equal(t, stateTmpl, tmpl)
 	})
 
-	t.Run("uses default template", func(t *testing.T) {
+	t.Run("empty state template", func(t *testing.T) {
 		t.Parallel()
 
-		problemID := t.Name()
 		statePath := filepath.Join(t.TempDir(), "state.json")
+		tmplDir := filepath.Join("testdata", "known-templates")
 
 		stateStore := state.NewFileStore(statePath)
-		require.NoError(t, stateStore.Save(&state.State{
-			Focus: &focusv1.Focus{
-				Problem: &problemv1.Problem{
-					Id: problemID,
-				},
+
+		a := &App{
+			Cfg: &config.Config{
+				TemplatesDir: tmplDir,
 			},
-			Template: filepath.Join(tmplDir, "1.star"),
-		}))
+			StateStore: stateStore,
+		}
 
-		app := app.NewApp(&config.Config{
-			StatePath:     statePath,
-			TemplatesDir:  tmplDir,
-			WorkspacesDir: wsDir,
-		}, nil)
-
-		dir, err := app.Focus("")
+		tmpl, err := a.defaultTemplate()
 		assert.NoError(t, err)
-		assert.Equal(t, filepath.Join(wsDir, problemID), dir)
+		assert.True(t, slices.Contains([]string{
+			filepath.Join(tmplDir, "1.star"),
+			filepath.Join(tmplDir, "2.star"),
+		}, tmpl))
+	})
+}
 
-		tmpl, err := os.ReadFile(filepath.Join(dir, "template"))
+func TestResolveTemplate(t *testing.T) {
+	t.Parallel()
+
+	t.Run("absolute path", func(t *testing.T) {
+		t.Parallel()
+
+		absTmpl := filepath.Join(t.TempDir(), "absolute.star")
+
+		a := &App{}
+
+		tmpl, err := a.resolveTemplate(absTmpl)
 		assert.NoError(t, err)
-		assert.Equal(t, "1", string(tmpl))
+		assert.Equal(t, absTmpl, tmpl)
 	})
 
-	t.Run("uses any template if no default", func(t *testing.T) {
+	t.Run("relative path", func(t *testing.T) {
 		t.Parallel()
 
-		problemID := t.Name()
-		statePath := filepath.Join(t.TempDir(), "state.json")
+		tmplDir := filepath.Join(t.TempDir(), "relative")
+		relTmpl := "relative.star"
 
-		wd, err := os.Getwd()
-		require.NoError(t, err)
-
-		stateStore := state.NewFileStore(statePath)
-		require.NoError(t, stateStore.Save(&state.State{
-			Focus: &focusv1.Focus{
-				Problem: &problemv1.Problem{
-					Id: problemID,
-				},
+		a := &App{
+			Cfg: &config.Config{
+				TemplatesDir: tmplDir,
 			},
-			Template: filepath.Join(wd, "testdata", "unknown-templates", "3.star"),
-		}))
+		}
 
-		app := app.NewApp(&config.Config{
-			StatePath:     statePath,
-			TemplatesDir:  tmplDir,
-			WorkspacesDir: wsDir,
-		}, nil)
-
-		dir, err := app.Focus("")
+		tmpl, err := a.resolveTemplate(relTmpl)
 		assert.NoError(t, err)
-
-		_, err = os.Stat(filepath.Join(dir, "template"))
-		assert.NoError(t, err)
+		assert.Equal(t, filepath.Join(tmplDir, relTmpl), tmpl)
 	})
 
-	t.Run("updates state", func(t *testing.T) {
+	t.Run("empty path", func(t *testing.T) {
 		t.Parallel()
 
-		problemID := t.Name()
+		tmplDir := filepath.Join("testdata", "known-templates")
 		statePath := filepath.Join(t.TempDir(), "state.json")
+		stateTmpl := "state"
 
 		stateStore := state.NewFileStore(statePath)
-		require.NoError(t, stateStore.Save(&state.State{
-			Focus: &focusv1.Focus{
-				Problem: &problemv1.Problem{
-					Id: problemID,
-				},
+		stateStore.Save(&state.State{
+			Template: stateTmpl,
+		})
+
+		a := &App{
+			Cfg: &config.Config{
+				TemplatesDir: tmplDir,
 			},
-		}))
+			StateStore: stateStore,
+		}
 
-		app := app.NewApp(&config.Config{
-			StatePath:     statePath,
-			TemplatesDir:  tmplDir,
-			WorkspacesDir: wsDir,
-		}, nil)
-
-		_, err := app.Focus("1.star")
+		tmpl, err := a.resolveTemplate("")
 		assert.NoError(t, err)
-
-		state, err := stateStore.Load()
-		assert.NoError(t, err)
-		assert.Equal(t, filepath.Join(tmplDir, "1.star"), state.Template)
+		assert.Equal(t, stateTmpl, tmpl)
 	})
 }

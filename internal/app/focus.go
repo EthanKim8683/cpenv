@@ -13,7 +13,7 @@ import (
 )
 
 func (a *App) focusedProblem() (*problemv1.Problem, error) {
-	state, err := a.stateStore.Load()
+	state, err := a.StateStore.Load()
 	if err != nil {
 		return nil, err
 	}
@@ -27,7 +27,7 @@ func (a *App) focusedProblem() (*problemv1.Problem, error) {
 }
 
 func (a *App) defaultTemplate() (string, error) {
-	state, err := a.stateStore.Load()
+	state, err := a.StateStore.Load()
 	if err != nil {
 		return "", err
 	}
@@ -36,7 +36,7 @@ func (a *App) defaultTemplate() (string, error) {
 		return tmpl, nil
 	}
 
-	matches, err := filepath.Glob(filepath.Join(a.cfg.TemplatesDir, "*.star"))
+	matches, err := filepath.Glob(filepath.Join(a.Cfg.TemplatesDir, "*.star"))
 	if err != nil {
 		return "", err
 	}
@@ -48,17 +48,39 @@ func (a *App) defaultTemplate() (string, error) {
 	return matches[0], nil
 }
 
-func (a *App) renderTemplate(fs afero.Fs, tmpl string, problem *problemv1.Problem) error {
-	var err error
+func (a *App) resolveTemplate(tmpl string) (string, error) {
 	if tmpl == "" {
-		tmpl, err = a.defaultTemplate()
+		tmpl, err := a.defaultTemplate()
 		if err != nil {
-			return err
+			return "", err
 		}
-	} else if !filepath.IsAbs(tmpl) {
-		tmpl = filepath.Join(a.cfg.TemplatesDir, tmpl)
+
+		return tmpl, nil
 	}
 
+	if filepath.IsAbs(tmpl) {
+		return tmpl, nil
+	}
+
+	return filepath.Join(a.Cfg.TemplatesDir, tmpl), nil
+}
+
+func (a *App) saveTemplate(tmpl string) error {
+	state, err := a.StateStore.Load()
+	if err != nil {
+		return err
+	}
+
+	state.Template = tmpl
+
+	if err := a.StateStore.Save(state); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (a *App) renderTemplate(fs afero.Fs, tmpl string, problem *problemv1.Problem) error {
 	src, err := os.ReadFile(tmpl)
 	if err != nil {
 		return err
@@ -68,14 +90,7 @@ func (a *App) renderTemplate(fs afero.Fs, tmpl string, problem *problemv1.Proble
 		return err
 	}
 
-	state, err := a.stateStore.Load()
-	if err != nil {
-		return err
-	}
-
-	state.Template = tmpl
-
-	if err := a.stateStore.Save(state); err != nil {
+	if err = a.saveTemplate(tmpl); err != nil {
 		return err
 	}
 
@@ -88,7 +103,7 @@ func (a *App) Focus(tmpl string) (string, error) {
 		return "", fmt.Errorf("focus: %w", err)
 	}
 
-	dir := filepath.Join(a.cfg.WorkspacesDir, problem.Id)
+	dir := filepath.Join(a.Cfg.WorkspacesDir, problem.Id)
 
 	if _, err := os.Stat(dir); err == nil {
 		return dir, nil
@@ -99,6 +114,11 @@ func (a *App) Focus(tmpl string) (string, error) {
 	fs := afero.NewBasePathFs(afero.NewOsFs(), dir)
 
 	if _, err := workspace.Create(fs, problem); err != nil {
+		return "", fmt.Errorf("focus: %w", err)
+	}
+
+	tmpl, err = a.resolveTemplate(tmpl)
+	if err != nil {
 		return "", fmt.Errorf("focus: %w", err)
 	}
 
