@@ -40,31 +40,35 @@ function scrapeProblemType() {
 }
 
 function scrapeSamples() {
-  return Array.from(
+  const inputs = Array.from(
     document
-      .querySelectorAll("div.sample-test")
+      .querySelectorAll("div.sample-test div.input pre")
       .values()
-      .map((sample, index) => {
-        let element: HTMLElement | null = null;
-
-        let input = "";
-        if ((element = sample.querySelector("div.input pre"))) {
-          input = element.innerText;
-        } else {
-          console.warn(`No input found for sample ${index + 1}.`);
-        }
-
-        let output = "";
-        if ((element = sample.querySelector("div.output pre"))) {
-          output = element.innerText;
-        } else {
-          console.warn(`No output found for sample ${index + 1}.`);
-        }
-
-        return { input, output };
-      })
-      .filter((sample) => sample !== null),
+      .map((element) => (element as HTMLPreElement).innerText),
   );
+
+  const outputs = Array.from(
+    document
+      .querySelectorAll("div.sample-test div.output pre")
+      .values()
+      .map((element) => (element as HTMLPreElement).innerText),
+  );
+
+  const samples = [];
+  for (let i = 0; i < Math.max(inputs.length, outputs.length); i++) {
+    const input = inputs[i] ?? "";
+    if (!input) {
+      console.warn(`No input found for sample ${i + 1}.`);
+    }
+
+    const output = outputs[i] ?? "";
+    if (!output) {
+      console.warn(`No output found for sample ${i + 1}.`);
+    }
+
+    samples.push({ input, output });
+  }
+  return samples;
 }
 
 function scrapeProblem() {
