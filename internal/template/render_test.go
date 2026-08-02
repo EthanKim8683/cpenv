@@ -54,14 +54,8 @@ func TestRender(t *testing.T) {
 			Id:   "id",
 			Type: problemv1.ProblemType_PROBLEM_TYPE_STDIO_BATCH,
 			Samples: []*problemv1.ProblemSample{
-				{
-					Input:  "input 0",
-					Output: "output 0",
-				},
-				{
-					Input:  "input 1",
-					Output: "output 1",
-				},
+				{Input: "input 0", Output: "output 0"},
+				{Input: "input 1", Output: "output 1"},
 			},
 		}
 

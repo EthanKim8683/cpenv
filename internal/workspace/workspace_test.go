@@ -18,9 +18,7 @@ func TestWorkspace(t *testing.T) {
 
 	fs := afero.NewMemMapFs()
 
-	created, err := workspace.Create(fs, &problemv1.Problem{
-		Id: "id",
-	})
+	created, err := workspace.Create(fs, &problemv1.Problem{Id: "id"})
 	require.NoError(t, err)
 
 	require.NoError(t, afero.WriteFile(fs, artifact, []byte("artifact"), 0644))

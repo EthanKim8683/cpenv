@@ -51,10 +51,7 @@ func Open(fs afero.Fs) (*Workspace, error) {
 		return nil, fmt.Errorf("open workspace: %w", err)
 	}
 
-	return &Workspace{
-		fs:      fs,
-		problem: &problem,
-	}, nil
+	return &Workspace{fs: fs, problem: &problem}, nil
 }
 
 func Create(fs afero.Fs, problem *problemv1.Problem) (*Workspace, error) {
@@ -71,8 +68,5 @@ func Create(fs afero.Fs, problem *problemv1.Problem) (*Workspace, error) {
 		return nil, fmt.Errorf("create workspace: %w", err)
 	}
 
-	return &Workspace{
-		fs:      fs,
-		problem: proto.CloneOf(problem),
-	}, nil
+	return &Workspace{fs: fs, problem: proto.CloneOf(problem)}, nil
 }

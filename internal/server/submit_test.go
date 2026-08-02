@@ -1,174 +1,175 @@
-package server_test
+package server
 
 import (
-	"context"
 	"errors"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
-	"strings"
 	"sync"
 	"testing"
 	"time"
 
 	submitv1 "github.com/EthanKim8683/cpenv/gen/submit/v1"
 	submitv1connect "github.com/EthanKim8683/cpenv/gen/submit/v1/submitv1connect"
-	"github.com/EthanKim8683/cpenv/internal/server"
-	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
-type subscribeFunc func(cb func(req *submitv1.SubscribeResponse) *submitv1.CallbackRequest)
-type submitFunc func(fileName string, content []byte) error
+func TestHub(t *testing.T) {
+	t.Parallel()
+
+	hub := newHub()
+
+	t.Run("round trip", func(t *testing.T) {
+		t.Parallel()
+
+		fileName := "file name"
+		content := []byte("content")
+		cbErr := errors.New("callback error")
+
+		subCh, err := hub.subscribe(t.Context(), t.Name())
+		require.NoError(t, err)
+
+		var wg sync.WaitGroup
+		wg.Go(func() {
+			cbCh, err := hub.submit(t.Context(), t.Name(), fileName, content)
+			require.NoError(t, err)
+			assert.ErrorIs(t, <-cbCh, cbErr)
+		})
+		wg.Go(func() {
+			msg := <-subCh
+			assert.Equal(t, fileName, msg.FileName)
+			assert.Equal(t, content, msg.Content)
+
+			require.NoError(t, hub.callback(msg.CallbackId, cbErr))
+		})
+		wg.Wait()
+	})
+
+	t.Run("no subscribers", func(t *testing.T) {
+		t.Parallel()
+
+		_, err := hub.submit(t.Context(), t.Name(), "", nil)
+		assert.ErrorContains(t, err, "no subscribers")
+	})
+
+	t.Run("multiple subscribers", func(t *testing.T) {
+		t.Parallel()
+
+		subCh1, err := hub.subscribe(t.Context(), t.Name())
+		require.NoError(t, err)
+
+		subCh2, err := hub.subscribe(t.Context(), t.Name())
+		require.NoError(t, err)
+
+		var wg sync.WaitGroup
+		wg.Go(func() {
+			cbCh, err := hub.submit(t.Context(), t.Name(), "", nil)
+			require.NoError(t, err)
+			assert.ErrorContains(t, <-cbCh, "sub 1")
+
+			cbCh, err = hub.submit(t.Context(), t.Name(), "", nil)
+			require.NoError(t, err)
+			assert.ErrorContains(t, <-cbCh, "sub 2")
+		})
+		wg.Go(func() {
+			require.NoError(t, hub.callback((<-subCh1).CallbackId, fmt.Errorf("sub 1")))
+
+			require.NoError(t, hub.callback((<-subCh2).CallbackId, fmt.Errorf("sub 2")))
+		})
+		wg.Wait()
+	})
+
+	t.Run("multiple submits", func(t *testing.T) {
+		t.Parallel()
+
+		subCh, err := hub.subscribe(t.Context(), t.Name())
+		require.NoError(t, err)
+
+		var wg sync.WaitGroup
+		wg.Go(func() {
+			cbCh, err := hub.submit(t.Context(), t.Name(), "", nil)
+			require.NoError(t, err)
+			assert.NoError(t, <-cbCh)
+		})
+		wg.Go(func() {
+			cbCh, err := hub.submit(t.Context(), t.Name(), "", nil)
+			require.NoError(t, err)
+			assert.NoError(t, <-cbCh)
+		})
+		wg.Go(func() {
+			require.NoError(t, hub.callback((<-subCh).CallbackId, nil))
+
+			require.NoError(t, hub.callback((<-subCh).CallbackId, nil))
+		})
+		wg.Wait()
+	})
+
+	t.Run("multiple callbacks", func(t *testing.T) {
+		t.Parallel()
+
+		subCh, err := hub.subscribe(t.Context(), t.Name())
+		require.NoError(t, err)
+
+		var wg sync.WaitGroup
+		wg.Go(func() {
+			cbCh, err := hub.submit(t.Context(), t.Name(), "", nil)
+			require.NoError(t, err)
+			assert.NoError(t, <-cbCh)
+		})
+		wg.Go(func() {
+			msg := <-subCh
+			require.NoError(t, hub.callback(msg.CallbackId, nil))
+
+			assert.ErrorContains(t, hub.callback(msg.CallbackId, nil), "not found")
+		})
+		wg.Wait()
+	})
+}
 
 func TestSubmitService(t *testing.T) {
 	t.Parallel()
 
-	tests := map[string]struct {
-		extension func(t *testing.T, subscribe subscribeFunc)
-		cli       func(t *testing.T, submit submitFunc)
-	}{
-		"successful submission": {
-			extension: func(t *testing.T, subscribe subscribeFunc) {
-				subscribe(func(req *submitv1.SubscribeResponse) *submitv1.CallbackRequest {
-					assert.Equal(t, "filename", req.FileName)
-					assert.Equal(t, []byte("content"), req.Content)
-					return &submitv1.CallbackRequest{
-						CallbackId: req.CallbackId,
-					}
-				})
-			},
-			cli: func(t *testing.T, submit submitFunc) {
-				assert.NoError(t, submit("filename", []byte("content")))
-			},
-		},
-		"no subscribers": {
-			extension: func(t *testing.T, subscribe subscribeFunc) {},
-			cli: func(t *testing.T, submit submitFunc) {
-				assert.ErrorContains(t, submit("", nil), "no subscribers")
-			},
-		},
-		"extension error": {
-			extension: func(t *testing.T, subscribe subscribeFunc) {
-				subscribe(func(req *submitv1.SubscribeResponse) *submitv1.CallbackRequest {
-					return &submitv1.CallbackRequest{
-						CallbackId: req.CallbackId,
-						Error:      "error message",
-					}
-				})
-			},
-			cli: func(t *testing.T, submit submitFunc) {
-				assert.ErrorContains(t, submit("", nil), "extension: error message")
-			},
-		},
-		"stress test": {
-			extension: func(t *testing.T, subscribe subscribeFunc) {
-				for range 10 {
-					subscribe(func(req *submitv1.SubscribeResponse) *submitv1.CallbackRequest {
-						return &submitv1.CallbackRequest{
-							CallbackId: req.CallbackId,
-							Error:      req.FileName,
-						}
-					})
-				}
-			},
-			cli: func(t *testing.T, submit submitFunc) {
-				var wg sync.WaitGroup
-				for range 20 {
-					wg.Go(func() {
-						id := uuid.New().String()
-						assert.ErrorContains(t, submit(id, nil), id)
-					})
-				}
-				wg.Wait()
-			},
-		},
-	}
-	for name, test := range tests {
-		t.Run(name, func(t *testing.T) {
-			t.Parallel()
+	fileName := "file name"
+	content := []byte("content")
+	cbErr := "callback error"
 
-			svc := server.NewSubmitService()
+	svc := NewSubmitService()
+	mux := http.NewServeMux()
+	mux.Handle(submitv1connect.NewSubmitServiceHandler(svc))
+	srv := httptest.NewServer(mux)
+	t.Cleanup(srv.Close)
 
-			mux := http.NewServeMux()
-			mux.Handle(submitv1connect.NewSubmitServiceHandler(svc))
+	var wg sync.WaitGroup
+	wg.Go(func() {
+		client := submitv1connect.NewSubmitServiceClient(srv.Client(), srv.URL)
 
-			srv := httptest.NewServer(mux)
-			t.Cleanup(srv.Close)
+		require.EventuallyWithT(t, func(c *assert.CollectT) {
+			_, err := client.Submit(t.Context(), &submitv1.SubmitRequest{
+				ProblemId: t.Name(),
+				FileName:  fileName,
+				Content:   content,
+			})
+			assert.ErrorContains(c, err, cbErr)
+		}, time.Second, 50*time.Millisecond)
+	})
+	wg.Go(func() {
+		client := submitv1connect.NewSubmitServiceClient(srv.Client(), srv.URL)
 
-			ctx, cancel := context.WithCancel(t.Context())
-			t.Cleanup(cancel)
+		stream, err := client.Subscribe(t.Context(), &submitv1.SubscribeRequest{ProblemId: t.Name()})
+		require.NoError(t, err)
 
-			problemID := t.Name()
+		require.True(t, stream.Receive())
 
-			var wg sync.WaitGroup
-			subscribe := func(cb func(req *submitv1.SubscribeResponse) *submitv1.CallbackRequest) {
-				wg.Go(func() {
-					ext := submitv1connect.NewSubmitServiceClient(srv.Client(), srv.URL)
+		msg := stream.Msg()
+		assert.Equal(t, fileName, msg.FileName)
+		assert.Equal(t, content, msg.Content)
 
-					stream, err := ext.Subscribe(ctx, &submitv1.SubscribeRequest{
-						ProblemId: problemID,
-					})
-					if errors.Is(err, context.Canceled) {
-						return
-					}
-					require.NoError(t, err)
-
-					t.Cleanup(func() {
-						err := stream.Close()
-						if errors.Is(err, context.Canceled) {
-							return
-						}
-						require.NoError(t, err)
-					})
-
-					for {
-						if !stream.Receive() {
-							return
-						}
-
-						_, err = ext.Callback(ctx, cb(stream.Msg()))
-						if errors.Is(err, context.Canceled) {
-							return
-						}
-						require.NoError(t, err)
-					}
-				})
-			}
-
-			submit := func(fileName string, content []byte) error {
-				tick := 100 * time.Millisecond
-				timeout := 1 * time.Second
-
-				cli := submitv1connect.NewSubmitServiceClient(srv.Client(), srv.URL)
-
-				deadline := time.Now().Add(timeout)
-				var err error
-				for {
-					if time.Now().After(deadline) {
-						break
-					}
-
-					if _, err = cli.Submit(ctx, &submitv1.SubmitRequest{
-						ProblemId: problemID,
-						FileName:  fileName,
-						Content:   content,
-					}); err == nil || !strings.Contains(err.Error(), "no subscribers") {
-						break
-					}
-
-					time.Sleep(tick)
-				}
-				return err
-			}
-
-			if test.extension != nil {
-				test.extension(t, subscribe)
-			}
-			if test.cli != nil {
-				test.cli(t, submit)
-			}
-			cancel()
+		_, err = client.Callback(t.Context(), &submitv1.CallbackRequest{
+			CallbackId: msg.CallbackId,
+			Error:      cbErr,
 		})
-	}
+		require.NoError(t, err)
+	})
+	wg.Wait()
 }

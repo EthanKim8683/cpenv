@@ -18,16 +18,12 @@ func TestFileStore(t *testing.T) {
 
 	store := state.NewFileStore(path)
 
-	loaded, err := store.Load()
+	empty, err := store.Load()
 	require.NoError(t, err)
 	assert.Empty(t, loaded)
 
 	saved := &state.State{
-		Focus: &focusv1.Focus{
-			Problem: &problemv1.Problem{
-				Id: t.Name(),
-			},
-		},
+		Focus:    &focusv1.Focus{Problem: &problemv1.Problem{Id: "id"}},
 		Template: "template",
 	}
 	require.NoError(t, store.Save(saved))
