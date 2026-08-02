@@ -9,8 +9,11 @@ import (
 var focusTmpl string
 
 var focusCmd = &cobra.Command{
-	Use:  "focus",
-	Args: cobra.NoArgs,
+	Use:     "focus [-t template]",
+	Short:   "Focus on the workspace for the current problem.",
+	Long:    "Output the path to the workspace for the last opened problem, creating and initializing it if necessary.",
+	Example: "cd \"$(cpenv focus -t template.star)\"",
+	Args:    cobra.NoArgs,
 	RunE: func(_ *cobra.Command, _ []string) error {
 		path, err := a.Focus(focusTmpl)
 		if err != nil {

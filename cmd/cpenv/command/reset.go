@@ -7,8 +7,10 @@ import (
 var resetTmpl string
 
 var resetCmd = &cobra.Command{
-	Use:  "reset",
-	Args: cobra.NoArgs,
+	Use:   "reset [-t template]",
+	Short: "Reset the current workspace.",
+	Long:  "Re-initialize the current workspace.",
+	Args:  cobra.NoArgs,
 	RunE: func(_ *cobra.Command, _ []string) error {
 		if err := a.Reset(resetTmpl); err != nil {
 			return err

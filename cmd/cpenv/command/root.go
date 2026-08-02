@@ -14,7 +14,8 @@ import (
 var a *app.App
 
 var rootCmd = &cobra.Command{
-	Use: "cpenv",
+	Use:   "cpenv",
+	Short: "Competitive programming environment utility.",
 	PersistentPreRunE: func(_ *cobra.Command, _ []string) error {
 		cfg, err := config.Load()
 		if err != nil {
