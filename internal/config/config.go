@@ -10,7 +10,7 @@ import (
 )
 
 type Config struct {
-	Port          string `env:"CPENV_PORT" envDefault:"8080"`
+	Port          string `env:"CPENV_PORT" envDefault:"8683"`
 	Home          string `env:"CPENV_HOME"`
 	StatePath     string `env:"CPENV_STATE_PATH"`
 	TemplatesDir  string `env:"CPENV_TEMPLATES_DIR"`
