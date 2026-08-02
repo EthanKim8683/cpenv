@@ -5,7 +5,6 @@ import (
 
 	"github.com/EthanKim8683/cpenv/internal/app"
 	"github.com/EthanKim8683/cpenv/internal/config"
-	"github.com/EthanKim8683/cpenv/internal/state"
 	"github.com/spf13/cobra"
 )
 
@@ -19,13 +18,7 @@ var rootCmd = &cobra.Command{
 			return err
 		}
 
-		stateStore := state.NewFileStore(cfg.StatePath)
-
-		a = &app.App{
-			Cfg:        cfg,
-			StateStore: stateStore,
-			HTTPClient: http.DefaultClient,
-		}
+		a = app.NewApp(cfg, http.DefaultClient)
 
 		return nil
 	},

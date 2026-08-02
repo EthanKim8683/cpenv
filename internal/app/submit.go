@@ -36,8 +36,8 @@ func (a *App) defaultSubmissionFile() (string, error) {
 
 func (a *App) Submit(ctx context.Context, subFile string) error {
 	client := submitv1connect.NewSubmitServiceClient(
-		a.HTTPClient,
-		"http://localhost:"+a.Cfg.Port,
+		a.httpClient,
+		"http://localhost:"+a.cfg.Port,
 	)
 
 	dir, err := os.Getwd()

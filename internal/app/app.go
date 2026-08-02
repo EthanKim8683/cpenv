@@ -8,7 +8,15 @@ import (
 )
 
 type App struct {
-	Cfg        *config.Config
-	StateStore state.Store
-	HTTPClient *http.Client
+	cfg        *config.Config
+	stateStore state.Store
+	httpClient *http.Client
+}
+
+func NewApp(cfg *config.Config, httpClient *http.Client) *App {
+	return &App{
+		cfg:        cfg,
+		stateStore: state.NewFileStore(cfg.StatePath),
+		httpClient: httpClient,
+	}
 }

@@ -13,7 +13,7 @@ import (
 )
 
 func (a *App) focusedProblem() (*problemv1.Problem, error) {
-	state, err := a.StateStore.Load()
+	state, err := a.stateStore.Load()
 	if err != nil {
 		return nil, err
 	}
@@ -27,7 +27,7 @@ func (a *App) focusedProblem() (*problemv1.Problem, error) {
 }
 
 func (a *App) defaultTemplate() (string, error) {
-	state, err := a.StateStore.Load()
+	state, err := a.stateStore.Load()
 	if err != nil {
 		return "", err
 	}
@@ -36,7 +36,7 @@ func (a *App) defaultTemplate() (string, error) {
 		return tmpl, nil
 	}
 
-	matches, err := filepath.Glob(filepath.Join(a.Cfg.TemplatesDir, "*.star"))
+	matches, err := filepath.Glob(filepath.Join(a.cfg.TemplatesDir, "*.star"))
 	if err != nil {
 		return "", err
 	}
@@ -56,7 +56,7 @@ func (a *App) renderTemplate(fs afero.Fs, tmpl string, problem *problemv1.Proble
 			return err
 		}
 	} else if !filepath.IsAbs(tmpl) {
-		tmpl = filepath.Join(a.Cfg.TemplatesDir, tmpl)
+		tmpl = filepath.Join(a.cfg.TemplatesDir, tmpl)
 	}
 
 	src, err := os.ReadFile(tmpl)
@@ -68,14 +68,14 @@ func (a *App) renderTemplate(fs afero.Fs, tmpl string, problem *problemv1.Proble
 		return err
 	}
 
-	state, err := a.StateStore.Load()
+	state, err := a.stateStore.Load()
 	if err != nil {
 		return err
 	}
 
 	state.Template = tmpl
 
-	if err := a.StateStore.Save(state); err != nil {
+	if err := a.stateStore.Save(state); err != nil {
 		return err
 	}
 
@@ -88,7 +88,7 @@ func (a *App) Focus(tmpl string) (string, error) {
 		return "", fmt.Errorf("focus: %w", err)
 	}
 
-	dir := filepath.Join(a.Cfg.WorkspacesDir, problem.Id)
+	dir := filepath.Join(a.cfg.WorkspacesDir, problem.Id)
 
 	if _, err := os.Stat(dir); err == nil {
 		return dir, nil

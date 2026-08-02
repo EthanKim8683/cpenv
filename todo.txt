@@ -1,2 +1,4 @@
 - improve code quality of cli
 - write vjudge and atcoder scrapers
+- make env vars more user friendly
+- write app tests
