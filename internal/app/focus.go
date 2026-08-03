@@ -36,7 +36,7 @@ func (a *App) defaultTemplate() (string, error) {
 		return tmpl, nil
 	}
 
-	matches, err := filepath.Glob(filepath.Join(a.Cfg.TemplatesDir, "*.star"))
+	matches, err := filepath.Glob(filepath.Join(a.Cfg.Home, "templates", "*.star"))
 	if err != nil {
 		return "", err
 	}
@@ -62,7 +62,7 @@ func (a *App) resolveTemplate(tmpl string) (string, error) {
 		return tmpl, nil
 	}
 
-	return filepath.Join(a.Cfg.TemplatesDir, tmpl), nil
+	return filepath.Join(a.Cfg.Home, "templates", tmpl), nil
 }
 
 func (a *App) saveTemplate(tmpl string) error {
@@ -103,7 +103,7 @@ func (a *App) Focus(tmpl string) (string, error) {
 		return "", fmt.Errorf("focus: %w", err)
 	}
 
-	dir := filepath.Join(a.Cfg.WorkspacesDir, problem.Id)
+	dir := filepath.Join(a.Cfg.Home, "workspaces", problem.Id)
 
 	if _, err := os.Stat(dir); err == nil {
 		return dir, nil

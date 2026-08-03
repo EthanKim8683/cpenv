@@ -22,7 +22,7 @@ var rootCmd = &cobra.Command{
 			return err
 		}
 
-		stateStore := state.NewFileStore(filepath.Join(cfg.StatePath))
+		stateStore := state.NewFileStore(filepath.Join(cfg.Home, "state.json"))
 
 		dir, err := os.Getwd()
 		if err != nil {

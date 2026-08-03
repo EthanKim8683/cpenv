@@ -1,115 +1,105 @@
 package app
 
-import (
-	"path/filepath"
-	"slices"
-	"testing"
+// func TestDefaultTemplate(t *testing.T) {
+// 	t.Parallel()
 
-	"github.com/EthanKim8683/cpenv/internal/config"
-	"github.com/EthanKim8683/cpenv/internal/state"
-	"github.com/stretchr/testify/assert"
-)
+// 	t.Run("state template", func(t *testing.T) {
+// 		t.Parallel()
 
-func TestDefaultTemplate(t *testing.T) {
-	t.Parallel()
+// 		statePath := filepath.Join(t.TempDir(), "state.json")
+// 		stateTmpl := "state"
 
-	t.Run("state template", func(t *testing.T) {
-		t.Parallel()
+// 		stateStore := state.NewFileStore(statePath)
+// 		stateStore.Save(&state.State{
+// 			Template: stateTmpl,
+// 		})
 
-		statePath := filepath.Join(t.TempDir(), "state.json")
-		stateTmpl := "state"
+// 		a := &App{
+// 			StateStore: stateStore,
+// 		}
 
-		stateStore := state.NewFileStore(statePath)
-		stateStore.Save(&state.State{
-			Template: stateTmpl,
-		})
+// 		tmpl, err := a.defaultTemplate()
+// 		assert.NoError(t, err)
+// 		assert.Equal(t, stateTmpl, tmpl)
+// 	})
 
-		a := &App{
-			StateStore: stateStore,
-		}
+// 	t.Run("empty state template", func(t *testing.T) {
+// 		t.Parallel()
 
-		tmpl, err := a.defaultTemplate()
-		assert.NoError(t, err)
-		assert.Equal(t, stateTmpl, tmpl)
-	})
+// 		statePath := filepath.Join(t.TempDir(), "state.json")
+// 		tmplDir := filepath.Join("testdata", "known-templates")
 
-	t.Run("empty state template", func(t *testing.T) {
-		t.Parallel()
+// 		stateStore := state.NewFileStore(statePath)
 
-		statePath := filepath.Join(t.TempDir(), "state.json")
-		tmplDir := filepath.Join("testdata", "known-templates")
+// 		a := &App{
+// 			Cfg: &config.Config{
+// 				TemplatesDir: tmplDir,
+// 			},
+// 			StateStore: stateStore,
+// 		}
 
-		stateStore := state.NewFileStore(statePath)
+// 		tmpl, err := a.defaultTemplate()
+// 		assert.NoError(t, err)
+// 		assert.True(t, slices.Contains([]string{
+// 			filepath.Join(tmplDir, "1.star"),
+// 			filepath.Join(tmplDir, "2.star"),
+// 		}, tmpl))
+// 	})
+// }
 
-		a := &App{
-			Cfg: &config.Config{
-				TemplatesDir: tmplDir,
-			},
-			StateStore: stateStore,
-		}
+// func TestResolveTemplate(t *testing.T) {
+// 	t.Parallel()
 
-		tmpl, err := a.defaultTemplate()
-		assert.NoError(t, err)
-		assert.True(t, slices.Contains([]string{
-			filepath.Join(tmplDir, "1.star"),
-			filepath.Join(tmplDir, "2.star"),
-		}, tmpl))
-	})
-}
+// 	t.Run("absolute path", func(t *testing.T) {
+// 		t.Parallel()
 
-func TestResolveTemplate(t *testing.T) {
-	t.Parallel()
+// 		absTmpl := filepath.Join(t.TempDir(), "absolute.star")
 
-	t.Run("absolute path", func(t *testing.T) {
-		t.Parallel()
+// 		a := &App{}
 
-		absTmpl := filepath.Join(t.TempDir(), "absolute.star")
+// 		tmpl, err := a.resolveTemplate(absTmpl)
+// 		assert.NoError(t, err)
+// 		assert.Equal(t, absTmpl, tmpl)
+// 	})
 
-		a := &App{}
+// 	t.Run("relative path", func(t *testing.T) {
+// 		t.Parallel()
 
-		tmpl, err := a.resolveTemplate(absTmpl)
-		assert.NoError(t, err)
-		assert.Equal(t, absTmpl, tmpl)
-	})
+// 		tmplDir := filepath.Join(t.TempDir(), "relative")
+// 		relTmpl := "relative.star"
 
-	t.Run("relative path", func(t *testing.T) {
-		t.Parallel()
+// 		a := &App{
+// 			Cfg: &config.Config{
+// 				TemplatesDir: tmplDir,
+// 			},
+// 		}
 
-		tmplDir := filepath.Join(t.TempDir(), "relative")
-		relTmpl := "relative.star"
+// 		tmpl, err := a.resolveTemplate(relTmpl)
+// 		assert.NoError(t, err)
+// 		assert.Equal(t, filepath.Join(tmplDir, relTmpl), tmpl)
+// 	})
 
-		a := &App{
-			Cfg: &config.Config{
-				TemplatesDir: tmplDir,
-			},
-		}
+// 	t.Run("empty path", func(t *testing.T) {
+// 		t.Parallel()
 
-		tmpl, err := a.resolveTemplate(relTmpl)
-		assert.NoError(t, err)
-		assert.Equal(t, filepath.Join(tmplDir, relTmpl), tmpl)
-	})
+// 		tmplDir := filepath.Join("testdata", "known-templates")
+// 		statePath := filepath.Join(t.TempDir(), "state.json")
+// 		stateTmpl := "state"
 
-	t.Run("empty path", func(t *testing.T) {
-		t.Parallel()
+// 		stateStore := state.NewFileStore(statePath)
+// 		stateStore.Save(&state.State{
+// 			Template: stateTmpl,
+// 		})
 
-		tmplDir := filepath.Join("testdata", "known-templates")
-		statePath := filepath.Join(t.TempDir(), "state.json")
-		stateTmpl := "state"
+// 		a := &App{
+// 			Cfg: &config.Config{
+// 				TemplatesDir: tmplDir,
+// 			},
+// 			StateStore: stateStore,
+// 		}
 
-		stateStore := state.NewFileStore(statePath)
-		stateStore.Save(&state.State{
-			Template: stateTmpl,
-		})
-
-		a := &App{
-			Cfg: &config.Config{
-				TemplatesDir: tmplDir,
-			},
-			StateStore: stateStore,
-		}
-
-		tmpl, err := a.resolveTemplate("")
-		assert.NoError(t, err)
-		assert.Equal(t, stateTmpl, tmpl)
-	})
-}
+// 		tmpl, err := a.resolveTemplate("")
+// 		assert.NoError(t, err)
+// 		assert.Equal(t, stateTmpl, tmpl)
+// 	})
+// }

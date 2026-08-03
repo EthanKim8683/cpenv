@@ -1,5 +1,4 @@
 - make app code nice
-- split validation and resolution in config
 - daemon status command + way to manage the daemon
 - init command to init cpenv-home if needed
 - error sentinels -> user-friendly error messages

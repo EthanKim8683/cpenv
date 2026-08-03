@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"path/filepath"
 	"syscall"
 	"time"
 
@@ -24,7 +25,7 @@ func main() {
 		log.Fatalf("cpenvd: %v", err)
 	}
 
-	stateStore := state.NewFileStore(cfg.StatePath)
+	stateStore := state.NewFileStore(filepath.Join(cfg.Home, "state.json"))
 
 	focusSvc := &server.FocusService{
 		StateStore: stateStore,
