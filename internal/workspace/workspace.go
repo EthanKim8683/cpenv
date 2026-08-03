@@ -9,7 +9,7 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
-const problemFile = "problem.json"
+const problemFile = ".problem.json"
 
 type Workspace struct {
 	fs      afero.Fs

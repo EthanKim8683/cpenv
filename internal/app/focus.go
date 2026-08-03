@@ -4,99 +4,30 @@ import (
 	"errors"
 	"fmt"
 	"os"
-	"path/filepath"
 
-	problemv1 "github.com/EthanKim8683/cpenv/gen/problem/v1"
 	"github.com/EthanKim8683/cpenv/internal/state"
 	"github.com/EthanKim8683/cpenv/internal/template"
 	"github.com/EthanKim8683/cpenv/internal/workspace"
 	"github.com/spf13/afero"
 )
 
-func (a *App) focusedProblem() (*problemv1.Problem, error) {
-	state, err := a.StateStore.Load()
-	if err != nil {
-		return nil, err
-	}
-
-	problem, err := state.FocusedProblem()
-	if err != nil {
-		return nil, err
-	}
-
-	return problem, nil
-}
-
-func (a *App) defaultTemplate() (string, error) {
-	state, err := a.StateStore.Load()
-	if err != nil {
-		return "", err
-	}
-
-	if tmpl := state.Template; tmpl != "" {
-		return tmpl, nil
-	}
-
-	matches, err := filepath.Glob(filepath.Join(a.Cfg.Home, "templates", "*.star"))
-	if err != nil {
-		return "", err
-	}
-
-	if len(matches) == 0 {
-		return "", fmt.Errorf("no templates found")
-	}
-
-	return matches[0], nil
-}
-
-func (a *App) resolveTemplate(tmpl string) (string, error) {
-	if tmpl == "" {
-		tmpl, err := a.defaultTemplate()
-		if err != nil {
-			return "", err
-		}
-
-		return tmpl, nil
-	}
-
-	if filepath.IsAbs(tmpl) {
-		return tmpl, nil
-	}
-
-	return filepath.Join(a.Cfg.Home, "templates", tmpl), nil
-}
-
-func (a *App) saveTemplate(tmpl string) error {
-	return a.StateStore.Update(func(st *state.State) error {
-		st.Template = tmpl
-		return nil
-	})
-}
-
-func (a *App) renderTemplate(fs afero.Fs, tmpl string, problem *problemv1.Problem) error {
-	src, err := os.ReadFile(tmpl)
-	if err != nil {
-		return err
-	}
-
-	if err := template.Render(fs, tmpl, src, problem); err != nil {
-		return err
-	}
-
-	if err = a.saveTemplate(tmpl); err != nil {
-		return err
-	}
-
-	return nil
-}
-
 func (a *App) Focus(tmpl string) (string, error) {
-	problem, err := a.focusedProblem()
+	store := state.NewFileStore(a.Cfg.StatePath())
+
+	st, err := store.Load()
 	if err != nil {
 		return "", fmt.Errorf("focus: %w", err)
 	}
 
-	dir := filepath.Join(a.Cfg.Home, "workspaces", problem.Id)
+	problem, err := st.FocusedProblem()
+	if err != nil {
+		return "", fmt.Errorf("focus: %w", err)
+	}
+	if problem == nil {
+		return "", fmt.Errorf("focus: no focused problem")
+	}
+
+	dir := a.Cfg.WorkspaceDir(problem.Id)
 
 	if _, err := os.Stat(dir); err == nil {
 		return dir, nil
@@ -110,12 +41,19 @@ func (a *App) Focus(tmpl string) (string, error) {
 		return "", fmt.Errorf("focus: %w", err)
 	}
 
-	tmpl, err = a.resolveTemplate(tmpl)
+	if tmpl == "" {
+		tmpl = st.Template
+		if tmpl == "" {
+			return "", fmt.Errorf("focus: no template")
+		}
+	}
+
+	src, err := os.ReadFile(tmpl)
 	if err != nil {
 		return "", fmt.Errorf("focus: %w", err)
 	}
 
-	if err := a.renderTemplate(fs, tmpl, problem); err != nil {
+	if err := template.Render(fs, tmpl, src, problem); err != nil {
 		return "", fmt.Errorf("focus: %w", err)
 	}
 
