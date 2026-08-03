@@ -14,22 +14,25 @@ import (
 func TestWorkspace(t *testing.T) {
 	t.Parallel()
 
-	artifact := "artifact"
+	t.Run("round trip", func(t *testing.T) {
+		t.Parallel()
 
-	fs := afero.NewMemMapFs()
+		artifact := "artifact"
 
-	created, err := workspace.Create(fs, &problemv1.Problem{Id: "id"})
-	require.NoError(t, err)
+		fs := afero.NewMemMapFs()
 
-	require.NoError(t, afero.WriteFile(fs, artifact, []byte("artifact"), 0644))
+		created, err := workspace.Create(fs, &problemv1.Problem{Id: "id"})
+		require.NoError(t, err)
 
-	require.NoError(t, created.Clear())
+		require.NoError(t, afero.WriteFile(fs, artifact, []byte("artifact"), 0644))
 
-	_, err = fs.Stat(artifact)
-	assert.ErrorIs(t, err, os.ErrNotExist)
+		require.NoError(t, created.Clear())
 
-	opened, err := workspace.Open(fs)
-	require.NoError(t, err)
+		_, err = fs.Stat(artifact)
+		assert.ErrorIs(t, err, os.ErrNotExist)
 
-	assert.Equal(t, created.Problem(), opened.Problem())
+		opened, err := workspace.Open(fs)
+		require.NoError(t, err)
+		assert.Equal(t, created.Problem(), opened.Problem())
+	})
 }

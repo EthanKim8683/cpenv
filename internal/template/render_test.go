@@ -47,8 +47,6 @@ func TestRender(t *testing.T) {
 	t.Run("successful render", func(t *testing.T) {
 		t.Parallel()
 
-		fs := afero.NewMemMapFs()
-
 		tmpl := "successful-render.star"
 		problem := &problemv1.Problem{
 			Id:   "id",
@@ -58,6 +56,8 @@ func TestRender(t *testing.T) {
 				{Input: "input 1", Output: "output 1"},
 			},
 		}
+
+		fs := afero.NewMemMapFs()
 
 		require.NoError(t, template.Render(fs, tmpl, readTemplate(t, tmpl), problem))
 

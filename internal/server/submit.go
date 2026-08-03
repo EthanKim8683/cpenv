@@ -42,7 +42,7 @@ func (h *hub) removeSubscriber(problemID string, ch chan *submitv1.SubscribeResp
 	}
 }
 
-func (h *hub) sendToSubscriber(ctx context.Context, problemID string, msg *submitv1.SubscribeResponse) error {
+func (h *hub) send(ctx context.Context, problemID string, msg *submitv1.SubscribeResponse) error {
 	h.mu.Lock()
 	chs := slices.Collect(maps.Keys(h.subs[problemID]))
 	h.mu.Unlock()
@@ -97,7 +97,7 @@ func (h *hub) submit(ctx context.Context, problemID, fileName string, content []
 		h.takeCallback(cbID)
 	})
 
-	if err := h.sendToSubscriber(ctx, problemID, &submitv1.SubscribeResponse{
+	if err := h.send(ctx, problemID, &submitv1.SubscribeResponse{
 		CallbackId: cbID,
 		FileName:   fileName,
 		Content:    content,

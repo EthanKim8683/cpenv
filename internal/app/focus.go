@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 
 	problemv1 "github.com/EthanKim8683/cpenv/gen/problem/v1"
+	"github.com/EthanKim8683/cpenv/internal/state"
 	"github.com/EthanKim8683/cpenv/internal/template"
 	"github.com/EthanKim8683/cpenv/internal/workspace"
 	"github.com/spf13/afero"
@@ -66,18 +67,10 @@ func (a *App) resolveTemplate(tmpl string) (string, error) {
 }
 
 func (a *App) saveTemplate(tmpl string) error {
-	state, err := a.StateStore.Load()
-	if err != nil {
-		return err
-	}
-
-	state.Template = tmpl
-
-	if err := a.StateStore.Save(state); err != nil {
-		return err
-	}
-
-	return nil
+	return a.StateStore.Update(func(st *state.State) error {
+		st.Template = tmpl
+		return nil
+	})
 }
 
 func (a *App) renderTemplate(fs afero.Fs, tmpl string, problem *problemv1.Problem) error {
