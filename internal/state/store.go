@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+
+	"github.com/gofrs/flock"
 )
 
 type Store interface {
@@ -14,10 +16,14 @@ type Store interface {
 }
 
 type fileStore struct {
+	lock *flock.Flock
 	path string
 }
 
 func (s *fileStore) Load() (*State, error) {
+	s.lock.RLock()
+	defer s.lock.Unlock()
+
 	var state State
 
 	data, err := os.ReadFile(s.path)
@@ -34,33 +40,10 @@ func (s *fileStore) Load() (*State, error) {
 	return &state, nil
 }
 
-func atomicWrite(path string, data []byte) error {
-	tmp, err := os.CreateTemp(filepath.Dir(path), "*")
-	if err != nil {
-		return err
-	}
-	tmpPath := tmp.Name()
-
-	if _, err := tmp.Write(data); err != nil {
-		_ = tmp.Close()
-		_ = os.Remove(tmpPath)
-		return err
-	}
-
-	if err := tmp.Close(); err != nil {
-		_ = os.Remove(tmpPath)
-		return err
-	}
-
-	if err := os.Rename(tmpPath, path); err != nil {
-		_ = os.Remove(tmpPath)
-		return err
-	}
-
-	return nil
-}
-
 func (s *fileStore) Save(state *State) error {
+	s.lock.Lock()
+	defer s.lock.Unlock()
+
 	data, err := json.Marshal(state)
 	if err != nil {
 		return fmt.Errorf("save state: %w", err)
@@ -70,7 +53,7 @@ func (s *fileStore) Save(state *State) error {
 		return fmt.Errorf("save state: %w", err)
 	}
 
-	if err := atomicWrite(s.path, data); err != nil {
+	if err := os.WriteFile(s.path, data, 0644); err != nil {
 		return fmt.Errorf("save state: %w", err)
 	}
 
@@ -78,5 +61,8 @@ func (s *fileStore) Save(state *State) error {
 }
 
 func NewFileStore(path string) Store {
-	return &fileStore{path: path}
+	return &fileStore{
+		path: path,
+		lock: flock.New(path + ".lock"),
+	}
 }

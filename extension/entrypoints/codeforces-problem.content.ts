@@ -118,6 +118,8 @@ async function submit(sourceFile: File) {
   formData.set("programTypeId", getProgramTypeId(sourceFile));
   formData.set("sourceFile", sourceFile);
 
+  // may not always work if cloudflare is upset
+  // maybe reload the tab?
   const url = window.location.href;
   const response = await fetch(url, {
     method: "POST",
