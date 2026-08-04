@@ -49,11 +49,11 @@ func (s *Store) Problem() (*problemv1.Problem, error) {
 		return nil, errors.New(errMsg)
 	}
 
-	if focus.GetProblem() == nil {
+	problem := focus.GetProblem()
+	if problem == nil {
 		return nil, errors.New("no problem")
 	}
-
-	return focus.GetProblem(), nil
+	return problem, nil
 }
 
 func atomicWrite(path string, data []byte) error {
