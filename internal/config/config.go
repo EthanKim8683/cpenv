@@ -25,22 +25,6 @@ func (c *Config) Validate() error {
 	return errs
 }
 
-func (c *Config) StatePath() string {
-	return filepath.Join(c.Home, "state.json")
-}
-
-func (c *Config) TemplatesDir() string {
-	return filepath.Join(c.Home, "templates")
-}
-
-func (c *Config) WorkspacesDir() string {
-	return filepath.Join(c.Home, "workspaces")
-}
-
-func (c *Config) WorkspaceDir(problemID string) string {
-	return filepath.Join(c.WorkspacesDir(), problemID)
-}
-
 func Load() (*Config, error) {
 	var cfg Config
 	if err := env.Parse(&cfg); err != nil {

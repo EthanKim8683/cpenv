@@ -83,6 +83,7 @@ func (x *SubmitRequest) GetContent() []byte {
 
 type SubmitResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
+	Error         string                 `protobuf:"bytes,1,opt,name=error,proto3" json:"error,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -117,182 +118,189 @@ func (*SubmitResponse) Descriptor() ([]byte, []int) {
 	return file_submit_v1_submit_service_proto_rawDescGZIP(), []int{1}
 }
 
-type SubscribeRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	ProblemId     string                 `protobuf:"bytes,1,opt,name=problem_id,json=problemId,proto3" json:"problem_id,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *SubscribeRequest) Reset() {
-	*x = SubscribeRequest{}
-	mi := &file_submit_v1_submit_service_proto_msgTypes[2]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *SubscribeRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*SubscribeRequest) ProtoMessage() {}
-
-func (x *SubscribeRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_submit_v1_submit_service_proto_msgTypes[2]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use SubscribeRequest.ProtoReflect.Descriptor instead.
-func (*SubscribeRequest) Descriptor() ([]byte, []int) {
-	return file_submit_v1_submit_service_proto_rawDescGZIP(), []int{2}
-}
-
-func (x *SubscribeRequest) GetProblemId() string {
-	if x != nil {
-		return x.ProblemId
-	}
-	return ""
-}
-
-type SubscribeResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	CallbackId    string                 `protobuf:"bytes,1,opt,name=callback_id,json=callbackId,proto3" json:"callback_id,omitempty"`
-	FileName      string                 `protobuf:"bytes,2,opt,name=file_name,json=fileName,proto3" json:"file_name,omitempty"`
-	Content       []byte                 `protobuf:"bytes,3,opt,name=content,proto3" json:"content,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *SubscribeResponse) Reset() {
-	*x = SubscribeResponse{}
-	mi := &file_submit_v1_submit_service_proto_msgTypes[3]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *SubscribeResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*SubscribeResponse) ProtoMessage() {}
-
-func (x *SubscribeResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_submit_v1_submit_service_proto_msgTypes[3]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use SubscribeResponse.ProtoReflect.Descriptor instead.
-func (*SubscribeResponse) Descriptor() ([]byte, []int) {
-	return file_submit_v1_submit_service_proto_rawDescGZIP(), []int{3}
-}
-
-func (x *SubscribeResponse) GetCallbackId() string {
-	if x != nil {
-		return x.CallbackId
-	}
-	return ""
-}
-
-func (x *SubscribeResponse) GetFileName() string {
-	if x != nil {
-		return x.FileName
-	}
-	return ""
-}
-
-func (x *SubscribeResponse) GetContent() []byte {
-	if x != nil {
-		return x.Content
-	}
-	return nil
-}
-
-type CallbackRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	CallbackId    string                 `protobuf:"bytes,1,opt,name=callback_id,json=callbackId,proto3" json:"callback_id,omitempty"`
-	Error         string                 `protobuf:"bytes,2,opt,name=error,proto3" json:"error,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *CallbackRequest) Reset() {
-	*x = CallbackRequest{}
-	mi := &file_submit_v1_submit_service_proto_msgTypes[4]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *CallbackRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*CallbackRequest) ProtoMessage() {}
-
-func (x *CallbackRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_submit_v1_submit_service_proto_msgTypes[4]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use CallbackRequest.ProtoReflect.Descriptor instead.
-func (*CallbackRequest) Descriptor() ([]byte, []int) {
-	return file_submit_v1_submit_service_proto_rawDescGZIP(), []int{4}
-}
-
-func (x *CallbackRequest) GetCallbackId() string {
-	if x != nil {
-		return x.CallbackId
-	}
-	return ""
-}
-
-func (x *CallbackRequest) GetError() string {
+func (x *SubmitResponse) GetError() string {
 	if x != nil {
 		return x.Error
 	}
 	return ""
 }
 
-type CallbackResponse struct {
+type RequestSubmissionRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	ProblemId     string                 `protobuf:"bytes,1,opt,name=problem_id,json=problemId,proto3" json:"problem_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *RequestSubmissionRequest) Reset() {
+	*x = RequestSubmissionRequest{}
+	mi := &file_submit_v1_submit_service_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RequestSubmissionRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RequestSubmissionRequest) ProtoMessage() {}
+
+func (x *RequestSubmissionRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_submit_v1_submit_service_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RequestSubmissionRequest.ProtoReflect.Descriptor instead.
+func (*RequestSubmissionRequest) Descriptor() ([]byte, []int) {
+	return file_submit_v1_submit_service_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *RequestSubmissionRequest) GetProblemId() string {
+	if x != nil {
+		return x.ProblemId
+	}
+	return ""
+}
+
+type RequestSubmissionResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	ReplyId       uint32                 `protobuf:"varint,1,opt,name=reply_id,json=replyId,proto3" json:"reply_id,omitempty"`
+	FileName      string                 `protobuf:"bytes,2,opt,name=file_name,json=fileName,proto3" json:"file_name,omitempty"`
+	Content       []byte                 `protobuf:"bytes,3,opt,name=content,proto3" json:"content,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *RequestSubmissionResponse) Reset() {
+	*x = RequestSubmissionResponse{}
+	mi := &file_submit_v1_submit_service_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RequestSubmissionResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RequestSubmissionResponse) ProtoMessage() {}
+
+func (x *RequestSubmissionResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_submit_v1_submit_service_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RequestSubmissionResponse.ProtoReflect.Descriptor instead.
+func (*RequestSubmissionResponse) Descriptor() ([]byte, []int) {
+	return file_submit_v1_submit_service_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *RequestSubmissionResponse) GetReplyId() uint32 {
+	if x != nil {
+		return x.ReplyId
+	}
+	return 0
+}
+
+func (x *RequestSubmissionResponse) GetFileName() string {
+	if x != nil {
+		return x.FileName
+	}
+	return ""
+}
+
+func (x *RequestSubmissionResponse) GetContent() []byte {
+	if x != nil {
+		return x.Content
+	}
+	return nil
+}
+
+type CompleteSubmissionRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	ReplyId       uint32                 `protobuf:"varint,1,opt,name=reply_id,json=replyId,proto3" json:"reply_id,omitempty"`
+	Error         string                 `protobuf:"bytes,2,opt,name=error,proto3" json:"error,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CompleteSubmissionRequest) Reset() {
+	*x = CompleteSubmissionRequest{}
+	mi := &file_submit_v1_submit_service_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CompleteSubmissionRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CompleteSubmissionRequest) ProtoMessage() {}
+
+func (x *CompleteSubmissionRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_submit_v1_submit_service_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CompleteSubmissionRequest.ProtoReflect.Descriptor instead.
+func (*CompleteSubmissionRequest) Descriptor() ([]byte, []int) {
+	return file_submit_v1_submit_service_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *CompleteSubmissionRequest) GetReplyId() uint32 {
+	if x != nil {
+		return x.ReplyId
+	}
+	return 0
+}
+
+func (x *CompleteSubmissionRequest) GetError() string {
+	if x != nil {
+		return x.Error
+	}
+	return ""
+}
+
+type CompleteSubmissionResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *CallbackResponse) Reset() {
-	*x = CallbackResponse{}
+func (x *CompleteSubmissionResponse) Reset() {
+	*x = CompleteSubmissionResponse{}
 	mi := &file_submit_v1_submit_service_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *CallbackResponse) String() string {
+func (x *CompleteSubmissionResponse) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*CallbackResponse) ProtoMessage() {}
+func (*CompleteSubmissionResponse) ProtoMessage() {}
 
-func (x *CallbackResponse) ProtoReflect() protoreflect.Message {
+func (x *CompleteSubmissionResponse) ProtoReflect() protoreflect.Message {
 	mi := &file_submit_v1_submit_service_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -304,8 +312,8 @@ func (x *CallbackResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use CallbackResponse.ProtoReflect.Descriptor instead.
-func (*CallbackResponse) Descriptor() ([]byte, []int) {
+// Deprecated: Use CompleteSubmissionResponse.ProtoReflect.Descriptor instead.
+func (*CompleteSubmissionResponse) Descriptor() ([]byte, []int) {
 	return file_submit_v1_submit_service_proto_rawDescGZIP(), []int{5}
 }
 
@@ -318,25 +326,24 @@ const file_submit_v1_submit_service_proto_rawDesc = "" +
 	"\n" +
 	"problem_id\x18\x01 \x01(\tR\tproblemId\x12\x1b\n" +
 	"\tfile_name\x18\x02 \x01(\tR\bfileName\x12\x18\n" +
-	"\acontent\x18\x03 \x01(\fR\acontent\"\x10\n" +
-	"\x0eSubmitResponse\"1\n" +
-	"\x10SubscribeRequest\x12\x1d\n" +
+	"\acontent\x18\x03 \x01(\fR\acontent\"&\n" +
+	"\x0eSubmitResponse\x12\x14\n" +
+	"\x05error\x18\x01 \x01(\tR\x05error\"9\n" +
+	"\x18RequestSubmissionRequest\x12\x1d\n" +
 	"\n" +
-	"problem_id\x18\x01 \x01(\tR\tproblemId\"k\n" +
-	"\x11SubscribeResponse\x12\x1f\n" +
-	"\vcallback_id\x18\x01 \x01(\tR\n" +
-	"callbackId\x12\x1b\n" +
+	"problem_id\x18\x01 \x01(\tR\tproblemId\"m\n" +
+	"\x19RequestSubmissionResponse\x12\x19\n" +
+	"\breply_id\x18\x01 \x01(\rR\areplyId\x12\x1b\n" +
 	"\tfile_name\x18\x02 \x01(\tR\bfileName\x12\x18\n" +
-	"\acontent\x18\x03 \x01(\fR\acontent\"H\n" +
-	"\x0fCallbackRequest\x12\x1f\n" +
-	"\vcallback_id\x18\x01 \x01(\tR\n" +
-	"callbackId\x12\x14\n" +
-	"\x05error\x18\x02 \x01(\tR\x05error\"\x12\n" +
-	"\x10CallbackResponse2\xdd\x01\n" +
+	"\acontent\x18\x03 \x01(\fR\acontent\"L\n" +
+	"\x19CompleteSubmissionRequest\x12\x19\n" +
+	"\breply_id\x18\x01 \x01(\rR\areplyId\x12\x14\n" +
+	"\x05error\x18\x02 \x01(\tR\x05error\"\x1c\n" +
+	"\x1aCompleteSubmissionResponse2\x91\x02\n" +
 	"\rSubmitService\x12=\n" +
-	"\x06Submit\x12\x18.submit.v1.SubmitRequest\x1a\x19.submit.v1.SubmitResponse\x12H\n" +
-	"\tSubscribe\x12\x1b.submit.v1.SubscribeRequest\x1a\x1c.submit.v1.SubscribeResponse0\x01\x12C\n" +
-	"\bCallback\x12\x1a.submit.v1.CallbackRequest\x1a\x1b.submit.v1.CallbackResponseB\x9e\x01\n" +
+	"\x06Submit\x12\x18.submit.v1.SubmitRequest\x1a\x19.submit.v1.SubmitResponse\x12^\n" +
+	"\x11RequestSubmission\x12#.submit.v1.RequestSubmissionRequest\x1a$.submit.v1.RequestSubmissionResponse\x12a\n" +
+	"\x12CompleteSubmission\x12$.submit.v1.CompleteSubmissionRequest\x1a%.submit.v1.CompleteSubmissionResponseB\x9e\x01\n" +
 	"\rcom.submit.v1B\x12SubmitServiceProtoP\x01Z4github.com/EthanKim8683/cpenv/gen/submit/v1;submitv1\xa2\x02\x03SXX\xaa\x02\tSubmit.V1\xca\x02\tSubmit\\V1\xe2\x02\x15Submit\\V1\\GPBMetadata\xea\x02\n" +
 	"Submit::V1b\x06proto3"
 
@@ -354,20 +361,20 @@ func file_submit_v1_submit_service_proto_rawDescGZIP() []byte {
 
 var file_submit_v1_submit_service_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
 var file_submit_v1_submit_service_proto_goTypes = []any{
-	(*SubmitRequest)(nil),     // 0: submit.v1.SubmitRequest
-	(*SubmitResponse)(nil),    // 1: submit.v1.SubmitResponse
-	(*SubscribeRequest)(nil),  // 2: submit.v1.SubscribeRequest
-	(*SubscribeResponse)(nil), // 3: submit.v1.SubscribeResponse
-	(*CallbackRequest)(nil),   // 4: submit.v1.CallbackRequest
-	(*CallbackResponse)(nil),  // 5: submit.v1.CallbackResponse
+	(*SubmitRequest)(nil),              // 0: submit.v1.SubmitRequest
+	(*SubmitResponse)(nil),             // 1: submit.v1.SubmitResponse
+	(*RequestSubmissionRequest)(nil),   // 2: submit.v1.RequestSubmissionRequest
+	(*RequestSubmissionResponse)(nil),  // 3: submit.v1.RequestSubmissionResponse
+	(*CompleteSubmissionRequest)(nil),  // 4: submit.v1.CompleteSubmissionRequest
+	(*CompleteSubmissionResponse)(nil), // 5: submit.v1.CompleteSubmissionResponse
 }
 var file_submit_v1_submit_service_proto_depIdxs = []int32{
 	0, // 0: submit.v1.SubmitService.Submit:input_type -> submit.v1.SubmitRequest
-	2, // 1: submit.v1.SubmitService.Subscribe:input_type -> submit.v1.SubscribeRequest
-	4, // 2: submit.v1.SubmitService.Callback:input_type -> submit.v1.CallbackRequest
+	2, // 1: submit.v1.SubmitService.RequestSubmission:input_type -> submit.v1.RequestSubmissionRequest
+	4, // 2: submit.v1.SubmitService.CompleteSubmission:input_type -> submit.v1.CompleteSubmissionRequest
 	1, // 3: submit.v1.SubmitService.Submit:output_type -> submit.v1.SubmitResponse
-	3, // 4: submit.v1.SubmitService.Subscribe:output_type -> submit.v1.SubscribeResponse
-	5, // 5: submit.v1.SubmitService.Callback:output_type -> submit.v1.CallbackResponse
+	3, // 4: submit.v1.SubmitService.RequestSubmission:output_type -> submit.v1.RequestSubmissionResponse
+	5, // 5: submit.v1.SubmitService.CompleteSubmission:output_type -> submit.v1.CompleteSubmissionResponse
 	3, // [3:6] is the sub-list for method output_type
 	0, // [0:3] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name

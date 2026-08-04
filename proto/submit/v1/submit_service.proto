@@ -4,8 +4,10 @@ package submit.v1;
 
 service SubmitService {
   rpc Submit(SubmitRequest) returns (SubmitResponse);
-  rpc Subscribe(SubscribeRequest) returns (stream SubscribeResponse);
-  rpc Callback(CallbackRequest) returns (CallbackResponse);
+  rpc RequestSubmission(RequestSubmissionRequest)
+      returns (RequestSubmissionResponse);
+  rpc CompleteSubmission(CompleteSubmissionRequest)
+      returns (CompleteSubmissionResponse);
 }
 
 message SubmitRequest {
@@ -14,21 +16,19 @@ message SubmitRequest {
   bytes content = 3;
 }
 
-message SubmitResponse {}
+message SubmitResponse { string error = 1; }
 
-message SubscribeRequest {
-  string problem_id = 1;
-}
+message RequestSubmissionRequest { string problem_id = 1; }
 
-message SubscribeResponse {
-  string callback_id = 1;
+message RequestSubmissionResponse {
+  uint32 reply_id = 1;
   string file_name = 2;
   bytes content = 3;
 }
 
-message CallbackRequest {
-  string callback_id = 1;
+message CompleteSubmissionRequest {
+  uint32 reply_id = 1;
   string error = 2;
 }
 
-message CallbackResponse {}
+message CompleteSubmissionResponse {}

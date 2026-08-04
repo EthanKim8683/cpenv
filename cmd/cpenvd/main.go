@@ -7,14 +7,16 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"path/filepath"
 	"syscall"
 	"time"
 
 	"github.com/EthanKim8683/cpenv/gen/focus/v1/focusv1connect"
 	"github.com/EthanKim8683/cpenv/gen/submit/v1/submitv1connect"
 	"github.com/EthanKim8683/cpenv/internal/config"
-	"github.com/EthanKim8683/cpenv/internal/server"
-	"github.com/EthanKim8683/cpenv/internal/state"
+	"github.com/EthanKim8683/cpenv/internal/domain"
+	"github.com/EthanKim8683/cpenv/internal/focus"
+	"github.com/EthanKim8683/cpenv/internal/submit"
 	"github.com/rs/cors"
 )
 
@@ -24,12 +26,12 @@ func main() {
 		log.Fatalf("cpenvd: %v", err)
 	}
 
-	stateStore := state.NewFileStore(cfg.StatePath())
-
-	focusSvc := &server.FocusService{
-		StateStore: stateStore,
+	focusStore := focus.NewStore(filepath.Join(cfg.Home, domain.FocusFile))
+	focusSvc := &focus.Service{
+		Store: focusStore,
 	}
-	submitSvc := server.NewSubmitService()
+
+	submitSvc := submit.NewService()
 
 	mux := http.NewServeMux()
 	mux.Handle(focusv1connect.NewFocusServiceHandler(focusSvc))
