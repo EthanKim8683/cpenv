@@ -10,7 +10,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file submit/v1/submit_service.proto.
  */
 export const file_submit_v1_submit_service: GenFile = /*@__PURE__*/
-  fileDesc("Ch5zdWJtaXQvdjEvc3VibWl0X3NlcnZpY2UucHJvdG8SCXN1Ym1pdC52MSJHCg1TdWJtaXRSZXF1ZXN0EhIKCnByb2JsZW1faWQYASABKAkSEQoJZmlsZV9uYW1lGAIgASgJEg8KB2NvbnRlbnQYAyABKAwiHwoOU3VibWl0UmVzcG9uc2USDQoFZXJyb3IYASABKAkiLgoYUmVxdWVzdFN1Ym1pc3Npb25SZXF1ZXN0EhIKCnByb2JsZW1faWQYASABKAkiUQoZUmVxdWVzdFN1Ym1pc3Npb25SZXNwb25zZRIQCghyZXBseV9pZBgBIAEoDRIRCglmaWxlX25hbWUYAiABKAkSDwoHY29udGVudBgDIAEoDCI8ChlDb21wbGV0ZVN1Ym1pc3Npb25SZXF1ZXN0EhAKCHJlcGx5X2lkGAEgASgNEg0KBWVycm9yGAIgASgJIhwKGkNvbXBsZXRlU3VibWlzc2lvblJlc3BvbnNlMpECCg1TdWJtaXRTZXJ2aWNlEj0KBlN1Ym1pdBIYLnN1Ym1pdC52MS5TdWJtaXRSZXF1ZXN0Ghkuc3VibWl0LnYxLlN1Ym1pdFJlc3BvbnNlEl4KEVJlcXVlc3RTdWJtaXNzaW9uEiMuc3VibWl0LnYxLlJlcXVlc3RTdWJtaXNzaW9uUmVxdWVzdBokLnN1Ym1pdC52MS5SZXF1ZXN0U3VibWlzc2lvblJlc3BvbnNlEmEKEkNvbXBsZXRlU3VibWlzc2lvbhIkLnN1Ym1pdC52MS5Db21wbGV0ZVN1Ym1pc3Npb25SZXF1ZXN0GiUuc3VibWl0LnYxLkNvbXBsZXRlU3VibWlzc2lvblJlc3BvbnNlQp4BCg1jb20uc3VibWl0LnYxQhJTdWJtaXRTZXJ2aWNlUHJvdG9QAVo0Z2l0aHViLmNvbS9FdGhhbktpbTg2ODMvY3BlbnYvZ2VuL3N1Ym1pdC92MTtzdWJtaXR2MaICA1NYWKoCCVN1Ym1pdC5WMcoCCVN1Ym1pdFxWMeICFVN1Ym1pdFxWMVxHUEJNZXRhZGF0YeoCClN1Ym1pdDo6VjFiBnByb3RvMw");
+  fileDesc("Ch5zdWJtaXQvdjEvc3VibWl0X3NlcnZpY2UucHJvdG8SCXN1Ym1pdC52MSJHCg1TdWJtaXRSZXF1ZXN0EhIKCnByb2JsZW1faWQYASABKAkSEQoJZmlsZV9uYW1lGAIgASgJEg8KB2NvbnRlbnQYAyABKAwiHwoOU3VibWl0UmVzcG9uc2USDQoFZXJyb3IYASABKAkiIgoMQ2xhaW1SZXF1ZXN0EhIKCnByb2JsZW1faWQYASABKAkiRQoNQ2xhaW1SZXNwb25zZRIQCghyZXBseV9pZBgBIAEoDRIRCglmaWxlX25hbWUYAiABKAkSDwoHY29udGVudBgDIAEoDCIvCgxSZXBseVJlcXVlc3QSEAoIcmVwbHlfaWQYASABKA0SDQoFZXJyb3IYAiABKAkiDwoNUmVwbHlSZXNwb25zZTLGAQoNU3VibWl0U2VydmljZRI9CgZTdWJtaXQSGC5zdWJtaXQudjEuU3VibWl0UmVxdWVzdBoZLnN1Ym1pdC52MS5TdWJtaXRSZXNwb25zZRI6CgVDbGFpbRIXLnN1Ym1pdC52MS5DbGFpbVJlcXVlc3QaGC5zdWJtaXQudjEuQ2xhaW1SZXNwb25zZRI6CgVSZXBseRIXLnN1Ym1pdC52MS5SZXBseVJlcXVlc3QaGC5zdWJtaXQudjEuUmVwbHlSZXNwb25zZUKeAQoNY29tLnN1Ym1pdC52MUISU3VibWl0U2VydmljZVByb3RvUAFaNGdpdGh1Yi5jb20vRXRoYW5LaW04NjgzL2NwZW52L2dlbi9zdWJtaXQvdjE7c3VibWl0djGiAgNTWFiqAglTdWJtaXQuVjHKAglTdWJtaXRcVjHiAhVTdWJtaXRcVjFcR1BCTWV0YWRhdGHqAgpTdWJtaXQ6OlYxYgZwcm90bzM");
 
 /**
  * @generated from message submit.v1.SubmitRequest
@@ -57,9 +57,9 @@ export const SubmitResponseSchema: GenMessage<SubmitResponse> = /*@__PURE__*/
   messageDesc(file_submit_v1_submit_service, 1);
 
 /**
- * @generated from message submit.v1.RequestSubmissionRequest
+ * @generated from message submit.v1.ClaimRequest
  */
-export type RequestSubmissionRequest = Message<"submit.v1.RequestSubmissionRequest"> & {
+export type ClaimRequest = Message<"submit.v1.ClaimRequest"> & {
   /**
    * @generated from field: string problem_id = 1;
    */
@@ -67,16 +67,16 @@ export type RequestSubmissionRequest = Message<"submit.v1.RequestSubmissionReque
 };
 
 /**
- * Describes the message submit.v1.RequestSubmissionRequest.
- * Use `create(RequestSubmissionRequestSchema)` to create a new message.
+ * Describes the message submit.v1.ClaimRequest.
+ * Use `create(ClaimRequestSchema)` to create a new message.
  */
-export const RequestSubmissionRequestSchema: GenMessage<RequestSubmissionRequest> = /*@__PURE__*/
+export const ClaimRequestSchema: GenMessage<ClaimRequest> = /*@__PURE__*/
   messageDesc(file_submit_v1_submit_service, 2);
 
 /**
- * @generated from message submit.v1.RequestSubmissionResponse
+ * @generated from message submit.v1.ClaimResponse
  */
-export type RequestSubmissionResponse = Message<"submit.v1.RequestSubmissionResponse"> & {
+export type ClaimResponse = Message<"submit.v1.ClaimResponse"> & {
   /**
    * @generated from field: uint32 reply_id = 1;
    */
@@ -94,16 +94,16 @@ export type RequestSubmissionResponse = Message<"submit.v1.RequestSubmissionResp
 };
 
 /**
- * Describes the message submit.v1.RequestSubmissionResponse.
- * Use `create(RequestSubmissionResponseSchema)` to create a new message.
+ * Describes the message submit.v1.ClaimResponse.
+ * Use `create(ClaimResponseSchema)` to create a new message.
  */
-export const RequestSubmissionResponseSchema: GenMessage<RequestSubmissionResponse> = /*@__PURE__*/
+export const ClaimResponseSchema: GenMessage<ClaimResponse> = /*@__PURE__*/
   messageDesc(file_submit_v1_submit_service, 3);
 
 /**
- * @generated from message submit.v1.CompleteSubmissionRequest
+ * @generated from message submit.v1.ReplyRequest
  */
-export type CompleteSubmissionRequest = Message<"submit.v1.CompleteSubmissionRequest"> & {
+export type ReplyRequest = Message<"submit.v1.ReplyRequest"> & {
   /**
    * @generated from field: uint32 reply_id = 1;
    */
@@ -116,23 +116,23 @@ export type CompleteSubmissionRequest = Message<"submit.v1.CompleteSubmissionReq
 };
 
 /**
- * Describes the message submit.v1.CompleteSubmissionRequest.
- * Use `create(CompleteSubmissionRequestSchema)` to create a new message.
+ * Describes the message submit.v1.ReplyRequest.
+ * Use `create(ReplyRequestSchema)` to create a new message.
  */
-export const CompleteSubmissionRequestSchema: GenMessage<CompleteSubmissionRequest> = /*@__PURE__*/
+export const ReplyRequestSchema: GenMessage<ReplyRequest> = /*@__PURE__*/
   messageDesc(file_submit_v1_submit_service, 4);
 
 /**
- * @generated from message submit.v1.CompleteSubmissionResponse
+ * @generated from message submit.v1.ReplyResponse
  */
-export type CompleteSubmissionResponse = Message<"submit.v1.CompleteSubmissionResponse"> & {
+export type ReplyResponse = Message<"submit.v1.ReplyResponse"> & {
 };
 
 /**
- * Describes the message submit.v1.CompleteSubmissionResponse.
- * Use `create(CompleteSubmissionResponseSchema)` to create a new message.
+ * Describes the message submit.v1.ReplyResponse.
+ * Use `create(ReplyResponseSchema)` to create a new message.
  */
-export const CompleteSubmissionResponseSchema: GenMessage<CompleteSubmissionResponse> = /*@__PURE__*/
+export const ReplyResponseSchema: GenMessage<ReplyResponse> = /*@__PURE__*/
   messageDesc(file_submit_v1_submit_service, 5);
 
 /**
@@ -148,20 +148,20 @@ export const SubmitService: GenService<{
     output: typeof SubmitResponseSchema;
   },
   /**
-   * @generated from rpc submit.v1.SubmitService.RequestSubmission
+   * @generated from rpc submit.v1.SubmitService.Claim
    */
-  requestSubmission: {
+  claim: {
     methodKind: "unary";
-    input: typeof RequestSubmissionRequestSchema;
-    output: typeof RequestSubmissionResponseSchema;
+    input: typeof ClaimRequestSchema;
+    output: typeof ClaimResponseSchema;
   },
   /**
-   * @generated from rpc submit.v1.SubmitService.CompleteSubmission
+   * @generated from rpc submit.v1.SubmitService.Reply
    */
-  completeSubmission: {
+  reply: {
     methodKind: "unary";
-    input: typeof CompleteSubmissionRequestSchema;
-    output: typeof CompleteSubmissionResponseSchema;
+    input: typeof ReplyRequestSchema;
+    output: typeof ReplyResponseSchema;
   },
 }> = /*@__PURE__*/
   serviceDesc(file_submit_v1_submit_service, 0);

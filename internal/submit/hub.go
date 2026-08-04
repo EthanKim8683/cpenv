@@ -13,48 +13,36 @@ type message[Req any] struct {
 	replyID uint32
 }
 
-type offerChRef[Req any] struct {
+type claimChRef[Req any] struct {
 	ch    chan *message[Req]
 	count int
 }
 
 type hub[Req, Reply any] struct {
 	mu         sync.Mutex
-	offerChs   map[string]*offerChRef[Req]
+	claimChs   map[string]*claimChRef[Req]
 	replyChs   sync.Map
 	replyIDSeq atomic.Uint32
 }
 
-func (h *hub[Req, Reply]) acquireOfferCh(subj string) chan *message[Req] {
+func (h *hub[Req, Reply]) acquireClaimCh(subj string) chan *message[Req] {
 	h.mu.Lock()
 	defer h.mu.Unlock()
-	if _, ok := h.offerChs[subj]; !ok {
-		h.offerChs[subj] = &offerChRef[Req]{ch: make(chan *message[Req])}
+	if _, ok := h.claimChs[subj]; !ok {
+		h.claimChs[subj] = &claimChRef[Req]{ch: make(chan *message[Req])}
 	}
-	ref := h.offerChs[subj]
+	ref := h.claimChs[subj]
 	ref.count++
 	return ref.ch
 }
 
-func (h *hub[Req, Reply]) releaseOfferCh(subj string) {
+func (h *hub[Req, Reply]) releaseClaimCh(subj string) {
 	h.mu.Lock()
 	defer h.mu.Unlock()
-	ref := h.offerChs[subj]
+	ref := h.claimChs[subj]
 	ref.count--
 	if ref.count == 0 {
-		delete(h.offerChs, subj)
-	}
-}
-
-func (h *hub[Req, Reply]) offer(ctx context.Context, subj string) (*message[Req], error) {
-	ch := h.acquireOfferCh(subj)
-	defer h.releaseOfferCh(subj)
-
-	select {
-	case <-ctx.Done():
-		return nil, fmt.Errorf("receive request: %w", ctx.Err())
-	case msg := <-ch:
-		return msg, nil
+		delete(h.claimChs, subj)
 	}
 }
 
@@ -73,33 +61,45 @@ func (h *hub[Req, Reply]) takeReplyCh(id uint32) (chan Reply, bool) {
 	return ch.(chan Reply), true
 }
 
+func (h *hub[Req, Reply]) claim(ctx context.Context, subj string) (*message[Req], error) {
+	ch := h.acquireClaimCh(subj)
+	defer h.releaseClaimCh(subj)
+
+	select {
+	case <-ctx.Done():
+		return nil, fmt.Errorf("receive: %w", ctx.Err())
+	case msg := <-ch:
+		return msg, nil
+	}
+}
+
 func (h *hub[Req, Reply]) doRequest(ctx context.Context, subj string, req Req, wait bool) (Reply, error) {
 	var zero Reply
 
 	rID, rCh := h.makeReplyCh()
 	defer h.takeReplyCh(rID)
 
-	oCh := h.acquireOfferCh(subj)
-	defer h.releaseOfferCh(subj)
+	cCh := h.acquireClaimCh(subj)
+	defer h.releaseClaimCh(subj)
 
 	msg := &message[Req]{req: req, replyID: rID}
 	if wait {
 		select {
 		case <-ctx.Done():
-			return zero, fmt.Errorf("send request: %w", ctx.Err())
-		case oCh <- msg:
+			return zero, fmt.Errorf("send: %w", ctx.Err())
+		case cCh <- msg:
 		}
 	} else {
 		select {
-		case oCh <- msg:
+		case cCh <- msg:
 		default:
-			return zero, errors.New("no offers")
+			return zero, errors.New("no claims")
 		}
 	}
 
 	select {
 	case <-ctx.Done():
-		return zero, fmt.Errorf("receive reply %d: %w", rID, ctx.Err())
+		return zero, fmt.Errorf("receive: %w", ctx.Err())
 	case reply := <-rCh:
 		return reply, nil
 	}
@@ -123,5 +123,5 @@ func (h *hub[Req, Reply]) reply(id uint32, reply Reply) error {
 }
 
 func newHub[Req, Reply any]() *hub[Req, Reply] {
-	return &hub[Req, Reply]{offerChs: make(map[string]*offerChRef[Req])}
+	return &hub[Req, Reply]{claimChs: make(map[string]*claimChRef[Req])}
 }

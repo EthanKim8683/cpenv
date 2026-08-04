@@ -35,19 +35,17 @@ const (
 const (
 	// SubmitServiceSubmitProcedure is the fully-qualified name of the SubmitService's Submit RPC.
 	SubmitServiceSubmitProcedure = "/submit.v1.SubmitService/Submit"
-	// SubmitServiceRequestSubmissionProcedure is the fully-qualified name of the SubmitService's
-	// RequestSubmission RPC.
-	SubmitServiceRequestSubmissionProcedure = "/submit.v1.SubmitService/RequestSubmission"
-	// SubmitServiceCompleteSubmissionProcedure is the fully-qualified name of the SubmitService's
-	// CompleteSubmission RPC.
-	SubmitServiceCompleteSubmissionProcedure = "/submit.v1.SubmitService/CompleteSubmission"
+	// SubmitServiceClaimProcedure is the fully-qualified name of the SubmitService's Claim RPC.
+	SubmitServiceClaimProcedure = "/submit.v1.SubmitService/Claim"
+	// SubmitServiceReplyProcedure is the fully-qualified name of the SubmitService's Reply RPC.
+	SubmitServiceReplyProcedure = "/submit.v1.SubmitService/Reply"
 )
 
 // SubmitServiceClient is a client for the submit.v1.SubmitService service.
 type SubmitServiceClient interface {
 	Submit(context.Context, *v1.SubmitRequest) (*v1.SubmitResponse, error)
-	RequestSubmission(context.Context, *v1.RequestSubmissionRequest) (*v1.RequestSubmissionResponse, error)
-	CompleteSubmission(context.Context, *v1.CompleteSubmissionRequest) (*v1.CompleteSubmissionResponse, error)
+	Claim(context.Context, *v1.ClaimRequest) (*v1.ClaimResponse, error)
+	Reply(context.Context, *v1.ReplyRequest) (*v1.ReplyResponse, error)
 }
 
 // NewSubmitServiceClient constructs a client for the submit.v1.SubmitService service. By default,
@@ -67,16 +65,16 @@ func NewSubmitServiceClient(httpClient connect.HTTPClient, baseURL string, opts 
 			connect.WithSchema(submitServiceMethods.ByName("Submit")),
 			connect.WithClientOptions(opts...),
 		),
-		requestSubmission: connect.NewClient[v1.RequestSubmissionRequest, v1.RequestSubmissionResponse](
+		claim: connect.NewClient[v1.ClaimRequest, v1.ClaimResponse](
 			httpClient,
-			baseURL+SubmitServiceRequestSubmissionProcedure,
-			connect.WithSchema(submitServiceMethods.ByName("RequestSubmission")),
+			baseURL+SubmitServiceClaimProcedure,
+			connect.WithSchema(submitServiceMethods.ByName("Claim")),
 			connect.WithClientOptions(opts...),
 		),
-		completeSubmission: connect.NewClient[v1.CompleteSubmissionRequest, v1.CompleteSubmissionResponse](
+		reply: connect.NewClient[v1.ReplyRequest, v1.ReplyResponse](
 			httpClient,
-			baseURL+SubmitServiceCompleteSubmissionProcedure,
-			connect.WithSchema(submitServiceMethods.ByName("CompleteSubmission")),
+			baseURL+SubmitServiceReplyProcedure,
+			connect.WithSchema(submitServiceMethods.ByName("Reply")),
 			connect.WithClientOptions(opts...),
 		),
 	}
@@ -84,9 +82,9 @@ func NewSubmitServiceClient(httpClient connect.HTTPClient, baseURL string, opts 
 
 // submitServiceClient implements SubmitServiceClient.
 type submitServiceClient struct {
-	submit             *connect.Client[v1.SubmitRequest, v1.SubmitResponse]
-	requestSubmission  *connect.Client[v1.RequestSubmissionRequest, v1.RequestSubmissionResponse]
-	completeSubmission *connect.Client[v1.CompleteSubmissionRequest, v1.CompleteSubmissionResponse]
+	submit *connect.Client[v1.SubmitRequest, v1.SubmitResponse]
+	claim  *connect.Client[v1.ClaimRequest, v1.ClaimResponse]
+	reply  *connect.Client[v1.ReplyRequest, v1.ReplyResponse]
 }
 
 // Submit calls submit.v1.SubmitService.Submit.
@@ -98,18 +96,18 @@ func (c *submitServiceClient) Submit(ctx context.Context, req *v1.SubmitRequest)
 	return nil, err
 }
 
-// RequestSubmission calls submit.v1.SubmitService.RequestSubmission.
-func (c *submitServiceClient) RequestSubmission(ctx context.Context, req *v1.RequestSubmissionRequest) (*v1.RequestSubmissionResponse, error) {
-	response, err := c.requestSubmission.CallUnary(ctx, connect.NewRequest(req))
+// Claim calls submit.v1.SubmitService.Claim.
+func (c *submitServiceClient) Claim(ctx context.Context, req *v1.ClaimRequest) (*v1.ClaimResponse, error) {
+	response, err := c.claim.CallUnary(ctx, connect.NewRequest(req))
 	if response != nil {
 		return response.Msg, err
 	}
 	return nil, err
 }
 
-// CompleteSubmission calls submit.v1.SubmitService.CompleteSubmission.
-func (c *submitServiceClient) CompleteSubmission(ctx context.Context, req *v1.CompleteSubmissionRequest) (*v1.CompleteSubmissionResponse, error) {
-	response, err := c.completeSubmission.CallUnary(ctx, connect.NewRequest(req))
+// Reply calls submit.v1.SubmitService.Reply.
+func (c *submitServiceClient) Reply(ctx context.Context, req *v1.ReplyRequest) (*v1.ReplyResponse, error) {
+	response, err := c.reply.CallUnary(ctx, connect.NewRequest(req))
 	if response != nil {
 		return response.Msg, err
 	}
@@ -119,8 +117,8 @@ func (c *submitServiceClient) CompleteSubmission(ctx context.Context, req *v1.Co
 // SubmitServiceHandler is an implementation of the submit.v1.SubmitService service.
 type SubmitServiceHandler interface {
 	Submit(context.Context, *v1.SubmitRequest) (*v1.SubmitResponse, error)
-	RequestSubmission(context.Context, *v1.RequestSubmissionRequest) (*v1.RequestSubmissionResponse, error)
-	CompleteSubmission(context.Context, *v1.CompleteSubmissionRequest) (*v1.CompleteSubmissionResponse, error)
+	Claim(context.Context, *v1.ClaimRequest) (*v1.ClaimResponse, error)
+	Reply(context.Context, *v1.ReplyRequest) (*v1.ReplyResponse, error)
 }
 
 // NewSubmitServiceHandler builds an HTTP handler from the service implementation. It returns the
@@ -136,26 +134,26 @@ func NewSubmitServiceHandler(svc SubmitServiceHandler, opts ...connect.HandlerOp
 		connect.WithSchema(submitServiceMethods.ByName("Submit")),
 		connect.WithHandlerOptions(opts...),
 	)
-	submitServiceRequestSubmissionHandler := connect.NewUnaryHandlerSimple(
-		SubmitServiceRequestSubmissionProcedure,
-		svc.RequestSubmission,
-		connect.WithSchema(submitServiceMethods.ByName("RequestSubmission")),
+	submitServiceClaimHandler := connect.NewUnaryHandlerSimple(
+		SubmitServiceClaimProcedure,
+		svc.Claim,
+		connect.WithSchema(submitServiceMethods.ByName("Claim")),
 		connect.WithHandlerOptions(opts...),
 	)
-	submitServiceCompleteSubmissionHandler := connect.NewUnaryHandlerSimple(
-		SubmitServiceCompleteSubmissionProcedure,
-		svc.CompleteSubmission,
-		connect.WithSchema(submitServiceMethods.ByName("CompleteSubmission")),
+	submitServiceReplyHandler := connect.NewUnaryHandlerSimple(
+		SubmitServiceReplyProcedure,
+		svc.Reply,
+		connect.WithSchema(submitServiceMethods.ByName("Reply")),
 		connect.WithHandlerOptions(opts...),
 	)
 	return "/submit.v1.SubmitService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case SubmitServiceSubmitProcedure:
 			submitServiceSubmitHandler.ServeHTTP(w, r)
-		case SubmitServiceRequestSubmissionProcedure:
-			submitServiceRequestSubmissionHandler.ServeHTTP(w, r)
-		case SubmitServiceCompleteSubmissionProcedure:
-			submitServiceCompleteSubmissionHandler.ServeHTTP(w, r)
+		case SubmitServiceClaimProcedure:
+			submitServiceClaimHandler.ServeHTTP(w, r)
+		case SubmitServiceReplyProcedure:
+			submitServiceReplyHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -169,10 +167,10 @@ func (UnimplementedSubmitServiceHandler) Submit(context.Context, *v1.SubmitReque
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("submit.v1.SubmitService.Submit is not implemented"))
 }
 
-func (UnimplementedSubmitServiceHandler) RequestSubmission(context.Context, *v1.RequestSubmissionRequest) (*v1.RequestSubmissionResponse, error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("submit.v1.SubmitService.RequestSubmission is not implemented"))
+func (UnimplementedSubmitServiceHandler) Claim(context.Context, *v1.ClaimRequest) (*v1.ClaimResponse, error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("submit.v1.SubmitService.Claim is not implemented"))
 }
 
-func (UnimplementedSubmitServiceHandler) CompleteSubmission(context.Context, *v1.CompleteSubmissionRequest) (*v1.CompleteSubmissionResponse, error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("submit.v1.SubmitService.CompleteSubmission is not implemented"))
+func (UnimplementedSubmitServiceHandler) Reply(context.Context, *v1.ReplyRequest) (*v1.ReplyResponse, error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("submit.v1.SubmitService.Reply is not implemented"))
 }

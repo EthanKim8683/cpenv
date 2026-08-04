@@ -9,42 +9,42 @@ import (
 )
 
 type Service struct {
-	hub *hub[*submitv1.SubmitRequest, *submitv1.SubmitResponse]
+	h *hub[*submitv1.SubmitRequest, *submitv1.SubmitResponse]
 }
 
 func (s *Service) Submit(ctx context.Context, req *submitv1.SubmitRequest) (*submitv1.SubmitResponse, error) {
-	reply, err := s.hub.tryRequest(ctx, req.GetProblemId(), req)
+	reply, err := s.h.tryRequest(ctx, req.GetProblemId(), req)
 	if err != nil {
 		return nil, fmt.Errorf("submit: %w", err)
 	}
 	return &submitv1.SubmitResponse{Error: reply.Error}, nil
 }
 
-func (s *Service) RequestSubmission(ctx context.Context, req *submitv1.RequestSubmissionRequest) (*submitv1.RequestSubmissionResponse, error) {
-	msg, err := s.hub.offer(ctx, req.GetProblemId())
+func (s *Service) Claim(ctx context.Context, req *submitv1.ClaimRequest) (*submitv1.ClaimResponse, error) {
+	msg, err := s.h.claim(ctx, req.GetProblemId())
 	if err != nil {
-		return nil, fmt.Errorf("request submission: %w", err)
+		return nil, fmt.Errorf("claim: %w", err)
 	}
 
-	return &submitv1.RequestSubmissionResponse{
+	return &submitv1.ClaimResponse{
 		ReplyId:  msg.replyID,
 		FileName: msg.req.GetFileName(),
 		Content:  msg.req.GetContent(),
 	}, nil
 }
 
-func (s *Service) CompleteSubmission(_ context.Context, req *submitv1.CompleteSubmissionRequest) (*submitv1.CompleteSubmissionResponse, error) {
+func (s *Service) Reply(_ context.Context, req *submitv1.ReplyRequest) (*submitv1.ReplyResponse, error) {
 	reply := &submitv1.SubmitResponse{Error: req.Error}
-	if err := s.hub.reply(req.GetReplyId(), reply); err != nil {
-		return nil, fmt.Errorf("complete submission: %w", err)
+	if err := s.h.reply(req.GetReplyId(), reply); err != nil {
+		return nil, fmt.Errorf("reply: %w", err)
 	}
-	return &submitv1.CompleteSubmissionResponse{}, nil
+	return &submitv1.ReplyResponse{}, nil
 }
 
 var _ submitv1connect.SubmitServiceHandler = (*Service)(nil)
 
 func NewService() *Service {
 	return &Service{
-		hub: newHub[*submitv1.SubmitRequest, *submitv1.SubmitResponse](),
+		h: newHub[*submitv1.SubmitRequest, *submitv1.SubmitResponse](),
 	}
 }

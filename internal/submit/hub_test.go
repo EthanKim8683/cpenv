@@ -58,7 +58,7 @@ func TestHub(t *testing.T) {
 			assert.Equal(c, reply, gotReply)
 		})
 		wg.Go(func() {
-			msg, err := h.offer(t.Context(), subj)
+			msg, err := h.claim(t.Context(), subj)
 			assert.NoError(c, err)
 			assert.Equal(c, req, msg.req)
 			assert.NoError(c, h.reply(msg.replyID, reply))
@@ -67,7 +67,7 @@ func TestHub(t *testing.T) {
 		require.NoError(t, c.Err())
 	})
 
-	t.Run("request wait false", func(t *testing.T) {
+	t.Run("try request", func(t *testing.T) {
 		t.Parallel()
 
 		h := newHub[struct{}, struct{}]()
@@ -80,7 +80,7 @@ func TestHub(t *testing.T) {
 			}, time.Second, 100*time.Millisecond)
 		})
 		wg.Go(func() {
-			msg, err := h.offer(t.Context(), subj)
+			msg, err := h.claim(t.Context(), subj)
 			assert.NoError(c, err)
 			assert.NoError(c, h.reply(msg.replyID, struct{}{}))
 		})
@@ -88,7 +88,7 @@ func TestHub(t *testing.T) {
 		require.NoError(t, c.Err())
 	})
 
-	t.Run("request consumes offer", func(t *testing.T) {
+	t.Run("request consumes claim", func(t *testing.T) {
 		t.Parallel()
 
 		h := newHub[struct{}, struct{}]()
@@ -99,39 +99,39 @@ func TestHub(t *testing.T) {
 			assert.NoError(c, err)
 		})
 		wg.Go(func() {
-			msg, err := h.offer(t.Context(), subj)
+			msg, err := h.claim(t.Context(), subj)
 			assert.NoError(c, err)
 			assert.NoError(c, h.reply(msg.replyID, struct{}{}))
 		})
 		wg.Wait()
 		require.NoError(t, c.Err())
 		_, err := h.tryRequest(t.Context(), subj, struct{}{})
-		assert.ErrorContains(t, err, "no offers")
+		assert.ErrorContains(t, err, "no claims")
 	})
 
-	t.Run("offer context done", func(t *testing.T) {
+	t.Run("claim context done", func(t *testing.T) {
 		t.Parallel()
 
 		ctx, cancel := context.WithCancel(t.Context())
 		cancel()
 		h := newHub[struct{}, struct{}]()
-		_, err := h.offer(ctx, subj)
-		require.ErrorContains(t, err, "receive message")
+		_, err := h.claim(ctx, subj)
+		require.ErrorContains(t, err, "receive")
 		_, err = h.tryRequest(t.Context(), subj, struct{}{})
-		assert.ErrorContains(t, err, "no offers")
+		assert.ErrorContains(t, err, "no claims")
 	})
 
 	t.Run("request context done", func(t *testing.T) {
 		t.Parallel()
 
-		t.Run("send message", func(t *testing.T) {
+		t.Run("send", func(t *testing.T) {
 			t.Parallel()
 
 			ctx, cancel := context.WithCancel(t.Context())
 			cancel()
 			h := newHub[struct{}, struct{}]()
 			_, err := h.request(ctx, subj, struct{}{})
-			require.ErrorContains(t, err, "send message")
+			require.ErrorContains(t, err, "send")
 			c := newCollectT(t)
 			var wg sync.WaitGroup
 			wg.Go(func() {
@@ -139,7 +139,7 @@ func TestHub(t *testing.T) {
 				assert.NoError(c, err)
 			})
 			wg.Go(func() {
-				msg, err := h.offer(t.Context(), subj)
+				msg, err := h.claim(t.Context(), subj)
 				assert.NoError(c, err)
 				assert.NoError(c, h.reply(msg.replyID, struct{}{}))
 			})
@@ -147,7 +147,7 @@ func TestHub(t *testing.T) {
 			require.NoError(t, c.Err())
 		})
 
-		t.Run("receive reply", func(t *testing.T) {
+		t.Run("receive", func(t *testing.T) {
 			t.Parallel()
 
 			ctx, cancel := context.WithCancel(t.Context())
@@ -156,12 +156,12 @@ func TestHub(t *testing.T) {
 			var wg sync.WaitGroup
 			wg.Go(func() {
 				_, err := h.request(ctx, subj, struct{}{})
-				assert.ErrorContains(c, err, "receive reply")
+				assert.ErrorContains(c, err, "receive")
 			})
 			var msg *message[struct{}]
 			wg.Go(func() {
 				var err error
-				msg, err = h.offer(t.Context(), subj)
+				msg, err = h.claim(t.Context(), subj)
 				assert.NoError(c, err)
 				cancel()
 			})
@@ -169,7 +169,7 @@ func TestHub(t *testing.T) {
 			require.NoError(t, c.Err())
 			assert.ErrorContains(t, h.reply(msg.replyID, struct{}{}), "not found")
 			_, err := h.tryRequest(t.Context(), subj, struct{}{})
-			assert.ErrorContains(t, err, "no offers")
+			assert.ErrorContains(t, err, "no claims")
 		})
 	})
 }
