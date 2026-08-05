@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	submitv1 "github.com/EthanKim8683/cpenv/internal/gen/proto/submit/v1"
-	"github.com/EthanKim8683/cpenv/internal/gen/proto/submit/v1/submitv1connect"
+	submitv1 "github.com/EthanKim8683/cpenv/internal/gen/submit/v1"
+	"github.com/EthanKim8683/cpenv/internal/gen/submit/v1/submitv1connect"
 )
 
 type Service struct {

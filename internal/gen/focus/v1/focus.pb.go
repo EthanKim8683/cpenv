@@ -7,7 +7,7 @@
 package focusv1
 
 import (
-	v1 "github.com/EthanKim8683/cpenv/internal/gen/proto/problem/v1"
+	v1 "github.com/EthanKim8683/cpenv/internal/gen/problem/v1"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
@@ -81,9 +81,9 @@ const file_focus_v1_focus_proto_rawDesc = "" +
 	"\x14focus/v1/focus.proto\x12\bfocus.v1\x1a\x18problem/v1/problem.proto\"L\n" +
 	"\x05Focus\x12-\n" +
 	"\aproblem\x18\x01 \x01(\v2\x13.problem.v1.ProblemR\aproblem\x12\x14\n" +
-	"\x05error\x18\x02 \x01(\tR\x05errorB\x9e\x01\n" +
+	"\x05error\x18\x02 \x01(\tR\x05errorB\x98\x01\n" +
 	"\fcom.focus.v1B\n" +
-	"FocusProtoP\x01ZAgithub.com/EthanKim8683/cpenv/internal/gen/proto/focus/v1;focusv1\xa2\x02\x03FXX\xaa\x02\bFocus.V1\xca\x02\bFocus\\V1\xe2\x02\x14Focus\\V1\\GPBMetadata\xea\x02\tFocus::V1b\x06proto3"
+	"FocusProtoP\x01Z;github.com/EthanKim8683/cpenv/internal/gen/focus/v1;focusv1\xa2\x02\x03FXX\xaa\x02\bFocus.V1\xca\x02\bFocus\\V1\xe2\x02\x14Focus\\V1\\GPBMetadata\xea\x02\tFocus::V1b\x06proto3"
 
 var (
 	file_focus_v1_focus_proto_rawDescOnce sync.Once

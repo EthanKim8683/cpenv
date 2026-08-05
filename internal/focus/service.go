@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	focusv1 "github.com/EthanKim8683/cpenv/internal/gen/proto/focus/v1"
-	"github.com/EthanKim8683/cpenv/internal/gen/proto/focus/v1/focusv1connect"
+	focusv1 "github.com/EthanKim8683/cpenv/internal/gen/focus/v1"
+	"github.com/EthanKim8683/cpenv/internal/gen/focus/v1/focusv1connect"
 )
 
 type Service struct {

@@ -4,13 +4,13 @@ managed:
   enabled: true
   override:
     - file_option: go_package_prefix
-      value: github.com/EthanKim8683/cpenv/internal/gen/proto
+      value: github.com/EthanKim8683/cpenv/internal/gen
 plugins:
   - local: [go, tool, protoc-gen-go]
-    out: internal/gen/proto
+    out: internal/gen
     opt: paths=source_relative
   - local: [go, tool, protoc-gen-connect-go]
-    out: internal/gen/proto
+    out: internal/gen
     opt:
       - paths=source_relative
       - simple

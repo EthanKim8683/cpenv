@@ -202,8 +202,8 @@ const file_problem_v1_problem_proto_rawDesc = "" +
 	"\x18PROBLEM_TYPE_UNSPECIFIED\x10\x00\x12\x1c\n" +
 	"\x18PROBLEM_TYPE_STDIO_BATCH\x10\x01\x12\"\n" +
 	"\x1ePROBLEM_TYPE_STDIO_INTERACTIVE\x10\x02\x12 \n" +
-	"\x1cPROBLEM_TYPE_STDIO_RUN_TWICE\x10\x03B\xae\x01\n" +
-	"\x0ecom.problem.v1B\fProblemProtoP\x01ZEgithub.com/EthanKim8683/cpenv/internal/gen/proto/problem/v1;problemv1\xa2\x02\x03PXX\xaa\x02\n" +
+	"\x1cPROBLEM_TYPE_STDIO_RUN_TWICE\x10\x03B\xa8\x01\n" +
+	"\x0ecom.problem.v1B\fProblemProtoP\x01Z?github.com/EthanKim8683/cpenv/internal/gen/problem/v1;problemv1\xa2\x02\x03PXX\xaa\x02\n" +
 	"Problem.V1\xca\x02\n" +
 	"Problem\\V1\xe2\x02\x16Problem\\V1\\GPBMetadata\xea\x02\vProblem::V1b\x06proto3"
 

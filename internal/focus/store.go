@@ -7,10 +7,18 @@ import (
 	"path/filepath"
 	"sync"
 
-	focusv1 "github.com/EthanKim8683/cpenv/internal/gen/proto/focus/v1"
-	problemv1 "github.com/EthanKim8683/cpenv/internal/gen/proto/problem/v1"
+	focusv1 "github.com/EthanKim8683/cpenv/internal/gen/focus/v1"
+	problemv1 "github.com/EthanKim8683/cpenv/internal/gen/problem/v1"
 	"google.golang.org/protobuf/encoding/protojson"
 )
+
+type FocusError struct {
+	Message string
+}
+
+func (e *FocusError) Error() string {
+	return fmt.Sprintf("focus: %s", e.Message)
+}
 
 type Store struct {
 	mu   sync.RWMutex
@@ -45,8 +53,7 @@ func (s *Store) Problem() (*problemv1.Problem, error) {
 	}
 
 	if errMsg := focus.GetError(); errMsg != "" {
-		// TODO: maybe error struct?
-		return nil, errors.New(errMsg)
+		return nil, &FocusError{Message: errMsg}
 	}
 
 	problem := focus.GetProblem()
