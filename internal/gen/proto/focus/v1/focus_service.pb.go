@@ -110,8 +110,8 @@ const file_focus_v1_focus_service_proto_rawDesc = "" +
 	"\x05focus\x18\x01 \x01(\v2\x0f.focus.v1.FocusR\x05focus\"\x12\n" +
 	"\x10SetFocusResponse2Q\n" +
 	"\fFocusService\x12A\n" +
-	"\bSetFocus\x12\x19.focus.v1.SetFocusRequest\x1a\x1a.focus.v1.SetFocusResponseB\x96\x01\n" +
-	"\fcom.focus.v1B\x11FocusServiceProtoP\x01Z2github.com/EthanKim8683/cpenv/gen/focus/v1;focusv1\xa2\x02\x03FXX\xaa\x02\bFocus.V1\xca\x02\bFocus\\V1\xe2\x02\x14Focus\\V1\\GPBMetadata\xea\x02\tFocus::V1b\x06proto3"
+	"\bSetFocus\x12\x19.focus.v1.SetFocusRequest\x1a\x1a.focus.v1.SetFocusResponseB\xa5\x01\n" +
+	"\fcom.focus.v1B\x11FocusServiceProtoP\x01ZAgithub.com/EthanKim8683/cpenv/internal/gen/proto/focus/v1;focusv1\xa2\x02\x03FXX\xaa\x02\bFocus.V1\xca\x02\bFocus\\V1\xe2\x02\x14Focus\\V1\\GPBMetadata\xea\x02\tFocus::V1b\x06proto3"
 
 var (
 	file_focus_v1_focus_service_proto_rawDescOnce sync.Once

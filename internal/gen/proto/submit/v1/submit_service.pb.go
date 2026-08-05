@@ -343,8 +343,8 @@ const file_submit_v1_submit_service_proto_rawDesc = "" +
 	"\rSubmitService\x12=\n" +
 	"\x06Submit\x12\x18.submit.v1.SubmitRequest\x1a\x19.submit.v1.SubmitResponse\x12:\n" +
 	"\x05Claim\x12\x17.submit.v1.ClaimRequest\x1a\x18.submit.v1.ClaimResponse\x12:\n" +
-	"\x05Reply\x12\x17.submit.v1.ReplyRequest\x1a\x18.submit.v1.ReplyResponseB\x9e\x01\n" +
-	"\rcom.submit.v1B\x12SubmitServiceProtoP\x01Z4github.com/EthanKim8683/cpenv/gen/submit/v1;submitv1\xa2\x02\x03SXX\xaa\x02\tSubmit.V1\xca\x02\tSubmit\\V1\xe2\x02\x15Submit\\V1\\GPBMetadata\xea\x02\n" +
+	"\x05Reply\x12\x17.submit.v1.ReplyRequest\x1a\x18.submit.v1.ReplyResponseB\xad\x01\n" +
+	"\rcom.submit.v1B\x12SubmitServiceProtoP\x01ZCgithub.com/EthanKim8683/cpenv/internal/gen/proto/submit/v1;submitv1\xa2\x02\x03SXX\xaa\x02\tSubmit.V1\xca\x02\tSubmit\\V1\xe2\x02\x15Submit\\V1\\GPBMetadata\xea\x02\n" +
 	"Submit::V1b\x06proto3"
 
 var (

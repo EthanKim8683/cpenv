@@ -1,45 +1,45 @@
 package command
 
-import (
-	"net/http"
-	"os"
-	"path/filepath"
+// import (
+// 	"net/http"
+// 	"os"
+// 	"path/filepath"
 
-	"github.com/EthanKim8683/cpenv/internal/app"
-	"github.com/EthanKim8683/cpenv/internal/config"
-	"github.com/EthanKim8683/cpenv/internal/state"
-	"github.com/spf13/cobra"
-)
+// 	"github.com/EthanKim8683/cpenv/internal/app"
+// 	"github.com/EthanKim8683/cpenv/internal/config"
+// 	"github.com/EthanKim8683/cpenv/internal/state"
+// 	"github.com/spf13/cobra"
+// )
 
-var a *app.App
+// var a *app.App
 
-var rootCmd = &cobra.Command{
-	Use:   "cpenv",
-	Short: "Competitive programming environment utility.",
-	PersistentPreRunE: func(_ *cobra.Command, _ []string) error {
-		cfg, err := config.Load()
-		if err != nil {
-			return err
-		}
+// var rootCmd = &cobra.Command{
+// 	Use:   "cpenv",
+// 	Short: "Competitive programming environment utility.",
+// 	PersistentPreRunE: func(_ *cobra.Command, _ []string) error {
+// 		cfg, err := config.Load()
+// 		if err != nil {
+// 			return err
+// 		}
 
-		stateStore := state.NewFileStore(filepath.Join(cfg.Home, "state.json"))
+// 		stateStore := state.NewFileStore(filepath.Join(cfg.Home, "state.json"))
 
-		dir, err := os.Getwd()
-		if err != nil {
-			return err
-		}
+// 		dir, err := os.Getwd()
+// 		if err != nil {
+// 			return err
+// 		}
 
-		a = &app.App{
-			Cfg:        cfg,
-			HTTPClient: http.DefaultClient,
-			StateStore: stateStore,
-			WorkingDir: dir,
-		}
+// 		a = &app.App{
+// 			Cfg:        cfg,
+// 			HTTPClient: http.DefaultClient,
+// 			StateStore: stateStore,
+// 			WorkingDir: dir,
+// 		}
 
-		return nil
-	},
-}
+// 		return nil
+// 	},
+// }
 
-func Execute() error {
-	return rootCmd.Execute()
-}
+// func Execute() error {
+// 	return rootCmd.Execute()
+// }

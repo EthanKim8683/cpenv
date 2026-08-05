@@ -1,13 +1,13 @@
 package main
 
-import (
-	"os"
+// import (
+// 	"os"
 
-	"github.com/EthanKim8683/cpenv/cmd/cpenv/command"
-)
+// 	"github.com/EthanKim8683/cpenv/cmd/cpenv/command"
+// )
 
-func main() {
-	if err := command.Execute(); err != nil {
-		os.Exit(1)
-	}
-}
+// func main() {
+// 	if err := command.Execute(); err != nil {
+// 		os.Exit(1)
+// 	}
+// }

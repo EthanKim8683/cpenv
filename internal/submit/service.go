@@ -4,16 +4,16 @@ import (
 	"context"
 	"fmt"
 
-	submitv1 "github.com/EthanKim8683/cpenv/gen/submit/v1"
-	"github.com/EthanKim8683/cpenv/gen/submit/v1/submitv1connect"
+	submitv1 "github.com/EthanKim8683/cpenv/internal/gen/proto/submit/v1"
+	"github.com/EthanKim8683/cpenv/internal/gen/proto/submit/v1/submitv1connect"
 )
 
 type Service struct {
-	h *hub[*submitv1.SubmitRequest, *submitv1.SubmitResponse]
+	hub *hub[*submitv1.SubmitRequest, *submitv1.SubmitResponse]
 }
 
 func (s *Service) Submit(ctx context.Context, req *submitv1.SubmitRequest) (*submitv1.SubmitResponse, error) {
-	reply, err := s.h.tryRequest(ctx, req.GetProblemId(), req)
+	reply, err := s.hub.tryRequest(ctx, req.GetProblemId(), req)
 	if err != nil {
 		return nil, fmt.Errorf("submit: %w", err)
 	}
@@ -21,7 +21,7 @@ func (s *Service) Submit(ctx context.Context, req *submitv1.SubmitRequest) (*sub
 }
 
 func (s *Service) Claim(ctx context.Context, req *submitv1.ClaimRequest) (*submitv1.ClaimResponse, error) {
-	msg, err := s.h.claim(ctx, req.GetProblemId())
+	msg, err := s.hub.claim(ctx, req.GetProblemId())
 	if err != nil {
 		return nil, fmt.Errorf("claim: %w", err)
 	}
@@ -35,7 +35,7 @@ func (s *Service) Claim(ctx context.Context, req *submitv1.ClaimRequest) (*submi
 
 func (s *Service) Reply(_ context.Context, req *submitv1.ReplyRequest) (*submitv1.ReplyResponse, error) {
 	reply := &submitv1.SubmitResponse{Error: req.Error}
-	if err := s.h.reply(req.GetReplyId(), reply); err != nil {
+	if err := s.hub.reply(req.GetReplyId(), reply); err != nil {
 		return nil, fmt.Errorf("reply: %w", err)
 	}
 	return &submitv1.ReplyResponse{}, nil
@@ -45,6 +45,6 @@ var _ submitv1connect.SubmitServiceHandler = (*Service)(nil)
 
 func NewService() *Service {
 	return &Service{
-		h: newHub[*submitv1.SubmitRequest, *submitv1.SubmitResponse](),
+		hub: newHub[*submitv1.SubmitRequest, *submitv1.SubmitResponse](),
 	}
 }

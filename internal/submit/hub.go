@@ -93,7 +93,7 @@ func (h *hub[Req, Reply]) doRequest(ctx context.Context, subj string, req Req, w
 		select {
 		case cCh <- msg:
 		default:
-			return zero, errors.New("no claims")
+			return zero, errors.New("no receiver")
 		}
 	}
 

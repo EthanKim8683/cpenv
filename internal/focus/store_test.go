@@ -4,8 +4,8 @@ import (
 	"path/filepath"
 	"testing"
 
-	focusv1 "github.com/EthanKim8683/cpenv/gen/focus/v1"
-	problemv1 "github.com/EthanKim8683/cpenv/gen/problem/v1"
+	focusv1 "github.com/EthanKim8683/cpenv/internal/gen/proto/focus/v1"
+	problemv1 "github.com/EthanKim8683/cpenv/internal/gen/proto/problem/v1"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

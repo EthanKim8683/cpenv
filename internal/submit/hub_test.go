@@ -169,7 +169,7 @@ func TestHub(t *testing.T) {
 			require.NoError(t, c.Err())
 			assert.ErrorContains(t, h.reply(msg.replyID, struct{}{}), "not found")
 			_, err := h.tryRequest(t.Context(), subj, struct{}{})
-			assert.ErrorContains(t, err, "no claims")
+			assert.ErrorContains(t, err, "no receiver")
 		})
 	})
 }

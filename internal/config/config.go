@@ -3,7 +3,6 @@ package config
 import (
 	"errors"
 	"fmt"
-	"path/filepath"
 	"strconv"
 
 	"github.com/caarlos0/env/v11"
@@ -11,16 +10,12 @@ import (
 
 type Config struct {
 	Port string `env:"CPENV_PORT" envDefault:"8683"`
-	Home string `env:"CPENV_HOME"`
 }
 
 func (c *Config) Validate() error {
 	var errs error
 	if port, err := strconv.Atoi(c.Port); err != nil || !(1 <= port && port <= 65535) {
 		errs = errors.Join(errs, fmt.Errorf("CPENV_PORT %q must be an integer between 1 and 65535", c.Port))
-	}
-	if !filepath.IsAbs(c.Home) {
-		errs = errors.Join(errs, fmt.Errorf("CPENV_HOME %q must be an absolute path", c.Home))
 	}
 	return errs
 }

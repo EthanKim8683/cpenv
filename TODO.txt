@@ -2,3 +2,23 @@
 - daemon status command + way to manage the daemon
 - init command to init cpenv-home if needed
 - error sentinels -> user-friendly error messages
+- add url to problem proto so that if the right tab isn't open, the extension
+  can open it
+- add json config for app behavior
+- expose some functions so people can make their own go clis
+- use adrg/xdg for config and state and stuff
+- consider multi-file submission: https://qoj.ac/problem/1
+
+workspace is backed by an sqlite store that says which workspace corresponds to
+which problem and vice versa
+
+base commands:
+- set-problem: tie dir to problem (should have flag for optional dir; uses cwd
+  if omitted)
+- problem: get focused problem (in json)
+- submit: submit to current problem (should have flag for optional problem
+  id/url)
+
+convenience commands:
+- focus: create workspace if needed and output path to workspace. if workspace
+  did not exist, it is rendered using our template feature
