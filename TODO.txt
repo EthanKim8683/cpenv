@@ -1,8 +1,12 @@
 - make app code nice
-- daemon status command + way to manage the daemon
+- daemon health command + way to manage the daemon
 - init command to init cpenv-home if needed
 - error sentinels -> user-friendly error messages
 - add url to problem proto so that if the right tab isn't open, the extension
   can open it
 - add json config for app behavior
 - use adrg/xdg for config and state and stuff
+- add submission status stuff. i feel like this could be a really simple sqlite
+  db and server that receives requests to update it. i'm debating whether the
+	extension should be responsible for ensuring that we see the final verdict of
+	all the in-progress stuff or the cli

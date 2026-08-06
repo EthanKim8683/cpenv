@@ -57,6 +57,7 @@ func NewFocusServiceClient(httpClient connect.HTTPClient, baseURL string, opts .
 			httpClient,
 			baseURL+FocusServiceSetFocusProcedure,
 			connect.WithSchema(focusServiceMethods.ByName("SetFocus")),
+			connect.WithIdempotency(connect.IdempotencyIdempotent),
 			connect.WithClientOptions(opts...),
 		),
 	}
@@ -92,6 +93,7 @@ func NewFocusServiceHandler(svc FocusServiceHandler, opts ...connect.HandlerOpti
 		FocusServiceSetFocusProcedure,
 		svc.SetFocus,
 		connect.WithSchema(focusServiceMethods.ByName("SetFocus")),
+		connect.WithIdempotency(connect.IdempotencyIdempotent),
 		connect.WithHandlerOptions(opts...),
 	)
 	return "/focus.v1.FocusService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

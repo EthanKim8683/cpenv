@@ -5,7 +5,9 @@ package focus.v1;
 import "focus/v1/focus.proto";
 
 service FocusService {
-  rpc SetFocus(SetFocusRequest) returns (SetFocusResponse);
+  rpc SetFocus(SetFocusRequest) returns (SetFocusResponse) {
+    option idempotency_level = IDEMPOTENT;
+  }
 }
 
 message SetFocusRequest { focus.v1.Focus focus = 1; }

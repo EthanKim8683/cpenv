@@ -4,7 +4,7 @@
 // @ts-nocheck
 
 import { SetFocusRequest, SetFocusResponse } from "./focus_service_pb.js";
-import { MethodKind } from "@bufbuild/protobuf";
+import { MethodIdempotency, MethodKind } from "@bufbuild/protobuf";
 
 /**
  * @generated from service focus.v1.FocusService
@@ -20,6 +20,7 @@ export const FocusService = {
       I: SetFocusRequest,
       O: SetFocusResponse,
       kind: MethodKind.Unary,
+      idempotency: MethodIdempotency.Idempotent,
     },
   }
 } as const;

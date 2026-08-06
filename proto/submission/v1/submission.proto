@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package submission.v1;
+
+enum Status {
+  STATUS_UNSPECIFIED = 0;
+  STATUS_PENDING = 1;
+  STATUS_ACCEPTED = 3;
+  STATUS_WRONG_ANSWER = 4;
+  STATUS_TIME_LIMIT_EXCEEDED = 5;
+  STATUS_MEMORY_LIMIT_EXCEEDED = 6;
+  STATUS_RUNTIME_ERROR = 7;
+  STATUS_COMPILATION_ERROR = 8;
+}
+
+message Submission {
+  int64 timestamp_ms = 1;
+  string problem_id = 2;
+  Status status = 3;
+  uint32 time_ms = 4;
+  uint32 memory_kb = 5;
+}
