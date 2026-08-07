@@ -1,1 +1,5 @@
-package app
+package cli
+
+type state struct {
+	LastTemplate string
+}

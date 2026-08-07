@@ -35,7 +35,7 @@ func (s *store) save(subs []*submissionv1.Submission) error {
 		if err != nil {
 			return err
 		}
-		pbs, err := tx.CreateBucketIfNotExists(bucketKeyByProblem)
+		pbb, err := tx.CreateBucketIfNotExists(bucketKeyByProblem)
 		if err != nil {
 			return err
 		}
@@ -50,7 +50,7 @@ func (s *store) save(subs []*submissionv1.Submission) error {
 				return err
 			}
 
-			pb, err := pbs.CreateBucketIfNotExists([]byte(sub.GetProblemId()))
+			pb, err := pbb.CreateBucketIfNotExists([]byte(sub.GetProblemId()))
 			if err != nil {
 				return err
 			}
@@ -112,11 +112,12 @@ func (s *store) tailProblem(problemID string, limit int) ([]*submissionv1.Submis
 		if b == nil {
 			return nil
 		}
-		pbs := tx.Bucket(bucketKeyByProblem)
-		if pbs == nil {
+
+		pbb := tx.Bucket(bucketKeyByProblem)
+		if pbb == nil {
 			return nil
 		}
-		pb := pbs.Bucket([]byte(problemID))
+		pb := pbb.Bucket([]byte(problemID))
 		if pb == nil {
 			return nil
 		}

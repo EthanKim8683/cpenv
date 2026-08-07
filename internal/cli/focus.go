@@ -1,10 +1,5 @@
-package app
+package cli
 
-func (a *App) Focus() error {
-	problem, err := a.focusStore.Problem()
-	if err != nil {
-		return err
-	}
+func (c *CLI) Focus() {
 
-	return nil
 }

@@ -1,7 +1,7 @@
-package app
+package cli
 
 import "github.com/EthanKim8683/cpenv/internal/focus"
 
-type App struct {
+type CLI struct {
 	focusStore *focus.Store
 }

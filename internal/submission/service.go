@@ -5,6 +5,7 @@ import (
 
 	submissionv1 "github.com/EthanKim8683/cpenv/internal/gen/submission/v1"
 	"github.com/EthanKim8683/cpenv/internal/gen/submission/v1/submissionv1connect"
+	bolt "go.etcd.io/bbolt"
 )
 
 type Service struct {
@@ -50,3 +51,11 @@ func (s *Service) Tail(ctx context.Context, req *submissionv1.TailRequest) (*sub
 }
 
 var _ submissionv1connect.SubmissionServiceHandler = (*Service)(nil)
+
+func NewService(db *bolt.DB, defaultLimit int, saveCh chan<- *submissionv1.Submission) *Service {
+	return &Service{
+		defaultLimit: defaultLimit,
+		store:        &store{db},
+		saveCh:       saveCh,
+	}
+}
