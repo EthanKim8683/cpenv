@@ -10,9 +10,9 @@ tool (
 require (
 	connectrpc.com/connect v1.20.0
 	github.com/caarlos0/env/v11 v11.4.1
-	github.com/google/uuid v1.6.0
 	github.com/stretchr/testify v1.11.1
 	go.etcd.io/bbolt v1.5.0
+	golang.org/x/sync v0.20.0
 	google.golang.org/protobuf v1.36.11
 )
 

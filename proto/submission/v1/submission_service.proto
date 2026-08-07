@@ -11,9 +11,6 @@ service SubmissionService {
   rpc Tail(TailRequest) returns (TailResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
   }
-  rpc Subscribe(SubscribeRequest) returns (stream SubscribeResponse) {
-    option idempotency_level = NO_SIDE_EFFECTS;
-  }
 }
 
 message SaveRequest { repeated submission.v1.Submission submissions = 1; }
@@ -26,7 +23,3 @@ message TailRequest {
 }
 
 message TailResponse { repeated submission.v1.Submission submissions = 1; }
-
-message SubscribeRequest { string problem_id = 1; }
-
-message SubscribeResponse { submission.v1.Submission submission = 1; }

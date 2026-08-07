@@ -33,12 +33,12 @@ func (s *Store) Load() (*focusv1.Focus, error) {
 	if errors.Is(err, os.ErrNotExist) {
 		return &focusv1.Focus{}, nil
 	} else if err != nil {
-		return nil, fmt.Errorf("load focus state: %w", err)
+		return nil, fmt.Errorf("load focus: %w", err)
 	}
 
 	focus := &focusv1.Focus{}
 	if err := protojson.Unmarshal(data, focus); err != nil {
-		return nil, fmt.Errorf("load focus state: %w", err)
+		return nil, fmt.Errorf("load focus: %w", err)
 	}
 	return focus, nil
 }
@@ -61,6 +61,17 @@ func (s *Store) Problem() (*problemv1.Problem, error) {
 		return nil, errors.New("no problem")
 	}
 	return problem, nil
+}
+
+func validateFocus(focus *focusv1.Focus) error {
+	if focus.GetError() != "" {
+		return nil
+	}
+
+	if focus.GetProblem() == nil {
+		return errors.New("validate: no problem")
+	}
+	return nil
 }
 
 func atomicWrite(path string, data []byte) error {
@@ -90,16 +101,20 @@ func atomicWrite(path string, data []byte) error {
 }
 
 func (s *Store) save(focus *focusv1.Focus) error {
-	s.mu.Lock()
-	defer s.mu.Unlock()
+	if err := validateFocus(focus); err != nil {
+		return fmt.Errorf("save: %w", err)
+	}
 
 	data, err := protojson.Marshal(focus)
 	if err != nil {
-		return fmt.Errorf("save state: %w", err)
+		return fmt.Errorf("save: %w", err)
 	}
 
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
 	if err := atomicWrite(s.path, data); err != nil {
-		return fmt.Errorf("save state: %w", err)
+		return fmt.Errorf("save: %w", err)
 	}
 	return nil
 }

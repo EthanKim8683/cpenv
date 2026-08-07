@@ -23,7 +23,7 @@ func (s *Service) Submit(ctx context.Context, req *submitv1.SubmitRequest) (*sub
 func (s *Service) Claim(ctx context.Context, req *submitv1.ClaimRequest) (*submitv1.ClaimResponse, error) {
 	msg, err := s.hub.claim(ctx, req.GetProblemId())
 	if err != nil {
-		return nil, fmt.Errorf("claim: %w", err)
+		return nil, err
 	}
 
 	return &submitv1.ClaimResponse{
@@ -36,7 +36,7 @@ func (s *Service) Claim(ctx context.Context, req *submitv1.ClaimRequest) (*submi
 func (s *Service) Reply(_ context.Context, req *submitv1.ReplyRequest) (*submitv1.ReplyResponse, error) {
 	reply := &submitv1.SubmitResponse{Error: req.Error}
 	if err := s.hub.reply(req.GetReplyId(), reply); err != nil {
-		return nil, fmt.Errorf("reply: %w", err)
+		return nil, err
 	}
 	return &submitv1.ReplyResponse{}, nil
 }

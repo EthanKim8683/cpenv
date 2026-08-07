@@ -3,7 +3,6 @@ package submission
 import (
 	"context"
 
-	"connectrpc.com/connect"
 	submissionv1 "github.com/EthanKim8683/cpenv/internal/gen/submission/v1"
 	"github.com/EthanKim8683/cpenv/internal/gen/submission/v1/submissionv1connect"
 )
@@ -11,10 +10,24 @@ import (
 type Service struct {
 	defaultLimit int
 	store        *store
+	saveCh       chan<- *submissionv1.Submission
 }
 
 func (s *Service) Save(ctx context.Context, req *submissionv1.SaveRequest) (*submissionv1.SaveResponse, error) {
-	return nil, nil
+	if err := s.store.save(req.GetSubmissions()); err != nil {
+		return nil, err
+	}
+
+	if ch := s.saveCh; ch != nil {
+		for _, sub := range req.GetSubmissions() {
+			select {
+			case ch <- sub:
+			default:
+			}
+		}
+	}
+
+	return &submissionv1.SaveResponse{}, nil
 }
 
 func (s *Service) Tail(ctx context.Context, req *submissionv1.TailRequest) (*submissionv1.TailResponse, error) {
@@ -33,12 +46,7 @@ func (s *Service) Tail(ctx context.Context, req *submissionv1.TailRequest) (*sub
 	if err != nil {
 		return nil, err
 	}
-
 	return &submissionv1.TailResponse{Submissions: subs}, nil
-}
-
-func (s *Service) Subscribe(ctx context.Context, req *submissionv1.SubscribeRequest, stream *connect.ServerStream[submissionv1.SubscribeResponse]) error {
-	return nil
 }
 
 var _ submissionv1connect.SubmissionServiceHandler = (*Service)(nil)

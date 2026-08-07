@@ -12,7 +12,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file submission/v1/submission_service.proto.
  */
 export const file_submission_v1_submission_service: GenFile = /*@__PURE__*/
-  fileDesc("CiZzdWJtaXNzaW9uL3YxL3N1Ym1pc3Npb25fc2VydmljZS5wcm90bxINc3VibWlzc2lvbi52MSI9CgtTYXZlUmVxdWVzdBIuCgtzdWJtaXNzaW9ucxgBIAMoCzIZLnN1Ym1pc3Npb24udjEuU3VibWlzc2lvbiIOCgxTYXZlUmVzcG9uc2UiMAoLVGFpbFJlcXVlc3QSDQoFbGltaXQYASABKA0SEgoKcHJvYmxlbV9pZBgCIAEoCSI+CgxUYWlsUmVzcG9uc2USLgoLc3VibWlzc2lvbnMYASADKAsyGS5zdWJtaXNzaW9uLnYxLlN1Ym1pc3Npb24iJgoQU3Vic2NyaWJlUmVxdWVzdBISCgpwcm9ibGVtX2lkGAEgASgJIkIKEVN1YnNjcmliZVJlc3BvbnNlEi0KCnN1Ym1pc3Npb24YASABKAsyGS5zdWJtaXNzaW9uLnYxLlN1Ym1pc3Npb24y9gEKEVN1Ym1pc3Npb25TZXJ2aWNlEkQKBFNhdmUSGi5zdWJtaXNzaW9uLnYxLlNhdmVSZXF1ZXN0Ghsuc3VibWlzc2lvbi52MS5TYXZlUmVzcG9uc2UiA5ACAhJECgRUYWlsEhouc3VibWlzc2lvbi52MS5UYWlsUmVxdWVzdBobLnN1Ym1pc3Npb24udjEuVGFpbFJlc3BvbnNlIgOQAgESVQoJU3Vic2NyaWJlEh8uc3VibWlzc2lvbi52MS5TdWJzY3JpYmVSZXF1ZXN0GiAuc3VibWlzc2lvbi52MS5TdWJzY3JpYmVSZXNwb25zZSIDkAIBMAFCxwEKEWNvbS5zdWJtaXNzaW9uLnYxQhZTdWJtaXNzaW9uU2VydmljZVByb3RvUAFaRWdpdGh1Yi5jb20vRXRoYW5LaW04NjgzL2NwZW52L2ludGVybmFsL2dlbi9zdWJtaXNzaW9uL3YxO3N1Ym1pc3Npb252MaICA1NYWKoCDVN1Ym1pc3Npb24uVjHKAg1TdWJtaXNzaW9uXFYx4gIZU3VibWlzc2lvblxWMVxHUEJNZXRhZGF0YeoCDlN1Ym1pc3Npb246OlYxYgZwcm90bzM", [file_submission_v1_submission]);
+  fileDesc("CiZzdWJtaXNzaW9uL3YxL3N1Ym1pc3Npb25fc2VydmljZS5wcm90bxINc3VibWlzc2lvbi52MSI9CgtTYXZlUmVxdWVzdBIuCgtzdWJtaXNzaW9ucxgBIAMoCzIZLnN1Ym1pc3Npb24udjEuU3VibWlzc2lvbiIOCgxTYXZlUmVzcG9uc2UiMAoLVGFpbFJlcXVlc3QSDQoFbGltaXQYASABKA0SEgoKcHJvYmxlbV9pZBgCIAEoCSI+CgxUYWlsUmVzcG9uc2USLgoLc3VibWlzc2lvbnMYASADKAsyGS5zdWJtaXNzaW9uLnYxLlN1Ym1pc3Npb24ynwEKEVN1Ym1pc3Npb25TZXJ2aWNlEkQKBFNhdmUSGi5zdWJtaXNzaW9uLnYxLlNhdmVSZXF1ZXN0Ghsuc3VibWlzc2lvbi52MS5TYXZlUmVzcG9uc2UiA5ACAhJECgRUYWlsEhouc3VibWlzc2lvbi52MS5UYWlsUmVxdWVzdBobLnN1Ym1pc3Npb24udjEuVGFpbFJlc3BvbnNlIgOQAgFCxwEKEWNvbS5zdWJtaXNzaW9uLnYxQhZTdWJtaXNzaW9uU2VydmljZVByb3RvUAFaRWdpdGh1Yi5jb20vRXRoYW5LaW04NjgzL2NwZW52L2ludGVybmFsL2dlbi9zdWJtaXNzaW9uL3YxO3N1Ym1pc3Npb252MaICA1NYWKoCDVN1Ym1pc3Npb24uVjHKAg1TdWJtaXNzaW9uXFYx4gIZU3VibWlzc2lvblxWMVxHUEJNZXRhZGF0YeoCDlN1Ym1pc3Npb246OlYxYgZwcm90bzM", [file_submission_v1_submission]);
 
 /**
  * @generated from message submission.v1.SaveRequest
@@ -84,40 +84,6 @@ export const TailResponseSchema: GenMessage<TailResponse> = /*@__PURE__*/
   messageDesc(file_submission_v1_submission_service, 3);
 
 /**
- * @generated from message submission.v1.SubscribeRequest
- */
-export type SubscribeRequest = Message<"submission.v1.SubscribeRequest"> & {
-  /**
-   * @generated from field: string problem_id = 1;
-   */
-  problemId: string;
-};
-
-/**
- * Describes the message submission.v1.SubscribeRequest.
- * Use `create(SubscribeRequestSchema)` to create a new message.
- */
-export const SubscribeRequestSchema: GenMessage<SubscribeRequest> = /*@__PURE__*/
-  messageDesc(file_submission_v1_submission_service, 4);
-
-/**
- * @generated from message submission.v1.SubscribeResponse
- */
-export type SubscribeResponse = Message<"submission.v1.SubscribeResponse"> & {
-  /**
-   * @generated from field: submission.v1.Submission submission = 1;
-   */
-  submission?: Submission | undefined;
-};
-
-/**
- * Describes the message submission.v1.SubscribeResponse.
- * Use `create(SubscribeResponseSchema)` to create a new message.
- */
-export const SubscribeResponseSchema: GenMessage<SubscribeResponse> = /*@__PURE__*/
-  messageDesc(file_submission_v1_submission_service, 5);
-
-/**
  * @generated from service submission.v1.SubmissionService
  */
 export const SubmissionService: GenService<{
@@ -136,14 +102,6 @@ export const SubmissionService: GenService<{
     methodKind: "unary";
     input: typeof TailRequestSchema;
     output: typeof TailResponseSchema;
-  },
-  /**
-   * @generated from rpc submission.v1.SubmissionService.Subscribe
-   */
-  subscribe: {
-    methodKind: "server_streaming";
-    input: typeof SubscribeRequestSchema;
-    output: typeof SubscribeResponseSchema;
   },
 }> = /*@__PURE__*/
   serviceDesc(file_submission_v1_submission_service, 0);

@@ -37,16 +37,12 @@ const (
 	SubmissionServiceSaveProcedure = "/submission.v1.SubmissionService/Save"
 	// SubmissionServiceTailProcedure is the fully-qualified name of the SubmissionService's Tail RPC.
 	SubmissionServiceTailProcedure = "/submission.v1.SubmissionService/Tail"
-	// SubmissionServiceSubscribeProcedure is the fully-qualified name of the SubmissionService's
-	// Subscribe RPC.
-	SubmissionServiceSubscribeProcedure = "/submission.v1.SubmissionService/Subscribe"
 )
 
 // SubmissionServiceClient is a client for the submission.v1.SubmissionService service.
 type SubmissionServiceClient interface {
 	Save(context.Context, *v1.SaveRequest) (*v1.SaveResponse, error)
 	Tail(context.Context, *v1.TailRequest) (*v1.TailResponse, error)
-	Subscribe(context.Context, *v1.SubscribeRequest) (*connect.ServerStreamForClient[v1.SubscribeResponse], error)
 }
 
 // NewSubmissionServiceClient constructs a client for the submission.v1.SubmissionService service.
@@ -74,21 +70,13 @@ func NewSubmissionServiceClient(httpClient connect.HTTPClient, baseURL string, o
 			connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 			connect.WithClientOptions(opts...),
 		),
-		subscribe: connect.NewClient[v1.SubscribeRequest, v1.SubscribeResponse](
-			httpClient,
-			baseURL+SubmissionServiceSubscribeProcedure,
-			connect.WithSchema(submissionServiceMethods.ByName("Subscribe")),
-			connect.WithIdempotency(connect.IdempotencyNoSideEffects),
-			connect.WithClientOptions(opts...),
-		),
 	}
 }
 
 // submissionServiceClient implements SubmissionServiceClient.
 type submissionServiceClient struct {
-	save      *connect.Client[v1.SaveRequest, v1.SaveResponse]
-	tail      *connect.Client[v1.TailRequest, v1.TailResponse]
-	subscribe *connect.Client[v1.SubscribeRequest, v1.SubscribeResponse]
+	save *connect.Client[v1.SaveRequest, v1.SaveResponse]
+	tail *connect.Client[v1.TailRequest, v1.TailResponse]
 }
 
 // Save calls submission.v1.SubmissionService.Save.
@@ -109,16 +97,10 @@ func (c *submissionServiceClient) Tail(ctx context.Context, req *v1.TailRequest)
 	return nil, err
 }
 
-// Subscribe calls submission.v1.SubmissionService.Subscribe.
-func (c *submissionServiceClient) Subscribe(ctx context.Context, req *v1.SubscribeRequest) (*connect.ServerStreamForClient[v1.SubscribeResponse], error) {
-	return c.subscribe.CallServerStream(ctx, connect.NewRequest(req))
-}
-
 // SubmissionServiceHandler is an implementation of the submission.v1.SubmissionService service.
 type SubmissionServiceHandler interface {
 	Save(context.Context, *v1.SaveRequest) (*v1.SaveResponse, error)
 	Tail(context.Context, *v1.TailRequest) (*v1.TailResponse, error)
-	Subscribe(context.Context, *v1.SubscribeRequest, *connect.ServerStream[v1.SubscribeResponse]) error
 }
 
 // NewSubmissionServiceHandler builds an HTTP handler from the service implementation. It returns
@@ -142,21 +124,12 @@ func NewSubmissionServiceHandler(svc SubmissionServiceHandler, opts ...connect.H
 		connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 		connect.WithHandlerOptions(opts...),
 	)
-	submissionServiceSubscribeHandler := connect.NewServerStreamHandlerSimple(
-		SubmissionServiceSubscribeProcedure,
-		svc.Subscribe,
-		connect.WithSchema(submissionServiceMethods.ByName("Subscribe")),
-		connect.WithIdempotency(connect.IdempotencyNoSideEffects),
-		connect.WithHandlerOptions(opts...),
-	)
 	return "/submission.v1.SubmissionService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case SubmissionServiceSaveProcedure:
 			submissionServiceSaveHandler.ServeHTTP(w, r)
 		case SubmissionServiceTailProcedure:
 			submissionServiceTailHandler.ServeHTTP(w, r)
-		case SubmissionServiceSubscribeProcedure:
-			submissionServiceSubscribeHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -172,8 +145,4 @@ func (UnimplementedSubmissionServiceHandler) Save(context.Context, *v1.SaveReque
 
 func (UnimplementedSubmissionServiceHandler) Tail(context.Context, *v1.TailRequest) (*v1.TailResponse, error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("submission.v1.SubmissionService.Tail is not implemented"))
-}
-
-func (UnimplementedSubmissionServiceHandler) Subscribe(context.Context, *v1.SubscribeRequest, *connect.ServerStream[v1.SubscribeResponse]) error {
-	return connect.NewError(connect.CodeUnimplemented, errors.New("submission.v1.SubmissionService.Subscribe is not implemented"))
 }

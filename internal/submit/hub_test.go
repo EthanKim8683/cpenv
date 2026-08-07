@@ -106,7 +106,7 @@ func TestHub(t *testing.T) {
 		wg.Wait()
 		require.NoError(t, c.Err())
 		_, err := h.tryRequest(t.Context(), subj, struct{}{})
-		assert.ErrorContains(t, err, "no claims")
+		assert.ErrorContains(t, err, "no receiver")
 	})
 
 	t.Run("claim context done", func(t *testing.T) {
@@ -116,9 +116,9 @@ func TestHub(t *testing.T) {
 		cancel()
 		h := newHub[struct{}, struct{}]()
 		_, err := h.claim(ctx, subj)
-		require.ErrorContains(t, err, "receive")
+		require.ErrorContains(t, err, "receive request")
 		_, err = h.tryRequest(t.Context(), subj, struct{}{})
-		assert.ErrorContains(t, err, "no claims")
+		assert.ErrorContains(t, err, "no receiver")
 	})
 
 	t.Run("request context done", func(t *testing.T) {
@@ -156,7 +156,7 @@ func TestHub(t *testing.T) {
 			var wg sync.WaitGroup
 			wg.Go(func() {
 				_, err := h.request(ctx, subj, struct{}{})
-				assert.ErrorContains(c, err, "receive")
+				assert.ErrorContains(c, err, "receive reply")
 			})
 			var msg *message[struct{}]
 			wg.Go(func() {

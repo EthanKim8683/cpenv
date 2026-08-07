@@ -66,6 +66,10 @@ func (s *store) save(subs []*submissionv1.Submission) error {
 }
 
 func (s *store) tail(limit int) ([]*submissionv1.Submission, error) {
+	if limit <= 0 {
+		return nil, fmt.Errorf("tail submissions: limit must be positive: %d", limit)
+	}
+
 	subs := []*submissionv1.Submission{}
 	if err := s.db.View(func(tx *bolt.Tx) error {
 		b := tx.Bucket(bucketKeyPrimary)
@@ -74,7 +78,7 @@ func (s *store) tail(limit int) ([]*submissionv1.Submission, error) {
 		}
 
 		subs = make([]*submissionv1.Submission, limit)
-		c := tx.Bucket(bucketKeyPrimary).Cursor()
+		c := b.Cursor()
 		k, v := c.Last()
 		for i := range limit {
 			if k == nil {
@@ -98,6 +102,10 @@ func (s *store) tail(limit int) ([]*submissionv1.Submission, error) {
 }
 
 func (s *store) tailProblem(problemID string, limit int) ([]*submissionv1.Submission, error) {
+	if limit <= 0 {
+		return nil, fmt.Errorf("tail problem %q submissions: limit must be positive: %d", problemID, limit)
+	}
+
 	subs := []*submissionv1.Submission{}
 	if err := s.db.View(func(tx *bolt.Tx) error {
 		b := tx.Bucket(bucketKeyPrimary)
@@ -132,7 +140,7 @@ func (s *store) tailProblem(problemID string, limit int) ([]*submissionv1.Submis
 		}
 		return nil
 	}); err != nil {
-		return nil, fmt.Errorf("tail submissions for problem %q: %w", problemID, err)
+		return nil, fmt.Errorf("tail problem %q submissions: %w", problemID, err)
 	}
 	return subs, nil
 }

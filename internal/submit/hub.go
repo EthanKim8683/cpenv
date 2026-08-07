@@ -67,7 +67,7 @@ func (h *hub[Req, Reply]) claim(ctx context.Context, subj string) (*message[Req]
 
 	select {
 	case <-ctx.Done():
-		return nil, fmt.Errorf("receive: %w", ctx.Err())
+		return nil, fmt.Errorf("claim: receive request: %w", ctx.Err())
 	case msg := <-ch:
 		return msg, nil
 	}
@@ -99,24 +99,34 @@ func (h *hub[Req, Reply]) doRequest(ctx context.Context, subj string, req Req, w
 
 	select {
 	case <-ctx.Done():
-		return zero, fmt.Errorf("receive: %w", ctx.Err())
+		return zero, fmt.Errorf("receive reply %d: %w", rID, ctx.Err())
 	case reply := <-rCh:
 		return reply, nil
 	}
 }
 
 func (h *hub[Req, Reply]) request(ctx context.Context, subj string, req Req) (Reply, error) {
-	return h.doRequest(ctx, subj, req, true)
+	reply, err := h.doRequest(ctx, subj, req, true)
+	if err != nil {
+		var zero Reply
+		return zero, fmt.Errorf("request: %w", err)
+	}
+	return reply, nil
 }
 
 func (h *hub[Req, Reply]) tryRequest(ctx context.Context, subj string, req Req) (Reply, error) {
-	return h.doRequest(ctx, subj, req, false)
+	reply, err := h.doRequest(ctx, subj, req, false)
+	if err != nil {
+		var zero Reply
+		return zero, fmt.Errorf("try request: %w", err)
+	}
+	return reply, nil
 }
 
 func (h *hub[Req, Reply]) reply(id uint32, reply Reply) error {
 	ch, ok := h.takeReplyCh(id)
 	if !ok {
-		return errors.New("not found")
+		return fmt.Errorf("reply %d: not found", id)
 	}
 	ch <- reply
 	return nil
