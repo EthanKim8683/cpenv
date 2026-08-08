@@ -13,8 +13,8 @@ var (
 	bucketKeyByProblem = []byte("submissions_by_problem")
 )
 
-type store struct {
-	db *bolt.DB
+type Store struct {
+	DB *bolt.DB
 }
 
 func key(ms int64, id string) []byte {
@@ -29,8 +29,8 @@ func key(ms int64, id string) []byte {
 	return k
 }
 
-func (s *store) save(subs []*submissionv1.Submission) error {
-	if err := s.db.Update(func(tx *bolt.Tx) error {
+func (s *Store) save(subs []*submissionv1.Submission) error {
+	if err := s.DB.Update(func(tx *bolt.Tx) error {
 		b, err := tx.CreateBucketIfNotExists(bucketKeyPrimary)
 		if err != nil {
 			return err
@@ -65,13 +65,13 @@ func (s *store) save(subs []*submissionv1.Submission) error {
 	return nil
 }
 
-func (s *store) tail(limit int) ([]*submissionv1.Submission, error) {
+func (s *Store) Tail(limit int) ([]*submissionv1.Submission, error) {
 	if limit <= 0 {
 		return nil, fmt.Errorf("tail submissions: limit must be positive: %d", limit)
 	}
 
 	subs := []*submissionv1.Submission{}
-	if err := s.db.View(func(tx *bolt.Tx) error {
+	if err := s.DB.View(func(tx *bolt.Tx) error {
 		b := tx.Bucket(bucketKeyPrimary)
 		if b == nil {
 			return nil
@@ -101,13 +101,13 @@ func (s *store) tail(limit int) ([]*submissionv1.Submission, error) {
 	return subs, nil
 }
 
-func (s *store) tailProblem(problemID string, limit int) ([]*submissionv1.Submission, error) {
+func (s *Store) TailProblem(problemID string, limit int) ([]*submissionv1.Submission, error) {
 	if limit <= 0 {
 		return nil, fmt.Errorf("tail problem %q submissions: limit must be positive: %d", problemID, limit)
 	}
 
 	subs := []*submissionv1.Submission{}
-	if err := s.db.View(func(tx *bolt.Tx) error {
+	if err := s.DB.View(func(tx *bolt.Tx) error {
 		b := tx.Bucket(bucketKeyPrimary)
 		if b == nil {
 			return nil

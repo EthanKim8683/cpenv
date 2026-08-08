@@ -35,14 +35,11 @@ const (
 const (
 	// SubmissionServiceSaveProcedure is the fully-qualified name of the SubmissionService's Save RPC.
 	SubmissionServiceSaveProcedure = "/submission.v1.SubmissionService/Save"
-	// SubmissionServiceTailProcedure is the fully-qualified name of the SubmissionService's Tail RPC.
-	SubmissionServiceTailProcedure = "/submission.v1.SubmissionService/Tail"
 )
 
 // SubmissionServiceClient is a client for the submission.v1.SubmissionService service.
 type SubmissionServiceClient interface {
 	Save(context.Context, *v1.SaveRequest) (*v1.SaveResponse, error)
-	Tail(context.Context, *v1.TailRequest) (*v1.TailResponse, error)
 }
 
 // NewSubmissionServiceClient constructs a client for the submission.v1.SubmissionService service.
@@ -63,20 +60,12 @@ func NewSubmissionServiceClient(httpClient connect.HTTPClient, baseURL string, o
 			connect.WithIdempotency(connect.IdempotencyIdempotent),
 			connect.WithClientOptions(opts...),
 		),
-		tail: connect.NewClient[v1.TailRequest, v1.TailResponse](
-			httpClient,
-			baseURL+SubmissionServiceTailProcedure,
-			connect.WithSchema(submissionServiceMethods.ByName("Tail")),
-			connect.WithIdempotency(connect.IdempotencyNoSideEffects),
-			connect.WithClientOptions(opts...),
-		),
 	}
 }
 
 // submissionServiceClient implements SubmissionServiceClient.
 type submissionServiceClient struct {
 	save *connect.Client[v1.SaveRequest, v1.SaveResponse]
-	tail *connect.Client[v1.TailRequest, v1.TailResponse]
 }
 
 // Save calls submission.v1.SubmissionService.Save.
@@ -88,19 +77,9 @@ func (c *submissionServiceClient) Save(ctx context.Context, req *v1.SaveRequest)
 	return nil, err
 }
 
-// Tail calls submission.v1.SubmissionService.Tail.
-func (c *submissionServiceClient) Tail(ctx context.Context, req *v1.TailRequest) (*v1.TailResponse, error) {
-	response, err := c.tail.CallUnary(ctx, connect.NewRequest(req))
-	if response != nil {
-		return response.Msg, err
-	}
-	return nil, err
-}
-
 // SubmissionServiceHandler is an implementation of the submission.v1.SubmissionService service.
 type SubmissionServiceHandler interface {
 	Save(context.Context, *v1.SaveRequest) (*v1.SaveResponse, error)
-	Tail(context.Context, *v1.TailRequest) (*v1.TailResponse, error)
 }
 
 // NewSubmissionServiceHandler builds an HTTP handler from the service implementation. It returns
@@ -117,19 +96,10 @@ func NewSubmissionServiceHandler(svc SubmissionServiceHandler, opts ...connect.H
 		connect.WithIdempotency(connect.IdempotencyIdempotent),
 		connect.WithHandlerOptions(opts...),
 	)
-	submissionServiceTailHandler := connect.NewUnaryHandlerSimple(
-		SubmissionServiceTailProcedure,
-		svc.Tail,
-		connect.WithSchema(submissionServiceMethods.ByName("Tail")),
-		connect.WithIdempotency(connect.IdempotencyNoSideEffects),
-		connect.WithHandlerOptions(opts...),
-	)
 	return "/submission.v1.SubmissionService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case SubmissionServiceSaveProcedure:
 			submissionServiceSaveHandler.ServeHTTP(w, r)
-		case SubmissionServiceTailProcedure:
-			submissionServiceTailHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -141,8 +111,4 @@ type UnimplementedSubmissionServiceHandler struct{}
 
 func (UnimplementedSubmissionServiceHandler) Save(context.Context, *v1.SaveRequest) (*v1.SaveResponse, error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("submission.v1.SubmissionService.Save is not implemented"))
-}
-
-func (UnimplementedSubmissionServiceHandler) Tail(context.Context, *v1.TailRequest) (*v1.TailResponse, error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("submission.v1.SubmissionService.Tail is not implemented"))
 }

@@ -8,18 +8,8 @@ service SubmissionService {
   rpc Save(SaveRequest) returns (SaveResponse) {
     option idempotency_level = IDEMPOTENT;
   }
-  rpc Tail(TailRequest) returns (TailResponse) {
-    option idempotency_level = NO_SIDE_EFFECTS;
-  }
 }
 
 message SaveRequest { repeated submission.v1.Submission submissions = 1; }
 
 message SaveResponse {}
-
-message TailRequest {
-  uint32 limit = 1;
-  string problem_id = 2;
-}
-
-message TailResponse { repeated submission.v1.Submission submissions = 1; }

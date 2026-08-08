@@ -65,9 +65,9 @@ func TestStore(t *testing.T) {
 		t.Cleanup(func() {
 			require.NoError(t, db.Close())
 		})
-		s := &store{db: db}
+		s := &Store{DB: db}
 		require.NoError(t, s.save(subs))
-		gotSubs, err := s.tail(2)
+		gotSubs, err := s.Tail(2)
 		assert.NoError(t, err)
 		assert.True(t, equalProto(t, subs, gotSubs))
 	})
@@ -89,9 +89,9 @@ func TestStore(t *testing.T) {
 		t.Cleanup(func() {
 			require.NoError(t, db.Close())
 		})
-		s := &store{db: db}
+		s := &Store{DB: db}
 		require.NoError(t, s.save(slices.Concat(subs1, subs2)))
-		gotSubs, err := s.tailProblem("1", 2)
+		gotSubs, err := s.TailProblem("1", 2)
 		assert.NoError(t, err)
 		assert.True(t, equalProto(t, subs1, gotSubs))
 	})
@@ -109,10 +109,10 @@ func TestStore(t *testing.T) {
 		t.Cleanup(func() {
 			require.NoError(t, db.Close())
 		})
-		s := &store{db: db}
+		s := &Store{DB: db}
 		require.NoError(t, s.save(subs))
 		require.NoError(t, s.save(subs))
-		gotSubs, err := s.tail(100)
+		gotSubs, err := s.Tail(100)
 		assert.NoError(t, err)
 		assert.True(t, equalProto(t, subs, gotSubs))
 	})
@@ -131,9 +131,9 @@ func TestStore(t *testing.T) {
 		t.Cleanup(func() {
 			require.NoError(t, db.Close())
 		})
-		s := &store{db: db}
+		s := &Store{DB: db}
 		require.NoError(t, s.save(subs))
-		gotSubs, err := s.tail(2)
+		gotSubs, err := s.Tail(2)
 		assert.NoError(t, err)
 		assert.True(t, elementsMatchProto(t, subs, gotSubs))
 	})
@@ -152,10 +152,10 @@ func TestStore(t *testing.T) {
 		t.Cleanup(func() {
 			require.NoError(t, db.Close())
 		})
-		s := &store{db: db}
+		s := &Store{DB: db}
 		require.NoError(t, s.save(subs))
 		require.NoError(t, s.save(subs))
-		gotSubs, err := s.tail(4)
+		gotSubs, err := s.Tail(4)
 		assert.NoError(t, err)
 		assert.True(t, equalProto(t, subs, gotSubs))
 	})

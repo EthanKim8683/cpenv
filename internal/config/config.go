@@ -9,8 +9,8 @@ import (
 )
 
 type Config struct {
-	Port string `env:"CPENV_PORT" envDefault:"8683"`
-	Home string `env:"CPENV_HOME,noEmpty"`
+	Port    string `env:"CPENV_PORT" envDefault:"8683"`
+	HomeDir string `env:"CPENV_HOME,noEmpty"`
 }
 
 func (c *Config) Validate() error {

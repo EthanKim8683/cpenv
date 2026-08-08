@@ -12,7 +12,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file submission/v1/submission_service.proto.
  */
 export const file_submission_v1_submission_service: GenFile = /*@__PURE__*/
-  fileDesc("CiZzdWJtaXNzaW9uL3YxL3N1Ym1pc3Npb25fc2VydmljZS5wcm90bxINc3VibWlzc2lvbi52MSI9CgtTYXZlUmVxdWVzdBIuCgtzdWJtaXNzaW9ucxgBIAMoCzIZLnN1Ym1pc3Npb24udjEuU3VibWlzc2lvbiIOCgxTYXZlUmVzcG9uc2UiMAoLVGFpbFJlcXVlc3QSDQoFbGltaXQYASABKA0SEgoKcHJvYmxlbV9pZBgCIAEoCSI+CgxUYWlsUmVzcG9uc2USLgoLc3VibWlzc2lvbnMYASADKAsyGS5zdWJtaXNzaW9uLnYxLlN1Ym1pc3Npb24ynwEKEVN1Ym1pc3Npb25TZXJ2aWNlEkQKBFNhdmUSGi5zdWJtaXNzaW9uLnYxLlNhdmVSZXF1ZXN0Ghsuc3VibWlzc2lvbi52MS5TYXZlUmVzcG9uc2UiA5ACAhJECgRUYWlsEhouc3VibWlzc2lvbi52MS5UYWlsUmVxdWVzdBobLnN1Ym1pc3Npb24udjEuVGFpbFJlc3BvbnNlIgOQAgFCxwEKEWNvbS5zdWJtaXNzaW9uLnYxQhZTdWJtaXNzaW9uU2VydmljZVByb3RvUAFaRWdpdGh1Yi5jb20vRXRoYW5LaW04NjgzL2NwZW52L2ludGVybmFsL2dlbi9zdWJtaXNzaW9uL3YxO3N1Ym1pc3Npb252MaICA1NYWKoCDVN1Ym1pc3Npb24uVjHKAg1TdWJtaXNzaW9uXFYx4gIZU3VibWlzc2lvblxWMVxHUEJNZXRhZGF0YeoCDlN1Ym1pc3Npb246OlYxYgZwcm90bzM", [file_submission_v1_submission]);
+  fileDesc("CiZzdWJtaXNzaW9uL3YxL3N1Ym1pc3Npb25fc2VydmljZS5wcm90bxINc3VibWlzc2lvbi52MSI9CgtTYXZlUmVxdWVzdBIuCgtzdWJtaXNzaW9ucxgBIAMoCzIZLnN1Ym1pc3Npb24udjEuU3VibWlzc2lvbiIOCgxTYXZlUmVzcG9uc2UyWQoRU3VibWlzc2lvblNlcnZpY2USRAoEU2F2ZRIaLnN1Ym1pc3Npb24udjEuU2F2ZVJlcXVlc3QaGy5zdWJtaXNzaW9uLnYxLlNhdmVSZXNwb25zZSIDkAICQscBChFjb20uc3VibWlzc2lvbi52MUIWU3VibWlzc2lvblNlcnZpY2VQcm90b1ABWkVnaXRodWIuY29tL0V0aGFuS2ltODY4My9jcGVudi9pbnRlcm5hbC9nZW4vc3VibWlzc2lvbi92MTtzdWJtaXNzaW9udjGiAgNTWFiqAg1TdWJtaXNzaW9uLlYxygINU3VibWlzc2lvblxWMeICGVN1Ym1pc3Npb25cVjFcR1BCTWV0YWRhdGHqAg5TdWJtaXNzaW9uOjpWMWIGcHJvdG8z", [file_submission_v1_submission]);
 
 /**
  * @generated from message submission.v1.SaveRequest
@@ -45,45 +45,6 @@ export const SaveResponseSchema: GenMessage<SaveResponse> = /*@__PURE__*/
   messageDesc(file_submission_v1_submission_service, 1);
 
 /**
- * @generated from message submission.v1.TailRequest
- */
-export type TailRequest = Message<"submission.v1.TailRequest"> & {
-  /**
-   * @generated from field: uint32 limit = 1;
-   */
-  limit: number;
-
-  /**
-   * @generated from field: string problem_id = 2;
-   */
-  problemId: string;
-};
-
-/**
- * Describes the message submission.v1.TailRequest.
- * Use `create(TailRequestSchema)` to create a new message.
- */
-export const TailRequestSchema: GenMessage<TailRequest> = /*@__PURE__*/
-  messageDesc(file_submission_v1_submission_service, 2);
-
-/**
- * @generated from message submission.v1.TailResponse
- */
-export type TailResponse = Message<"submission.v1.TailResponse"> & {
-  /**
-   * @generated from field: repeated submission.v1.Submission submissions = 1;
-   */
-  submissions: Submission[];
-};
-
-/**
- * Describes the message submission.v1.TailResponse.
- * Use `create(TailResponseSchema)` to create a new message.
- */
-export const TailResponseSchema: GenMessage<TailResponse> = /*@__PURE__*/
-  messageDesc(file_submission_v1_submission_service, 3);
-
-/**
  * @generated from service submission.v1.SubmissionService
  */
 export const SubmissionService: GenService<{
@@ -94,14 +55,6 @@ export const SubmissionService: GenService<{
     methodKind: "unary";
     input: typeof SaveRequestSchema;
     output: typeof SaveResponseSchema;
-  },
-  /**
-   * @generated from rpc submission.v1.SubmissionService.Tail
-   */
-  tail: {
-    methodKind: "unary";
-    input: typeof TailRequestSchema;
-    output: typeof TailResponseSchema;
   },
 }> = /*@__PURE__*/
   serviceDesc(file_submission_v1_submission_service, 0);

@@ -110,6 +110,10 @@ func (s *Store) save(focus *focusv1.Focus) error {
 		return fmt.Errorf("save: %w", err)
 	}
 
+	if err := os.MkdirAll(filepath.Dir(s.path), 0755); err != nil {
+		return fmt.Errorf("save: %w", err)
+	}
+
 	s.mu.Lock()
 	defer s.mu.Unlock()
 

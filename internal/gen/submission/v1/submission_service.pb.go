@@ -101,102 +101,6 @@ func (*SaveResponse) Descriptor() ([]byte, []int) {
 	return file_submission_v1_submission_service_proto_rawDescGZIP(), []int{1}
 }
 
-type TailRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Limit         uint32                 `protobuf:"varint,1,opt,name=limit,proto3" json:"limit,omitempty"`
-	ProblemId     string                 `protobuf:"bytes,2,opt,name=problem_id,json=problemId,proto3" json:"problem_id,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *TailRequest) Reset() {
-	*x = TailRequest{}
-	mi := &file_submission_v1_submission_service_proto_msgTypes[2]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *TailRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*TailRequest) ProtoMessage() {}
-
-func (x *TailRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_submission_v1_submission_service_proto_msgTypes[2]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use TailRequest.ProtoReflect.Descriptor instead.
-func (*TailRequest) Descriptor() ([]byte, []int) {
-	return file_submission_v1_submission_service_proto_rawDescGZIP(), []int{2}
-}
-
-func (x *TailRequest) GetLimit() uint32 {
-	if x != nil {
-		return x.Limit
-	}
-	return 0
-}
-
-func (x *TailRequest) GetProblemId() string {
-	if x != nil {
-		return x.ProblemId
-	}
-	return ""
-}
-
-type TailResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Submissions   []*Submission          `protobuf:"bytes,1,rep,name=submissions,proto3" json:"submissions,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *TailResponse) Reset() {
-	*x = TailResponse{}
-	mi := &file_submission_v1_submission_service_proto_msgTypes[3]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *TailResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*TailResponse) ProtoMessage() {}
-
-func (x *TailResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_submission_v1_submission_service_proto_msgTypes[3]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use TailResponse.ProtoReflect.Descriptor instead.
-func (*TailResponse) Descriptor() ([]byte, []int) {
-	return file_submission_v1_submission_service_proto_rawDescGZIP(), []int{3}
-}
-
-func (x *TailResponse) GetSubmissions() []*Submission {
-	if x != nil {
-		return x.Submissions
-	}
-	return nil
-}
-
 var File_submission_v1_submission_service_proto protoreflect.FileDescriptor
 
 const file_submission_v1_submission_service_proto_rawDesc = "" +
@@ -204,16 +108,9 @@ const file_submission_v1_submission_service_proto_rawDesc = "" +
 	"&submission/v1/submission_service.proto\x12\rsubmission.v1\x1a\x1esubmission/v1/submission.proto\"J\n" +
 	"\vSaveRequest\x12;\n" +
 	"\vsubmissions\x18\x01 \x03(\v2\x19.submission.v1.SubmissionR\vsubmissions\"\x0e\n" +
-	"\fSaveResponse\"B\n" +
-	"\vTailRequest\x12\x14\n" +
-	"\x05limit\x18\x01 \x01(\rR\x05limit\x12\x1d\n" +
-	"\n" +
-	"problem_id\x18\x02 \x01(\tR\tproblemId\"K\n" +
-	"\fTailResponse\x12;\n" +
-	"\vsubmissions\x18\x01 \x03(\v2\x19.submission.v1.SubmissionR\vsubmissions2\x9f\x01\n" +
+	"\fSaveResponse2Y\n" +
 	"\x11SubmissionService\x12D\n" +
-	"\x04Save\x12\x1a.submission.v1.SaveRequest\x1a\x1b.submission.v1.SaveResponse\"\x03\x90\x02\x02\x12D\n" +
-	"\x04Tail\x12\x1a.submission.v1.TailRequest\x1a\x1b.submission.v1.TailResponse\"\x03\x90\x02\x01B\xc7\x01\n" +
+	"\x04Save\x12\x1a.submission.v1.SaveRequest\x1a\x1b.submission.v1.SaveResponse\"\x03\x90\x02\x02B\xc7\x01\n" +
 	"\x11com.submission.v1B\x16SubmissionServiceProtoP\x01ZEgithub.com/EthanKim8683/cpenv/internal/gen/submission/v1;submissionv1\xa2\x02\x03SXX\xaa\x02\rSubmission.V1\xca\x02\rSubmission\\V1\xe2\x02\x19Submission\\V1\\GPBMetadata\xea\x02\x0eSubmission::V1b\x06proto3"
 
 var (
@@ -228,26 +125,21 @@ func file_submission_v1_submission_service_proto_rawDescGZIP() []byte {
 	return file_submission_v1_submission_service_proto_rawDescData
 }
 
-var file_submission_v1_submission_service_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
+var file_submission_v1_submission_service_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
 var file_submission_v1_submission_service_proto_goTypes = []any{
 	(*SaveRequest)(nil),  // 0: submission.v1.SaveRequest
 	(*SaveResponse)(nil), // 1: submission.v1.SaveResponse
-	(*TailRequest)(nil),  // 2: submission.v1.TailRequest
-	(*TailResponse)(nil), // 3: submission.v1.TailResponse
-	(*Submission)(nil),   // 4: submission.v1.Submission
+	(*Submission)(nil),   // 2: submission.v1.Submission
 }
 var file_submission_v1_submission_service_proto_depIdxs = []int32{
-	4, // 0: submission.v1.SaveRequest.submissions:type_name -> submission.v1.Submission
-	4, // 1: submission.v1.TailResponse.submissions:type_name -> submission.v1.Submission
-	0, // 2: submission.v1.SubmissionService.Save:input_type -> submission.v1.SaveRequest
-	2, // 3: submission.v1.SubmissionService.Tail:input_type -> submission.v1.TailRequest
-	1, // 4: submission.v1.SubmissionService.Save:output_type -> submission.v1.SaveResponse
-	3, // 5: submission.v1.SubmissionService.Tail:output_type -> submission.v1.TailResponse
-	4, // [4:6] is the sub-list for method output_type
-	2, // [2:4] is the sub-list for method input_type
-	2, // [2:2] is the sub-list for extension type_name
-	2, // [2:2] is the sub-list for extension extendee
-	0, // [0:2] is the sub-list for field type_name
+	2, // 0: submission.v1.SaveRequest.submissions:type_name -> submission.v1.Submission
+	0, // 1: submission.v1.SubmissionService.Save:input_type -> submission.v1.SaveRequest
+	1, // 2: submission.v1.SubmissionService.Save:output_type -> submission.v1.SaveResponse
+	2, // [2:3] is the sub-list for method output_type
+	1, // [1:2] is the sub-list for method input_type
+	1, // [1:1] is the sub-list for extension type_name
+	1, // [1:1] is the sub-list for extension extendee
+	0, // [0:1] is the sub-list for field type_name
 }
 
 func init() { file_submission_v1_submission_service_proto_init() }
@@ -262,7 +154,7 @@ func file_submission_v1_submission_service_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_submission_v1_submission_service_proto_rawDesc), len(file_submission_v1_submission_service_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   4,
+			NumMessages:   2,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

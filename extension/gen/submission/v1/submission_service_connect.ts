@@ -3,7 +3,7 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import { SaveRequest, SaveResponse, TailRequest, TailResponse } from "./submission_service_pb.js";
+import { SaveRequest, SaveResponse } from "./submission_service_pb.js";
 import { MethodIdempotency, MethodKind } from "@bufbuild/protobuf";
 
 /**
@@ -21,16 +21,6 @@ export const SubmissionService = {
       O: SaveResponse,
       kind: MethodKind.Unary,
       idempotency: MethodIdempotency.Idempotent,
-    },
-    /**
-     * @generated from rpc submission.v1.SubmissionService.Tail
-     */
-    tail: {
-      name: "Tail",
-      I: TailRequest,
-      O: TailResponse,
-      kind: MethodKind.Unary,
-      idempotency: MethodIdempotency.NoSideEffects,
     },
   }
 } as const;
