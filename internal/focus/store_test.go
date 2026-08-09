@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestStore(t *testing.T) {
+func TestFileStore(t *testing.T) {
 	t.Parallel()
 
 	t.Run("round trip", func(t *testing.T) {
@@ -22,9 +22,9 @@ func TestStore(t *testing.T) {
 			Error:   "error",
 		}
 
-		store := &Store{path: path}
+		store := &FileStore{Path: path}
 		require.NoError(t, store.save(focus))
-		gotFocus, err := store.Load()
+		gotFocus, err := store.load()
 		assert.NoError(t, err)
 		assert.Equal(t, focus, gotFocus)
 	})
@@ -38,7 +38,7 @@ func TestStore(t *testing.T) {
 			path := filepath.Join(t.TempDir(), "focus.json")
 			problem := &problemv1.Problem{Id: "id"}
 
-			store := &Store{path: path}
+			store := &FileStore{Path: path}
 			require.NoError(t, store.save(&focusv1.Focus{Problem: problem}))
 			gotProblem, err := store.Problem()
 			assert.NoError(t, err)
@@ -51,7 +51,7 @@ func TestStore(t *testing.T) {
 			path := filepath.Join(t.TempDir(), "focus.json")
 			errMsg := "error"
 
-			store := &Store{path: path}
+			store := &FileStore{Path: path}
 			require.NoError(t, store.save(&focusv1.Focus{Error: errMsg}))
 			_, err := store.Problem()
 			focusErr := &FocusError{}

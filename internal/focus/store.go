@@ -20,16 +20,22 @@ func (e *FocusError) Error() string {
 	return fmt.Sprintf("focus: %s", e.Message)
 }
 
-type Store struct {
-	mu   sync.RWMutex
-	path string
+type Store interface {
+	load() (*focusv1.Focus, error)
+	Problem() (*problemv1.Problem, error)
+	save(focus *focusv1.Focus) error
 }
 
-func (s *Store) Load() (*focusv1.Focus, error) {
+type FileStore struct {
+	mu   sync.RWMutex
+	Path string
+}
+
+func (s *FileStore) load() (*focusv1.Focus, error) {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 
-	data, err := os.ReadFile(s.path)
+	data, err := os.ReadFile(s.Path)
 	if errors.Is(err, os.ErrNotExist) {
 		return &focusv1.Focus{}, nil
 	} else if err != nil {
@@ -43,8 +49,8 @@ func (s *Store) Load() (*focusv1.Focus, error) {
 	return focus, nil
 }
 
-func (s *Store) Problem() (*problemv1.Problem, error) {
-	focus, err := s.Load()
+func (s *FileStore) Problem() (*problemv1.Problem, error) {
+	focus, err := s.load()
 	if err != nil {
 		return nil, err
 	}
@@ -100,7 +106,7 @@ func atomicWrite(path string, data []byte) error {
 	return nil
 }
 
-func (s *Store) save(focus *focusv1.Focus) error {
+func (s *FileStore) save(focus *focusv1.Focus) error {
 	if err := validateFocus(focus); err != nil {
 		return fmt.Errorf("save: %w", err)
 	}
@@ -110,19 +116,17 @@ func (s *Store) save(focus *focusv1.Focus) error {
 		return fmt.Errorf("save: %w", err)
 	}
 
-	if err := os.MkdirAll(filepath.Dir(s.path), 0755); err != nil {
+	if err := os.MkdirAll(filepath.Dir(s.Path), 0755); err != nil {
 		return fmt.Errorf("save: %w", err)
 	}
 
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	if err := atomicWrite(s.path, data); err != nil {
+	if err := atomicWrite(s.Path, data); err != nil {
 		return fmt.Errorf("save: %w", err)
 	}
 	return nil
 }
 
-func NewStore(path string) *Store {
-	return &Store{path: path}
-}
+var _ Store = (*FileStore)(nil)

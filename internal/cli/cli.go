@@ -12,12 +12,12 @@ import (
 
 type CLI struct {
 	Cfg             *config.Config
-	FocusStore      *focus.Store
-	SubmissionStore *submission.Store
+	FocusStore      focus.Store
+	SubmissionStore submission.Store
 	SubmitClient    submitv1connect.SubmitServiceClient
 }
 
-func (c *CLI) newHome() *Home {
+func (c *CLI) NewHome() *Home {
 	return &Home{
 		dir:             c.Cfg.HomeDir,
 		submissionStore: c.SubmissionStore,
@@ -31,18 +31,22 @@ func (c *CLI) Focus(tmpl string) (string, error) {
 		return "", fmt.Errorf("focus: %w", err)
 	}
 
-	h := c.newHome()
+	h := c.NewHome()
 	if ok, err := h.exists(); err != nil {
 		return "", fmt.Errorf("focus: %w", err)
 	} else if !ok {
-		h.init()
+		if err := h.init(); err != nil {
+			return "", fmt.Errorf("focus: %w", err)
+		}
 	}
 
 	w := h.newWorkspace(problem)
 	if ok, err := w.exists(); err != nil {
 		return "", fmt.Errorf("focus: %w", err)
 	} else if !ok {
-		w.init(tmpl)
+		if err := w.init(tmpl); err != nil {
+			return "", fmt.Errorf("focus: %w", err)
+		}
 	}
 
 	return h.workspaceDir(problem.GetId()), nil

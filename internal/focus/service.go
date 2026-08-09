@@ -9,7 +9,7 @@ import (
 )
 
 type Service struct {
-	Store *Store
+	Store Store
 }
 
 func (s *Service) SetFocus(ctx context.Context, req *focusv1.SetFocusRequest) (*focusv1.SetFocusResponse, error) {

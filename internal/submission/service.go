@@ -8,7 +8,7 @@ import (
 )
 
 type Service struct {
-	Store  *Store
+	Store  Store
 	SaveCh chan<- *submissionv1.Submission
 }
 

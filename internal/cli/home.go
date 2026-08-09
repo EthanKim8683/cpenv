@@ -14,7 +14,7 @@ import (
 
 type Home struct {
 	dir             string
-	submissionStore *submission.Store
+	submissionStore submission.Store
 	submitClient    submitv1connect.SubmitServiceClient
 }
 
@@ -56,10 +56,21 @@ func (h *Home) init() error {
 		return fmt.Errorf("init home: %w", err)
 	}
 
+	tmplPath := filepath.Join(h.templatesDir(), "default.star")
+	if err := os.WriteFile(tmplPath, []byte("files = {}"), 0644); err != nil {
+		return fmt.Errorf("init home: %w", err)
+	}
+	ss := h.stateStore()
+	if err := ss.save(&state{
+		LastTemplatePath: tmplPath,
+	}); err != nil {
+		return fmt.Errorf("init home: %w", err)
+	}
+	return nil
 }
 
-func (h *Home) stateStore() *stateStore {
-
+func (h *Home) stateStore() stateStore {
+	return &fileStateStore{path: h.statePath()}
 }
 
 func (h *Home) newWorkspace(problem *problemv1.Problem) *Workspace {
@@ -68,6 +79,7 @@ func (h *Home) newWorkspace(problem *problemv1.Problem) *Workspace {
 		problem:         problem,
 		submissionStore: h.submissionStore,
 		submitClient:    h.submitClient,
+		templateGetter:  h,
 	}
 }
 

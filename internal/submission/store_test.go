@@ -48,7 +48,7 @@ func elementsMatchProto[T proto.Message](t *testing.T, expected []T, actual []T)
 	return true
 }
 
-func TestStore(t *testing.T) {
+func TestDBStore(t *testing.T) {
 	t.Parallel()
 
 	t.Run("round trip", func(t *testing.T) {
@@ -65,7 +65,7 @@ func TestStore(t *testing.T) {
 		t.Cleanup(func() {
 			require.NoError(t, db.Close())
 		})
-		s := &Store{DB: db}
+		s := &DBStore{DB: db}
 		require.NoError(t, s.save(subs))
 		gotSubs, err := s.Tail(2)
 		assert.NoError(t, err)
@@ -89,7 +89,7 @@ func TestStore(t *testing.T) {
 		t.Cleanup(func() {
 			require.NoError(t, db.Close())
 		})
-		s := &Store{DB: db}
+		s := &DBStore{DB: db}
 		require.NoError(t, s.save(slices.Concat(subs1, subs2)))
 		gotSubs, err := s.TailProblem("1", 2)
 		assert.NoError(t, err)
@@ -109,7 +109,7 @@ func TestStore(t *testing.T) {
 		t.Cleanup(func() {
 			require.NoError(t, db.Close())
 		})
-		s := &Store{DB: db}
+		s := &DBStore{DB: db}
 		require.NoError(t, s.save(subs))
 		require.NoError(t, s.save(subs))
 		gotSubs, err := s.Tail(100)
@@ -131,7 +131,7 @@ func TestStore(t *testing.T) {
 		t.Cleanup(func() {
 			require.NoError(t, db.Close())
 		})
-		s := &Store{DB: db}
+		s := &DBStore{DB: db}
 		require.NoError(t, s.save(subs))
 		gotSubs, err := s.Tail(2)
 		assert.NoError(t, err)
@@ -152,7 +152,7 @@ func TestStore(t *testing.T) {
 		t.Cleanup(func() {
 			require.NoError(t, db.Close())
 		})
-		s := &Store{DB: db}
+		s := &DBStore{DB: db}
 		require.NoError(t, s.save(subs))
 		require.NoError(t, s.save(subs))
 		gotSubs, err := s.Tail(4)
