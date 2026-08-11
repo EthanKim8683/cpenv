@@ -18,7 +18,6 @@ import (
 
 var db *bolt.DB
 var c *cli.CLI
-var w *cli.Workspace
 
 var rootCmd = &cobra.Command{
 	Use:   "cpenv",

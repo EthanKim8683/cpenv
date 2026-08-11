@@ -5,7 +5,6 @@ import (
 	"strconv"
 	"time"
 
-	submissionv1 "github.com/EthanKim8683/cpenv/internal/gen/submission/v1"
 	"github.com/olekukonko/tablewriter"
 	"github.com/spf13/cobra"
 )
@@ -18,13 +17,7 @@ var statusCmd = &cobra.Command{
 	Long:  "Tail submission results for the problem corresponding to the current workspace, or globally if not in a workspace.",
 	Args:  cobra.NoArgs,
 	RunE: func(_ *cobra.Command, _ []string) error {
-		var subs []*submissionv1.Submission
-		var err error
-		if w != nil {
-			subs, err = w.Status(statusLimit)
-		} else {
-			subs, err = c.Status(statusLimit)
-		}
+		subs, err := c.Status(statusLimit)
 		if err != nil {
 			return err
 		}

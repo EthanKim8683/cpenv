@@ -7,153 +7,140 @@ import (
 	"path/filepath"
 
 	problemv1 "github.com/EthanKim8683/cpenv/internal/gen/problem/v1"
+	starlarkjson "go.starlark.net/lib/json"
 	"go.starlark.net/starlark"
-	"go.starlark.net/starlarkjson"
 	"go.starlark.net/syntax"
 	"google.golang.org/protobuf/encoding/protojson"
 )
 
 type template struct {
-	path       string
-	src        []byte
-	stateStore stateStore
+	path string
+	src  []byte
 }
 
 func encodeProblem(thread *starlark.Thread, problem *problemv1.Problem) (starlark.Value, error) {
 	data, err := protojson.Marshal(problem)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("encode problem: %w", err)
 	}
 
-	value, err := starlark.Call(
+	v, err := starlark.Call(
 		thread,
 		starlarkjson.Module.Members["decode"],
 		starlark.Tuple{starlark.String(data)},
 		nil,
 	)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("encode problem: %w", err)
 	}
-
-	return value, nil
+	return v, nil
 }
 
-func execTemplate(thread *starlark.Thread, tmpl string, src []byte, problem starlark.Value) (starlark.Value, error) {
+func execTemplate(thread *starlark.Thread, name string, src []byte, problem starlark.Value) (starlark.Value, error) {
 	globals, err := starlark.ExecFileOptions(
 		&syntax.FileOptions{
 			While:           true,
 			TopLevelControl: true,
+			GlobalReassign:  true,
 		},
 		thread,
-		tmpl,
+		name,
 		src,
 		starlark.StringDict{
 			"problem": problem,
 		},
 	)
 	if err != nil {
-		return nil, fmt.Errorf("starlark: %w", err)
+		return nil, fmt.Errorf("exec template: %w", err)
 	}
 
-	value, ok := globals["files"]
+	v, ok := globals["files"]
 	if !ok {
-		return nil, errors.New("missing global \"files\"")
+		return nil, errors.New("exec template: files is unbound")
 	}
-	return value, nil
+	return v, nil
 }
 
 func decodeFiles(value starlark.Value) (map[string]string, error) {
 	dict, ok := value.(*starlark.Dict)
 	if !ok {
-		return nil, fmt.Errorf("expected dict, got %s", value.Type())
+		return nil, fmt.Errorf("decode files: expected dict, got %s", value.Type())
 	}
 
-	files := make(map[string]string)
+	files := make(map[string]string, dict.Len())
 	var errs error
-	for key, value := range dict.Entries() {
+	for k, v := range dict.Entries() {
 		skip := false
 
-		path, ok := starlark.AsString(key)
+		fileName, ok := starlark.AsString(k)
 		if !ok {
-			errs = errors.Join(errs, fmt.Errorf("file %s: expected string path, got %s", key, key.Type()))
+			errs = errors.Join(errs, fmt.Errorf("%s: expected string file name, got %s", k, k.Type()))
 			skip = true
 		}
 
-		content, ok := starlark.AsString(value)
+		content, ok := starlark.AsString(v)
 		if !ok {
-			errs = errors.Join(errs, fmt.Errorf("file %s: expected string content, got %s", key, value.Type()))
+			errs = errors.Join(errs, fmt.Errorf("%s: expected string content, got %s", k, v.Type()))
 			skip = true
 		}
 
 		if skip {
 			continue
 		}
-		files[path] = content
+
+		files[fileName] = content
 	}
 	if errs != nil {
-		return nil, errs
+		return nil, fmt.Errorf("decode files: %w", errs)
 	}
 	return files, nil
 }
 
 func writeFiles(dir string, files map[string]string) error {
-	for path, content := range files {
-		path = filepath.FromSlash(path)
-		path = filepath.Join(dir, path)
-		path = filepath.Clean(path)
-
-		if !filepath.IsLocal(path) || path == "." {
-			return fmt.Errorf("path %q is not local", path)
-		}
+	var errs error
+	for fileName, content := range files {
+		path := filepath.Join(dir, fileName)
 
 		if err := os.MkdirAll(filepath.Dir(path), 0755); err != nil {
-			return fmt.Errorf("mkdir %q: %w", filepath.Dir(path), err)
+			errs = errors.Join(errs, err)
+			continue
 		}
 
-		if err := os.WriteFile(path, []byte(content), 0644); err != nil {
-			return fmt.Errorf("write %q: %w", path, err)
-		}
+		errs = errors.Join(errs, os.WriteFile(path, []byte(content), 0644))
+	}
+	if errs != nil {
+		return fmt.Errorf("write files to %q: %w", dir, errs)
 	}
 	return nil
 }
 
 func (t *template) render(dir string, problem *problemv1.Problem) error {
 	thread := &starlark.Thread{}
-
-	problemValue, err := encodeProblem(thread, problem)
+	pValue, err := encodeProblem(thread, problem)
 	if err != nil {
-		return fmt.Errorf("render template %q: encode problem: %w", t.path, err)
+		return fmt.Errorf("render %q: %w", t.path, err)
 	}
 
-	filesValue, err := execTemplate(thread, t.path, t.src, problemValue)
+	fValue, err := execTemplate(thread, t.path, t.src, pValue)
 	if err != nil {
-		return fmt.Errorf("render template %q: exec: %w", t.path, err)
+		return fmt.Errorf("render %q: %w", t.path, err)
 	}
 
-	files, err := decodeFiles(filesValue)
+	files, err := decodeFiles(fValue)
 	if err != nil {
-		return fmt.Errorf("render template %q: decode files: %w", t.path, err)
+		return fmt.Errorf("render %q: %w", t.path, err)
 	}
 
 	if err := writeFiles(dir, files); err != nil {
-		return fmt.Errorf("render template %q: write files: %w", t.path, err)
+		return fmt.Errorf("render %q: %w", t.path, err)
 	}
 	return nil
 }
 
-func newTemplate(path string, stateStore stateStore) (*template, error) {
-	data, err := os.ReadFile(path)
+func newTemplate(path string) (*template, error) {
+	src, err := os.ReadFile(path)
 	if err != nil {
-		return nil, fmt.Errorf("new template %q: %w", path, err)
+		return nil, err
 	}
-
-	return &template{
-		path:       path,
-		src:        data,
-		stateStore: stateStore,
-	}, nil
-}
-
-type templateGetter interface {
-	template(name string) (*template, error)
+	return &template{path: path, src: src}, nil
 }

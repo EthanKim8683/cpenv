@@ -12,7 +12,7 @@ var resetCmd = &cobra.Command{
 	Long:  "Re-initialize the current workspace.",
 	Args:  cobra.NoArgs,
 	RunE: func(_ *cobra.Command, _ []string) error {
-		return w.Reset(resetTmpl)
+		return c.Reset(resetTmpl)
 	},
 }
 

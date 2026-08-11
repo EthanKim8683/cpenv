@@ -12,6 +12,7 @@ import (
 	"google.golang.org/protobuf/encoding/protojson"
 )
 
+// TODO: change to extension error
 type FocusError struct {
 	Message string
 }

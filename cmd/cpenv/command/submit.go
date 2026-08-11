@@ -3,8 +3,6 @@ package command
 import (
 	"context"
 	"fmt"
-	"os"
-	"path/filepath"
 
 	"github.com/spf13/cobra"
 )
@@ -17,13 +15,13 @@ var submitCmd = &cobra.Command{
 	RunE: func(_ *cobra.Command, args []string) error {
 		var path string
 		if len(args) > 0 {
-			dir, err := os.Getwd()
-			if err != nil {
-				return fmt.Errorf("submit: %w", err)
-			}
-			path = filepath.Join(dir, args[0])
+			path = args[0]
 		}
-		return w.Submit(context.Background(), path)
+
+		if err := c.Submit(context.Background(), path); err != nil {
+			return fmt.Errorf("submit: %w", err)
+		}
+		return nil
 	},
 }
 
