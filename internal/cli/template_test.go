@@ -6,9 +6,11 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/EthanKim8683/cpenv/internal/config"
 	problemv1 "github.com/EthanKim8683/cpenv/internal/gen/problem/v1"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	bolt "go.etcd.io/bbolt"
 )
 
 func readFiles(t *testing.T, dir string) map[string]string {
@@ -34,7 +36,18 @@ func readFiles(t *testing.T, dir string) map[string]string {
 	return files
 }
 
-func TestTemplate(t *testing.T) {
+func removeFiles(t *testing.T, dir string) {
+	t.Helper()
+
+	entries, err := os.ReadDir(dir)
+	require.NoError(t, err)
+
+	for _, entry := range entries {
+		require.NoError(t, os.RemoveAll(filepath.Join(dir, entry.Name())))
+	}
+}
+
+func TestRenderTemplate(t *testing.T) {
 	t.Parallel()
 
 	t.Run("coverage", func(t *testing.T) {
@@ -76,5 +89,94 @@ func TestTemplate(t *testing.T) {
 		assert.ErrorContains(t, err, "0: expected string content, got int")
 		assert.ErrorContains(t, err, "2: expected string file name, got int")
 		assert.ErrorContains(t, err, "\"4\": expected string content, got int")
+	})
+}
+
+func TestCLI_resolveTemplate(t *testing.T) {
+	t.Parallel()
+
+	t.Run("coverage", func(t *testing.T) {
+		t.Parallel()
+
+		homeDir := filepath.Join(t.TempDir(), "home")
+		cwd := filepath.Join(t.TempDir(), "cwd")
+
+		db, err := bolt.Open(filepath.Join(t.TempDir(), "db.db"), 0600, nil)
+		require.NoError(t, err)
+		cli := &CLI{
+			Cfg: &config.Config{HomeDir: homeDir},
+			CWD: cwd,
+			DB:  db,
+		}
+
+		path, err := cli.resolveTemplate("")
+		require.NoError(t, err)
+		assert.Equal(t, "", path)
+
+		relName := "rel.star"
+		require.NoError(t, os.MkdirAll(cli.templatesDir(), 0755))
+		require.NoError(t, os.WriteFile(filepath.Join(cli.templatesDir(), relName), nil, 0644))
+		path, err = cli.resolveTemplate("")
+		require.NoError(t, err)
+		assert.Equal(t, filepath.Join(cli.templatesDir(), relName), path)
+
+		defaultPath := filepath.Join(t.TempDir(), "default.star")
+		require.NoError(t, os.WriteFile(defaultPath, nil, 0644))
+		_ = db.Update(func(tx *bolt.Tx) error {
+			b, err := tx.CreateBucket(templateBucketKey)
+			require.NoError(t, err)
+			require.NoError(t, b.Put(defaultTemplateKey, []byte(defaultPath)))
+			return nil
+		})
+		path, err = cli.resolveTemplate("")
+		require.NoError(t, err)
+		assert.Equal(t, defaultPath, path)
+
+		path, err = cli.resolveTemplate(relName)
+		require.NoError(t, err)
+		assert.Equal(t, filepath.Join(cli.templatesDir(), relName), path)
+
+		require.NoError(t, os.MkdirAll(cwd, 0755))
+		require.NoError(t, os.WriteFile(filepath.Join(cwd, relName), nil, 0644))
+		path, err = cli.resolveTemplate(relName)
+		require.NoError(t, err)
+		assert.Equal(t, filepath.Join(cwd, relName), path)
+
+		absName := filepath.Join(t.TempDir(), "abs.star")
+		require.NoError(t, os.WriteFile(absName, nil, 0644))
+		path, err = cli.resolveTemplate(absName)
+		require.NoError(t, err)
+		assert.Equal(t, absName, path)
+	})
+}
+
+func TestCLI_renderTemplate(t *testing.T) {
+	t.Parallel()
+
+	t.Run("default template round trip", func(t *testing.T) {
+		t.Parallel()
+
+		homeDir := filepath.Join(t.TempDir(), "home")
+		cwd := filepath.Join(t.TempDir(), "cwd")
+		name, err := filepath.Abs(filepath.Join("testdata", "template", "minimal.star"))
+		require.NoError(t, err)
+		problem1 := &problemv1.Problem{Id: "id1"}
+		problem2 := &problemv1.Problem{Id: "id2"}
+
+		db, err := bolt.Open(filepath.Join(t.TempDir(), "db.db"), 0600, nil)
+		require.NoError(t, err)
+		cli := &CLI{
+			Cfg: &config.Config{HomeDir: homeDir},
+			CWD: cwd,
+			DB:  db,
+		}
+
+		require.NoError(t, cli.renderTemplate(name, cwd, problem1))
+		assert.Equal(t, map[string]string{"id": "id1"}, readFiles(t, cwd))
+
+		removeFiles(t, cwd)
+
+		require.NoError(t, cli.renderTemplate("", cwd, problem2))
+		assert.Equal(t, map[string]string{"id": "id2"}, readFiles(t, cwd))
 	})
 }

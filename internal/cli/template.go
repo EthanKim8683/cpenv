@@ -101,6 +101,12 @@ func decodeFiles(value starlark.Value) (map[string]string, error) {
 func writeFiles(dir string, files map[string]string) error {
 	var errs error
 	for fileName, content := range files {
+		fileName = filepath.Clean(fileName)
+		if !filepath.IsLocal(fileName) || fileName == "." {
+			errs = errors.Join(errs, fmt.Errorf("file name %q is not local", fileName))
+			continue
+		}
+
 		path := filepath.Join(dir, fileName)
 
 		if err := os.MkdirAll(filepath.Dir(path), 0755); err != nil {
@@ -202,7 +208,9 @@ func (c *CLI) resolveTemplate(name string) (string, error) {
 		return "", fmt.Errorf("resolve template: %w", err)
 	}
 	if path != "" {
-		return path, nil
+		if _, err := os.Stat(path); err == nil {
+			return path, nil
+		}
 	}
 
 	matches, err := doublestar.FilepathGlob(filepath.Join(c.templatesDir(), "**", "*.star"))

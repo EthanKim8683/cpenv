@@ -7,7 +7,7 @@ import (
 )
 
 func (c *CLI) Focus(templateName string) (string, error) {
-	p, err := c.FocusedProblem.Load()
+	p, err := c.FocusLoader.Load()
 	if err != nil {
 		return "", fmt.Errorf("focus: %w", err)
 	}

@@ -1,4 +1,4 @@
-package submit
+package extension
 
 import (
 	"context"
@@ -67,7 +67,7 @@ func (h *hub[Req, Reply]) claim(ctx context.Context, subj string) (*message[Req]
 
 	select {
 	case <-ctx.Done():
-		return nil, fmt.Errorf("claim: receive request: %w", ctx.Err())
+		return nil, fmt.Errorf("claim %q: receive request: %w", subj, ctx.Err())
 	case msg := <-ch:
 		return msg, nil
 	}
@@ -109,7 +109,7 @@ func (h *hub[Req, Reply]) request(ctx context.Context, subj string, req Req) (Re
 	reply, err := h.doRequest(ctx, subj, req, true)
 	if err != nil {
 		var zero Reply
-		return zero, fmt.Errorf("request: %w", err)
+		return zero, fmt.Errorf("request %q: %w", subj, err)
 	}
 	return reply, nil
 }
@@ -118,7 +118,7 @@ func (h *hub[Req, Reply]) tryRequest(ctx context.Context, subj string, req Req) 
 	reply, err := h.doRequest(ctx, subj, req, false)
 	if err != nil {
 		var zero Reply
-		return zero, fmt.Errorf("try request: %w", err)
+		return zero, fmt.Errorf("try request %q: %w", subj, err)
 	}
 	return reply, nil
 }

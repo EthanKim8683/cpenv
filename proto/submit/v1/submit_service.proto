@@ -3,18 +3,18 @@ syntax = "proto3";
 package submit.v1;
 
 service SubmitService {
-  rpc Submit(SubmitRequest) returns (SubmitResponse);
+  rpc Request(RequestRequest) returns (RequestResponse);
   rpc Claim(ClaimRequest) returns (ClaimResponse);
   rpc Reply(ReplyRequest) returns (ReplyResponse);
 }
 
-message SubmitRequest {
+message RequestRequest {
   string problem_id = 1;
   string file_name = 2;
   bytes content = 3;
 }
 
-message SubmitResponse {
+message RequestResponse {
   string error = 1;
 }
 

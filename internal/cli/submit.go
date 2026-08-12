@@ -7,7 +7,6 @@ import (
 	"os"
 	"path/filepath"
 
-	submitv1 "github.com/EthanKim8683/cpenv/internal/gen/submit/v1"
 	"github.com/bmatcuk/doublestar/v4"
 )
 
@@ -57,19 +56,13 @@ func (c *CLI) Submit(ctx context.Context, name string) error {
 	}
 	defer w.close()
 
-	// TODO: turn into streamlined client in extension package; will read file + return extension error
-	res, err := c.Submitter.Submit(ctx, &submitv1.SubmitRequest{
-		ProblemId: w.problem.GetId(),
-		FileName:  filepath.Base(path),
-		Content:   content,
-	})
-	if err != nil {
+	if err := c.SubmitRequester.Request(
+		ctx,
+		w.problem.GetId(),
+		filepath.Base(path),
+		content,
+	); err != nil {
 		return fmt.Errorf("submit %q: %w", path, err)
-	}
-
-	// TODO: change to extension error
-	if errMsg := res.GetError(); errMsg != "" {
-		return fmt.Errorf("submit %q: %s", path, errMsg)
 	}
 	return nil
 }

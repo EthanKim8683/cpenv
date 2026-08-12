@@ -2,9 +2,9 @@
 // versions:
 // 	protoc-gen-go v1.36.11
 // 	protoc        (unknown)
-// source: submission/v1/submission.proto
+// source: status/v1/submission.proto
 
-package submissionv1
+package statusv1
 
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
@@ -69,11 +69,11 @@ func (x Status) String() string {
 }
 
 func (Status) Descriptor() protoreflect.EnumDescriptor {
-	return file_submission_v1_submission_proto_enumTypes[0].Descriptor()
+	return file_status_v1_submission_proto_enumTypes[0].Descriptor()
 }
 
 func (Status) Type() protoreflect.EnumType {
-	return &file_submission_v1_submission_proto_enumTypes[0]
+	return &file_status_v1_submission_proto_enumTypes[0]
 }
 
 func (x Status) Number() protoreflect.EnumNumber {
@@ -82,14 +82,14 @@ func (x Status) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use Status.Descriptor instead.
 func (Status) EnumDescriptor() ([]byte, []int) {
-	return file_submission_v1_submission_proto_rawDescGZIP(), []int{0}
+	return file_status_v1_submission_proto_rawDescGZIP(), []int{0}
 }
 
 type Submission struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	TimestampMs   int64                  `protobuf:"varint,1,opt,name=timestamp_ms,json=timestampMs,proto3" json:"timestamp_ms,omitempty"`
 	ProblemId     string                 `protobuf:"bytes,2,opt,name=problem_id,json=problemId,proto3" json:"problem_id,omitempty"`
-	Status        Status                 `protobuf:"varint,3,opt,name=status,proto3,enum=submission.v1.Status" json:"status,omitempty"`
+	Status        Status                 `protobuf:"varint,3,opt,name=status,proto3,enum=status.v1.Status" json:"status,omitempty"`
 	TimeMs        uint32                 `protobuf:"varint,4,opt,name=time_ms,json=timeMs,proto3" json:"time_ms,omitempty"`
 	MemoryKb      uint32                 `protobuf:"varint,5,opt,name=memory_kb,json=memoryKb,proto3" json:"memory_kb,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -98,7 +98,7 @@ type Submission struct {
 
 func (x *Submission) Reset() {
 	*x = Submission{}
-	mi := &file_submission_v1_submission_proto_msgTypes[0]
+	mi := &file_status_v1_submission_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -110,7 +110,7 @@ func (x *Submission) String() string {
 func (*Submission) ProtoMessage() {}
 
 func (x *Submission) ProtoReflect() protoreflect.Message {
-	mi := &file_submission_v1_submission_proto_msgTypes[0]
+	mi := &file_status_v1_submission_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -123,7 +123,7 @@ func (x *Submission) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Submission.ProtoReflect.Descriptor instead.
 func (*Submission) Descriptor() ([]byte, []int) {
-	return file_submission_v1_submission_proto_rawDescGZIP(), []int{0}
+	return file_status_v1_submission_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *Submission) GetTimestampMs() int64 {
@@ -161,17 +161,17 @@ func (x *Submission) GetMemoryKb() uint32 {
 	return 0
 }
 
-var File_submission_v1_submission_proto protoreflect.FileDescriptor
+var File_status_v1_submission_proto protoreflect.FileDescriptor
 
-const file_submission_v1_submission_proto_rawDesc = "" +
+const file_status_v1_submission_proto_rawDesc = "" +
 	"\n" +
-	"\x1esubmission/v1/submission.proto\x12\rsubmission.v1\"\xb3\x01\n" +
+	"\x1astatus/v1/submission.proto\x12\tstatus.v1\"\xaf\x01\n" +
 	"\n" +
 	"Submission\x12!\n" +
 	"\ftimestamp_ms\x18\x01 \x01(\x03R\vtimestampMs\x12\x1d\n" +
 	"\n" +
-	"problem_id\x18\x02 \x01(\tR\tproblemId\x12-\n" +
-	"\x06status\x18\x03 \x01(\x0e2\x15.submission.v1.StatusR\x06status\x12\x17\n" +
+	"problem_id\x18\x02 \x01(\tR\tproblemId\x12)\n" +
+	"\x06status\x18\x03 \x01(\x0e2\x11.status.v1.StatusR\x06status\x12\x17\n" +
 	"\atime_ms\x18\x04 \x01(\rR\x06timeMs\x12\x1b\n" +
 	"\tmemory_kb\x18\x05 \x01(\rR\bmemoryKb*\xdc\x01\n" +
 	"\x06Status\x12\x16\n" +
@@ -182,29 +182,30 @@ const file_submission_v1_submission_proto_rawDesc = "" +
 	"\x1aSTATUS_TIME_LIMIT_EXCEEDED\x10\x05\x12 \n" +
 	"\x1cSTATUS_MEMORY_LIMIT_EXCEEDED\x10\x06\x12\x18\n" +
 	"\x14STATUS_RUNTIME_ERROR\x10\a\x12\x1c\n" +
-	"\x18STATUS_COMPILATION_ERROR\x10\bB\xc0\x01\n" +
-	"\x11com.submission.v1B\x0fSubmissionProtoP\x01ZEgithub.com/EthanKim8683/cpenv/internal/gen/submission/v1;submissionv1\xa2\x02\x03SXX\xaa\x02\rSubmission.V1\xca\x02\rSubmission\\V1\xe2\x02\x19Submission\\V1\\GPBMetadata\xea\x02\x0eSubmission::V1b\x06proto3"
+	"\x18STATUS_COMPILATION_ERROR\x10\bB\xa4\x01\n" +
+	"\rcom.status.v1B\x0fSubmissionProtoP\x01Z=github.com/EthanKim8683/cpenv/internal/gen/status/v1;statusv1\xa2\x02\x03SXX\xaa\x02\tStatus.V1\xca\x02\tStatus\\V1\xe2\x02\x15Status\\V1\\GPBMetadata\xea\x02\n" +
+	"Status::V1b\x06proto3"
 
 var (
-	file_submission_v1_submission_proto_rawDescOnce sync.Once
-	file_submission_v1_submission_proto_rawDescData []byte
+	file_status_v1_submission_proto_rawDescOnce sync.Once
+	file_status_v1_submission_proto_rawDescData []byte
 )
 
-func file_submission_v1_submission_proto_rawDescGZIP() []byte {
-	file_submission_v1_submission_proto_rawDescOnce.Do(func() {
-		file_submission_v1_submission_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_submission_v1_submission_proto_rawDesc), len(file_submission_v1_submission_proto_rawDesc)))
+func file_status_v1_submission_proto_rawDescGZIP() []byte {
+	file_status_v1_submission_proto_rawDescOnce.Do(func() {
+		file_status_v1_submission_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_status_v1_submission_proto_rawDesc), len(file_status_v1_submission_proto_rawDesc)))
 	})
-	return file_submission_v1_submission_proto_rawDescData
+	return file_status_v1_submission_proto_rawDescData
 }
 
-var file_submission_v1_submission_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_submission_v1_submission_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
-var file_submission_v1_submission_proto_goTypes = []any{
-	(Status)(0),        // 0: submission.v1.Status
-	(*Submission)(nil), // 1: submission.v1.Submission
+var file_status_v1_submission_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
+var file_status_v1_submission_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
+var file_status_v1_submission_proto_goTypes = []any{
+	(Status)(0),        // 0: status.v1.Status
+	(*Submission)(nil), // 1: status.v1.Submission
 }
-var file_submission_v1_submission_proto_depIdxs = []int32{
-	0, // 0: submission.v1.Submission.status:type_name -> submission.v1.Status
+var file_status_v1_submission_proto_depIdxs = []int32{
+	0, // 0: status.v1.Submission.status:type_name -> status.v1.Status
 	1, // [1:1] is the sub-list for method output_type
 	1, // [1:1] is the sub-list for method input_type
 	1, // [1:1] is the sub-list for extension type_name
@@ -212,27 +213,27 @@ var file_submission_v1_submission_proto_depIdxs = []int32{
 	0, // [0:1] is the sub-list for field type_name
 }
 
-func init() { file_submission_v1_submission_proto_init() }
-func file_submission_v1_submission_proto_init() {
-	if File_submission_v1_submission_proto != nil {
+func init() { file_status_v1_submission_proto_init() }
+func file_status_v1_submission_proto_init() {
+	if File_status_v1_submission_proto != nil {
 		return
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_submission_v1_submission_proto_rawDesc), len(file_submission_v1_submission_proto_rawDesc)),
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_status_v1_submission_proto_rawDesc), len(file_status_v1_submission_proto_rawDesc)),
 			NumEnums:      1,
 			NumMessages:   1,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
-		GoTypes:           file_submission_v1_submission_proto_goTypes,
-		DependencyIndexes: file_submission_v1_submission_proto_depIdxs,
-		EnumInfos:         file_submission_v1_submission_proto_enumTypes,
-		MessageInfos:      file_submission_v1_submission_proto_msgTypes,
+		GoTypes:           file_status_v1_submission_proto_goTypes,
+		DependencyIndexes: file_status_v1_submission_proto_depIdxs,
+		EnumInfos:         file_status_v1_submission_proto_enumTypes,
+		MessageInfos:      file_status_v1_submission_proto_msgTypes,
 	}.Build()
-	File_submission_v1_submission_proto = out.File
-	file_submission_v1_submission_proto_goTypes = nil
-	file_submission_v1_submission_proto_depIdxs = nil
+	File_status_v1_submission_proto = out.File
+	file_status_v1_submission_proto_goTypes = nil
+	file_status_v1_submission_proto_depIdxs = nil
 }

@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	submissionv1 "github.com/EthanKim8683/cpenv/internal/gen/submission/v1"
+	submissionv1 "github.com/EthanKim8683/cpenv/internal/gen/status/v1"
 )
 
 func (c *CLI) Status(limit int) ([]*submissionv1.Submission, error) {

@@ -10,12 +10,12 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file submit/v1/submit_service.proto.
  */
 export const file_submit_v1_submit_service: GenFile = /*@__PURE__*/
-  fileDesc("Ch5zdWJtaXQvdjEvc3VibWl0X3NlcnZpY2UucHJvdG8SCXN1Ym1pdC52MSJHCg1TdWJtaXRSZXF1ZXN0EhIKCnByb2JsZW1faWQYASABKAkSEQoJZmlsZV9uYW1lGAIgASgJEg8KB2NvbnRlbnQYAyABKAwiHwoOU3VibWl0UmVzcG9uc2USDQoFZXJyb3IYASABKAkiIgoMQ2xhaW1SZXF1ZXN0EhIKCnByb2JsZW1faWQYASABKAkiRQoNQ2xhaW1SZXNwb25zZRIQCghyZXBseV9pZBgBIAEoDRIRCglmaWxlX25hbWUYAiABKAkSDwoHY29udGVudBgDIAEoDCIvCgxSZXBseVJlcXVlc3QSEAoIcmVwbHlfaWQYASABKA0SDQoFZXJyb3IYAiABKAkiDwoNUmVwbHlSZXNwb25zZTLGAQoNU3VibWl0U2VydmljZRI9CgZTdWJtaXQSGC5zdWJtaXQudjEuU3VibWl0UmVxdWVzdBoZLnN1Ym1pdC52MS5TdWJtaXRSZXNwb25zZRI6CgVDbGFpbRIXLnN1Ym1pdC52MS5DbGFpbVJlcXVlc3QaGC5zdWJtaXQudjEuQ2xhaW1SZXNwb25zZRI6CgVSZXBseRIXLnN1Ym1pdC52MS5SZXBseVJlcXVlc3QaGC5zdWJtaXQudjEuUmVwbHlSZXNwb25zZUKnAQoNY29tLnN1Ym1pdC52MUISU3VibWl0U2VydmljZVByb3RvUAFaPWdpdGh1Yi5jb20vRXRoYW5LaW04NjgzL2NwZW52L2ludGVybmFsL2dlbi9zdWJtaXQvdjE7c3VibWl0djGiAgNTWFiqAglTdWJtaXQuVjHKAglTdWJtaXRcVjHiAhVTdWJtaXRcVjFcR1BCTWV0YWRhdGHqAgpTdWJtaXQ6OlYxYgZwcm90bzM");
+  fileDesc("Ch5zdWJtaXQvdjEvc3VibWl0X3NlcnZpY2UucHJvdG8SCXN1Ym1pdC52MSJICg5SZXF1ZXN0UmVxdWVzdBISCgpwcm9ibGVtX2lkGAEgASgJEhEKCWZpbGVfbmFtZRgCIAEoCRIPCgdjb250ZW50GAMgASgMIiAKD1JlcXVlc3RSZXNwb25zZRINCgVlcnJvchgBIAEoCSIiCgxDbGFpbVJlcXVlc3QSEgoKcHJvYmxlbV9pZBgBIAEoCSJFCg1DbGFpbVJlc3BvbnNlEhAKCHJlcGx5X2lkGAEgASgNEhEKCWZpbGVfbmFtZRgCIAEoCRIPCgdjb250ZW50GAMgASgMIi8KDFJlcGx5UmVxdWVzdBIQCghyZXBseV9pZBgBIAEoDRINCgVlcnJvchgCIAEoCSIPCg1SZXBseVJlc3BvbnNlMskBCg1TdWJtaXRTZXJ2aWNlEkAKB1JlcXVlc3QSGS5zdWJtaXQudjEuUmVxdWVzdFJlcXVlc3QaGi5zdWJtaXQudjEuUmVxdWVzdFJlc3BvbnNlEjoKBUNsYWltEhcuc3VibWl0LnYxLkNsYWltUmVxdWVzdBoYLnN1Ym1pdC52MS5DbGFpbVJlc3BvbnNlEjoKBVJlcGx5Ehcuc3VibWl0LnYxLlJlcGx5UmVxdWVzdBoYLnN1Ym1pdC52MS5SZXBseVJlc3BvbnNlQqcBCg1jb20uc3VibWl0LnYxQhJTdWJtaXRTZXJ2aWNlUHJvdG9QAVo9Z2l0aHViLmNvbS9FdGhhbktpbTg2ODMvY3BlbnYvaW50ZXJuYWwvZ2VuL3N1Ym1pdC92MTtzdWJtaXR2MaICA1NYWKoCCVN1Ym1pdC5WMcoCCVN1Ym1pdFxWMeICFVN1Ym1pdFxWMVxHUEJNZXRhZGF0YeoCClN1Ym1pdDo6VjFiBnByb3RvMw");
 
 /**
- * @generated from message submit.v1.SubmitRequest
+ * @generated from message submit.v1.RequestRequest
  */
-export type SubmitRequest = Message<"submit.v1.SubmitRequest"> & {
+export type RequestRequest = Message<"submit.v1.RequestRequest"> & {
   /**
    * @generated from field: string problem_id = 1;
    */
@@ -33,16 +33,16 @@ export type SubmitRequest = Message<"submit.v1.SubmitRequest"> & {
 };
 
 /**
- * Describes the message submit.v1.SubmitRequest.
- * Use `create(SubmitRequestSchema)` to create a new message.
+ * Describes the message submit.v1.RequestRequest.
+ * Use `create(RequestRequestSchema)` to create a new message.
  */
-export const SubmitRequestSchema: GenMessage<SubmitRequest> = /*@__PURE__*/
+export const RequestRequestSchema: GenMessage<RequestRequest> = /*@__PURE__*/
   messageDesc(file_submit_v1_submit_service, 0);
 
 /**
- * @generated from message submit.v1.SubmitResponse
+ * @generated from message submit.v1.RequestResponse
  */
-export type SubmitResponse = Message<"submit.v1.SubmitResponse"> & {
+export type RequestResponse = Message<"submit.v1.RequestResponse"> & {
   /**
    * @generated from field: string error = 1;
    */
@@ -50,10 +50,10 @@ export type SubmitResponse = Message<"submit.v1.SubmitResponse"> & {
 };
 
 /**
- * Describes the message submit.v1.SubmitResponse.
- * Use `create(SubmitResponseSchema)` to create a new message.
+ * Describes the message submit.v1.RequestResponse.
+ * Use `create(RequestResponseSchema)` to create a new message.
  */
-export const SubmitResponseSchema: GenMessage<SubmitResponse> = /*@__PURE__*/
+export const RequestResponseSchema: GenMessage<RequestResponse> = /*@__PURE__*/
   messageDesc(file_submit_v1_submit_service, 1);
 
 /**
@@ -140,12 +140,12 @@ export const ReplyResponseSchema: GenMessage<ReplyResponse> = /*@__PURE__*/
  */
 export const SubmitService: GenService<{
   /**
-   * @generated from rpc submit.v1.SubmitService.Submit
+   * @generated from rpc submit.v1.SubmitService.Request
    */
-  submit: {
+  request: {
     methodKind: "unary";
-    input: typeof SubmitRequestSchema;
-    output: typeof SubmitResponseSchema;
+    input: typeof RequestRequestSchema;
+    output: typeof RequestResponseSchema;
   },
   /**
    * @generated from rpc submit.v1.SubmitService.Claim

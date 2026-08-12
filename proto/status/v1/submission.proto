@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package submission.v1;
+package status.v1;
 
 enum Status {
   STATUS_UNSPECIFIED = 0;

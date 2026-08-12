@@ -21,7 +21,7 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-type SubmitRequest struct {
+type RequestRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	ProblemId     string                 `protobuf:"bytes,1,opt,name=problem_id,json=problemId,proto3" json:"problem_id,omitempty"`
 	FileName      string                 `protobuf:"bytes,2,opt,name=file_name,json=fileName,proto3" json:"file_name,omitempty"`
@@ -30,20 +30,20 @@ type SubmitRequest struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *SubmitRequest) Reset() {
-	*x = SubmitRequest{}
+func (x *RequestRequest) Reset() {
+	*x = RequestRequest{}
 	mi := &file_submit_v1_submit_service_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *SubmitRequest) String() string {
+func (x *RequestRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*SubmitRequest) ProtoMessage() {}
+func (*RequestRequest) ProtoMessage() {}
 
-func (x *SubmitRequest) ProtoReflect() protoreflect.Message {
+func (x *RequestRequest) ProtoReflect() protoreflect.Message {
 	mi := &file_submit_v1_submit_service_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -55,53 +55,53 @@ func (x *SubmitRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use SubmitRequest.ProtoReflect.Descriptor instead.
-func (*SubmitRequest) Descriptor() ([]byte, []int) {
+// Deprecated: Use RequestRequest.ProtoReflect.Descriptor instead.
+func (*RequestRequest) Descriptor() ([]byte, []int) {
 	return file_submit_v1_submit_service_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *SubmitRequest) GetProblemId() string {
+func (x *RequestRequest) GetProblemId() string {
 	if x != nil {
 		return x.ProblemId
 	}
 	return ""
 }
 
-func (x *SubmitRequest) GetFileName() string {
+func (x *RequestRequest) GetFileName() string {
 	if x != nil {
 		return x.FileName
 	}
 	return ""
 }
 
-func (x *SubmitRequest) GetContent() []byte {
+func (x *RequestRequest) GetContent() []byte {
 	if x != nil {
 		return x.Content
 	}
 	return nil
 }
 
-type SubmitResponse struct {
+type RequestResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Error         string                 `protobuf:"bytes,1,opt,name=error,proto3" json:"error,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *SubmitResponse) Reset() {
-	*x = SubmitResponse{}
+func (x *RequestResponse) Reset() {
+	*x = RequestResponse{}
 	mi := &file_submit_v1_submit_service_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *SubmitResponse) String() string {
+func (x *RequestResponse) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*SubmitResponse) ProtoMessage() {}
+func (*RequestResponse) ProtoMessage() {}
 
-func (x *SubmitResponse) ProtoReflect() protoreflect.Message {
+func (x *RequestResponse) ProtoReflect() protoreflect.Message {
 	mi := &file_submit_v1_submit_service_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -113,12 +113,12 @@ func (x *SubmitResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use SubmitResponse.ProtoReflect.Descriptor instead.
-func (*SubmitResponse) Descriptor() ([]byte, []int) {
+// Deprecated: Use RequestResponse.ProtoReflect.Descriptor instead.
+func (*RequestResponse) Descriptor() ([]byte, []int) {
 	return file_submit_v1_submit_service_proto_rawDescGZIP(), []int{1}
 }
 
-func (x *SubmitResponse) GetError() string {
+func (x *RequestResponse) GetError() string {
 	if x != nil {
 		return x.Error
 	}
@@ -321,13 +321,13 @@ var File_submit_v1_submit_service_proto protoreflect.FileDescriptor
 
 const file_submit_v1_submit_service_proto_rawDesc = "" +
 	"\n" +
-	"\x1esubmit/v1/submit_service.proto\x12\tsubmit.v1\"e\n" +
-	"\rSubmitRequest\x12\x1d\n" +
+	"\x1esubmit/v1/submit_service.proto\x12\tsubmit.v1\"f\n" +
+	"\x0eRequestRequest\x12\x1d\n" +
 	"\n" +
 	"problem_id\x18\x01 \x01(\tR\tproblemId\x12\x1b\n" +
 	"\tfile_name\x18\x02 \x01(\tR\bfileName\x12\x18\n" +
-	"\acontent\x18\x03 \x01(\fR\acontent\"&\n" +
-	"\x0eSubmitResponse\x12\x14\n" +
+	"\acontent\x18\x03 \x01(\fR\acontent\"'\n" +
+	"\x0fRequestResponse\x12\x14\n" +
 	"\x05error\x18\x01 \x01(\tR\x05error\"-\n" +
 	"\fClaimRequest\x12\x1d\n" +
 	"\n" +
@@ -339,9 +339,9 @@ const file_submit_v1_submit_service_proto_rawDesc = "" +
 	"\fReplyRequest\x12\x19\n" +
 	"\breply_id\x18\x01 \x01(\rR\areplyId\x12\x14\n" +
 	"\x05error\x18\x02 \x01(\tR\x05error\"\x0f\n" +
-	"\rReplyResponse2\xc6\x01\n" +
-	"\rSubmitService\x12=\n" +
-	"\x06Submit\x12\x18.submit.v1.SubmitRequest\x1a\x19.submit.v1.SubmitResponse\x12:\n" +
+	"\rReplyResponse2\xc9\x01\n" +
+	"\rSubmitService\x12@\n" +
+	"\aRequest\x12\x19.submit.v1.RequestRequest\x1a\x1a.submit.v1.RequestResponse\x12:\n" +
 	"\x05Claim\x12\x17.submit.v1.ClaimRequest\x1a\x18.submit.v1.ClaimResponse\x12:\n" +
 	"\x05Reply\x12\x17.submit.v1.ReplyRequest\x1a\x18.submit.v1.ReplyResponseB\xa7\x01\n" +
 	"\rcom.submit.v1B\x12SubmitServiceProtoP\x01Z=github.com/EthanKim8683/cpenv/internal/gen/submit/v1;submitv1\xa2\x02\x03SXX\xaa\x02\tSubmit.V1\xca\x02\tSubmit\\V1\xe2\x02\x15Submit\\V1\\GPBMetadata\xea\x02\n" +
@@ -361,18 +361,18 @@ func file_submit_v1_submit_service_proto_rawDescGZIP() []byte {
 
 var file_submit_v1_submit_service_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
 var file_submit_v1_submit_service_proto_goTypes = []any{
-	(*SubmitRequest)(nil),  // 0: submit.v1.SubmitRequest
-	(*SubmitResponse)(nil), // 1: submit.v1.SubmitResponse
-	(*ClaimRequest)(nil),   // 2: submit.v1.ClaimRequest
-	(*ClaimResponse)(nil),  // 3: submit.v1.ClaimResponse
-	(*ReplyRequest)(nil),   // 4: submit.v1.ReplyRequest
-	(*ReplyResponse)(nil),  // 5: submit.v1.ReplyResponse
+	(*RequestRequest)(nil),  // 0: submit.v1.RequestRequest
+	(*RequestResponse)(nil), // 1: submit.v1.RequestResponse
+	(*ClaimRequest)(nil),    // 2: submit.v1.ClaimRequest
+	(*ClaimResponse)(nil),   // 3: submit.v1.ClaimResponse
+	(*ReplyRequest)(nil),    // 4: submit.v1.ReplyRequest
+	(*ReplyResponse)(nil),   // 5: submit.v1.ReplyResponse
 }
 var file_submit_v1_submit_service_proto_depIdxs = []int32{
-	0, // 0: submit.v1.SubmitService.Submit:input_type -> submit.v1.SubmitRequest
+	0, // 0: submit.v1.SubmitService.Request:input_type -> submit.v1.RequestRequest
 	2, // 1: submit.v1.SubmitService.Claim:input_type -> submit.v1.ClaimRequest
 	4, // 2: submit.v1.SubmitService.Reply:input_type -> submit.v1.ReplyRequest
-	1, // 3: submit.v1.SubmitService.Submit:output_type -> submit.v1.SubmitResponse
+	1, // 3: submit.v1.SubmitService.Request:output_type -> submit.v1.RequestResponse
 	3, // 4: submit.v1.SubmitService.Claim:output_type -> submit.v1.ClaimResponse
 	5, // 5: submit.v1.SubmitService.Reply:output_type -> submit.v1.ReplyResponse
 	3, // [3:6] is the sub-list for method output_type

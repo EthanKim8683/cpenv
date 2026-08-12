@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package status.v1;
+
+import "status/v1/submission.proto";
+
+service StatusService {
+  rpc Save(SaveRequest) returns (SaveResponse) {
+    option idempotency_level = IDEMPOTENT;
+  }
+}
+
+message SaveRequest { repeated status.v1.Submission submissions = 1; }
+
+message SaveResponse {}
