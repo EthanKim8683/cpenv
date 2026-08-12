@@ -7,6 +7,7 @@ import (
 	problemv1 "github.com/EthanKim8683/cpenv/internal/gen/problem/v1"
 	submissionv1 "github.com/EthanKim8683/cpenv/internal/gen/submission/v1"
 	submitv1 "github.com/EthanKim8683/cpenv/internal/gen/submit/v1"
+	bolt "go.etcd.io/bbolt"
 )
 
 type FocusedProblemLoader interface {
@@ -24,7 +25,8 @@ type Submitter interface {
 
 type CLI struct {
 	Cfg            *config.Config
-	Cwd            string
+	CWD            string
+	DB             *bolt.DB
 	FocusedProblem FocusedProblemLoader
 	Submissions    SubmissionTailer
 	Submitter      Submitter

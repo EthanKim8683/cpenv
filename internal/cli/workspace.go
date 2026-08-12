@@ -54,3 +54,11 @@ func createWorkspace(dir string, problem *problemv1.Problem) (*workspace, error)
 	}
 	return &workspace{dir: dir, problem: problem}, nil
 }
+
+func (c *CLI) workspacesDir() string {
+	return filepath.Join(c.Cfg.HomeDir, "workspaces")
+}
+
+func (c *CLI) workspaceDir(problemID string) string {
+	return filepath.Join(c.workspacesDir(), problemID)
+}

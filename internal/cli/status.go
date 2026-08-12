@@ -10,7 +10,7 @@ import (
 
 func (c *CLI) Status(limit int) ([]*submissionv1.Submission, error) {
 	var subs []*submissionv1.Submission
-	if w, err := openWorkspace(c.Cwd); err == nil {
+	if w, err := openWorkspace(c.CWD); err == nil {
 		defer w.close()
 		subs, err = c.Submissions.TailProblem(w.problem.GetId(), limit)
 		if err != nil {

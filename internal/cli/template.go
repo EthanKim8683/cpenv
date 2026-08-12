@@ -7,16 +7,18 @@ import (
 	"path/filepath"
 
 	problemv1 "github.com/EthanKim8683/cpenv/internal/gen/problem/v1"
+	"github.com/bmatcuk/doublestar/v4"
+	bolt "go.etcd.io/bbolt"
 	starlarkjson "go.starlark.net/lib/json"
 	"go.starlark.net/starlark"
 	"go.starlark.net/syntax"
 	"google.golang.org/protobuf/encoding/protojson"
 )
 
-type template struct {
-	path string
-	src  []byte
-}
+var (
+	templateBucketKey  = []byte("template")
+	defaultTemplateKey = []byte("default-template")
+)
 
 func encodeProblem(thread *starlark.Thread, problem *problemv1.Problem) (starlark.Value, error) {
 	data, err := protojson.Marshal(problem)
@@ -114,33 +116,131 @@ func writeFiles(dir string, files map[string]string) error {
 	return nil
 }
 
-func (t *template) render(dir string, problem *problemv1.Problem) error {
+func renderTemplate(path string, dir string, problem *problemv1.Problem) error {
+	src, err := os.ReadFile(path)
+	if err != nil {
+		return fmt.Errorf("render %q: %w", path, err)
+	}
+
 	thread := &starlark.Thread{}
 	pValue, err := encodeProblem(thread, problem)
 	if err != nil {
-		return fmt.Errorf("render %q: %w", t.path, err)
+		return fmt.Errorf("render %q: %w", path, err)
 	}
 
-	fValue, err := execTemplate(thread, t.path, t.src, pValue)
+	fValue, err := execTemplate(thread, path, src, pValue)
 	if err != nil {
-		return fmt.Errorf("render %q: %w", t.path, err)
+		return fmt.Errorf("render %q: %w", path, err)
 	}
 
 	files, err := decodeFiles(fValue)
 	if err != nil {
-		return fmt.Errorf("render %q: %w", t.path, err)
+		return fmt.Errorf("render %q: %w", path, err)
 	}
 
 	if err := writeFiles(dir, files); err != nil {
-		return fmt.Errorf("render %q: %w", t.path, err)
+		return fmt.Errorf("render %q: %w", path, err)
 	}
 	return nil
 }
 
-func newTemplate(path string) (*template, error) {
-	src, err := os.ReadFile(path)
-	if err != nil {
-		return nil, err
+func (c *CLI) templatesDir() string {
+	return filepath.Join(c.Cfg.HomeDir, "templates")
+}
+
+func (c *CLI) getDefaultTemplate() (string, error) {
+	var path string
+	if err := c.DB.View(func(tx *bolt.Tx) error {
+		b := tx.Bucket(templateBucketKey)
+		if b == nil {
+			return nil
+		}
+
+		v := b.Get(defaultTemplateKey)
+		if v == nil {
+			return nil
+		}
+
+		path = string(v)
+		return nil
+	}); err != nil {
+		return "", fmt.Errorf("get default template: %w", err)
 	}
-	return &template{path: path, src: src}, nil
+	return path, nil
+}
+
+func (c *CLI) resolveTemplate(name string) (string, error) {
+	if path := name; filepath.IsAbs(path) {
+		if _, err := os.Stat(path); err != nil {
+			return "", fmt.Errorf("resolve template %q: %w", name, err)
+		}
+		return path, nil
+	}
+
+	if name != "" {
+		var errs error
+
+		path := filepath.Join(c.CWD, name)
+		if _, err := os.Stat(path); err == nil {
+			return path, nil
+		} else {
+			errs = errors.Join(errs, err)
+		}
+
+		path = filepath.Join(c.templatesDir(), name)
+		if _, err := os.Stat(path); err == nil {
+			return path, nil
+		} else {
+			errs = errors.Join(errs, err)
+		}
+
+		return "", fmt.Errorf("resolve template %q: %w", name, errs)
+	}
+
+	path, err := c.getDefaultTemplate()
+	if err != nil {
+		return "", fmt.Errorf("resolve template: %w", err)
+	}
+	if path != "" {
+		return path, nil
+	}
+
+	matches, err := doublestar.FilepathGlob(filepath.Join(c.templatesDir(), "**", "*.star"))
+	if err != nil {
+		return "", fmt.Errorf("resolve template: %w", err)
+	}
+	for _, path := range matches {
+		return path, nil
+	}
+
+	return "", nil
+}
+
+func (c *CLI) setDefaultTemplate(path string) error {
+	if err := c.DB.Update(func(tx *bolt.Tx) error {
+		b, err := tx.CreateBucketIfNotExists(templateBucketKey)
+		if err != nil {
+			return err
+		}
+		return b.Put(defaultTemplateKey, []byte(path))
+	}); err != nil {
+		return fmt.Errorf("set default template to %q: %w", path, err)
+	}
+	return nil
+}
+
+func (c *CLI) renderTemplate(name string, dir string, problem *problemv1.Problem) error {
+	path, err := c.resolveTemplate(name)
+	if err != nil {
+		return err
+	}
+	if path == "" {
+		return nil
+	}
+
+	if err := renderTemplate(path, dir, problem); err != nil {
+		return err
+	}
+
+	return c.setDefaultTemplate(path)
 }

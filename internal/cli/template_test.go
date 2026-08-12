@@ -51,10 +51,7 @@ func TestTemplate(t *testing.T) {
 			},
 		}
 
-		tp, err := newTemplate(path)
-		require.NoError(t, err)
-
-		require.NoError(t, tp.render(dir, problem))
+		require.NoError(t, renderTemplate(path, dir, problem))
 
 		files := readFiles(t, dir)
 		assert.Equal(t, map[string]string{
@@ -73,10 +70,7 @@ func TestTemplate(t *testing.T) {
 		path := filepath.Join("testdata", "template", "decode-error.star")
 		dir := t.TempDir()
 
-		tp, err := newTemplate(path)
-		require.NoError(t, err)
-
-		err = tp.render(dir, nil)
+		err := renderTemplate(path, dir, nil)
 		require.ErrorContains(t, err, "decode files")
 		assert.ErrorContains(t, err, "0: expected string file name, got int")
 		assert.ErrorContains(t, err, "0: expected string content, got int")

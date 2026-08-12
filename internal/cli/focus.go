@@ -24,14 +24,7 @@ func (c *CLI) Focus(templateName string) (string, error) {
 		return "", fmt.Errorf("focus: %w", err)
 	}
 
-	tPath, err := c.resolveTemplatePath(templateName)
-	if err != nil {
-		_ = w.close()
-		return "", fmt.Errorf("focus: %w", err)
-	}
-	t := &template{path: tPath}
-
-	if err := t.render(w.dir, p); err != nil {
+	if err := c.renderTemplate(templateName, w.dir, p); err != nil {
 		_ = w.close()
 		return "", fmt.Errorf("focus: %w", err)
 	}
