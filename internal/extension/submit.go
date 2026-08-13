@@ -9,10 +9,10 @@ import (
 )
 
 type SubmitService struct {
-	hub *hub[*submitv1.RequestRequest, *submitv1.RequestResponse]
+	hub *hub[*submitv1.SubmitRequest, *submitv1.SubmitResponse]
 }
 
-func (s *SubmitService) Request(ctx context.Context, req *submitv1.RequestRequest) (*submitv1.RequestResponse, error) {
+func (s *SubmitService) Submit(ctx context.Context, req *submitv1.SubmitRequest) (*submitv1.SubmitResponse, error) {
 	res, err := s.hub.request(ctx, req.GetProblemId(), req)
 	if err != nil {
 		return nil, err
@@ -33,7 +33,7 @@ func (s *SubmitService) Claim(ctx context.Context, req *submitv1.ClaimRequest) (
 }
 
 func (s *SubmitService) Reply(ctx context.Context, req *submitv1.ReplyRequest) (*submitv1.ReplyResponse, error) {
-	reply := &submitv1.RequestResponse{Error: req.GetError()}
+	reply := &submitv1.SubmitResponse{Error: req.GetError()}
 	if err := s.hub.reply(req.GetReplyId(), reply); err != nil {
 		return nil, err
 	}
@@ -43,19 +43,15 @@ func (s *SubmitService) Reply(ctx context.Context, req *submitv1.ReplyRequest) (
 var _ submitv1connect.SubmitServiceHandler = (*SubmitService)(nil)
 
 func NewSubmitService() *SubmitService {
-	return &SubmitService{hub: newHub[*submitv1.RequestRequest, *submitv1.RequestResponse]()}
+	return &SubmitService{hub: newHub[*submitv1.SubmitRequest, *submitv1.SubmitResponse]()}
 }
 
-type SubmitRequester struct {
+type Submitter struct {
 	client submitv1connect.SubmitServiceClient
 }
 
-func (r *SubmitRequester) Request(ctx context.Context, problemID string, fileName string, content []byte) error {
-	res, err := r.client.Request(ctx, &submitv1.RequestRequest{
-		ProblemId: problemID,
-		FileName:  fileName,
-		Content:   content,
-	})
+func (r *Submitter) Submit(ctx context.Context, req *submitv1.SubmitRequest) error {
+	res, err := r.client.Submit(ctx, req)
 	if err != nil {
 		return err
 	}
@@ -66,4 +62,4 @@ func (r *SubmitRequester) Request(ctx context.Context, problemID string, fileNam
 	return nil
 }
 
-var _ cli.SubmitRequester = (*SubmitRequester)(nil)
+var _ cli.Submitter = (*Submitter)(nil)

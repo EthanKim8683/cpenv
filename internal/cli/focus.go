@@ -7,9 +7,12 @@ import (
 )
 
 func (c *CLI) Focus(templateName string) (string, error) {
-	p, err := c.FocusLoader.Load()
+	p, err := c.FocusedProblem.Load()
 	if err != nil {
 		return "", fmt.Errorf("focus: %w", err)
+	}
+	if p == nil {
+		return "", errors.New("focus: no focused problem")
 	}
 
 	dir := c.workspaceDir(p.GetId())

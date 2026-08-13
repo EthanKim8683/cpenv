@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 
+	submitv1 "github.com/EthanKim8683/cpenv/internal/gen/submit/v1"
 	"github.com/bmatcuk/doublestar/v4"
 )
 
@@ -56,13 +57,12 @@ func (c *CLI) Submit(ctx context.Context, name string) error {
 	}
 	defer w.close()
 
-	if err := c.SubmitRequester.Request(
-		ctx,
-		w.problem.GetId(),
-		filepath.Base(path),
-		content,
-	); err != nil {
-		return fmt.Errorf("submit %q: %w", path, err)
+	if err := c.Submitter.Submit(ctx, &submitv1.SubmitRequest{
+		ProblemId: w.problem.GetId(),
+		FileName:  filepath.Base(path),
+		Content:   content,
+	}); err != nil {
+		return fmt.Errorf("submit %q to %q: %w", path, w.problem.GetId(), err)
 	}
 	return nil
 }

@@ -21,27 +21,27 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-type SetFocusRequest struct {
+type SaveRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Focus         *Focus                 `protobuf:"bytes,1,opt,name=focus,proto3" json:"focus,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *SetFocusRequest) Reset() {
-	*x = SetFocusRequest{}
+func (x *SaveRequest) Reset() {
+	*x = SaveRequest{}
 	mi := &file_focus_v1_focus_service_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *SetFocusRequest) String() string {
+func (x *SaveRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*SetFocusRequest) ProtoMessage() {}
+func (*SaveRequest) ProtoMessage() {}
 
-func (x *SetFocusRequest) ProtoReflect() protoreflect.Message {
+func (x *SaveRequest) ProtoReflect() protoreflect.Message {
 	mi := &file_focus_v1_focus_service_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -53,38 +53,38 @@ func (x *SetFocusRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use SetFocusRequest.ProtoReflect.Descriptor instead.
-func (*SetFocusRequest) Descriptor() ([]byte, []int) {
+// Deprecated: Use SaveRequest.ProtoReflect.Descriptor instead.
+func (*SaveRequest) Descriptor() ([]byte, []int) {
 	return file_focus_v1_focus_service_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *SetFocusRequest) GetFocus() *Focus {
+func (x *SaveRequest) GetFocus() *Focus {
 	if x != nil {
 		return x.Focus
 	}
 	return nil
 }
 
-type SetFocusResponse struct {
+type SaveResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *SetFocusResponse) Reset() {
-	*x = SetFocusResponse{}
+func (x *SaveResponse) Reset() {
+	*x = SaveResponse{}
 	mi := &file_focus_v1_focus_service_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *SetFocusResponse) String() string {
+func (x *SaveResponse) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*SetFocusResponse) ProtoMessage() {}
+func (*SaveResponse) ProtoMessage() {}
 
-func (x *SetFocusResponse) ProtoReflect() protoreflect.Message {
+func (x *SaveResponse) ProtoReflect() protoreflect.Message {
 	mi := &file_focus_v1_focus_service_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -96,8 +96,8 @@ func (x *SetFocusResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use SetFocusResponse.ProtoReflect.Descriptor instead.
-func (*SetFocusResponse) Descriptor() ([]byte, []int) {
+// Deprecated: Use SaveResponse.ProtoReflect.Descriptor instead.
+func (*SaveResponse) Descriptor() ([]byte, []int) {
 	return file_focus_v1_focus_service_proto_rawDescGZIP(), []int{1}
 }
 
@@ -105,12 +105,12 @@ var File_focus_v1_focus_service_proto protoreflect.FileDescriptor
 
 const file_focus_v1_focus_service_proto_rawDesc = "" +
 	"\n" +
-	"\x1cfocus/v1/focus_service.proto\x12\bfocus.v1\x1a\x14focus/v1/focus.proto\"8\n" +
-	"\x0fSetFocusRequest\x12%\n" +
-	"\x05focus\x18\x01 \x01(\v2\x0f.focus.v1.FocusR\x05focus\"\x12\n" +
-	"\x10SetFocusResponse2V\n" +
-	"\fFocusService\x12F\n" +
-	"\bSetFocus\x12\x19.focus.v1.SetFocusRequest\x1a\x1a.focus.v1.SetFocusResponse\"\x03\x90\x02\x02B\x9f\x01\n" +
+	"\x1cfocus/v1/focus_service.proto\x12\bfocus.v1\x1a\x14focus/v1/focus.proto\"4\n" +
+	"\vSaveRequest\x12%\n" +
+	"\x05focus\x18\x01 \x01(\v2\x0f.focus.v1.FocusR\x05focus\"\x0e\n" +
+	"\fSaveResponse2J\n" +
+	"\fFocusService\x12:\n" +
+	"\x04Save\x12\x15.focus.v1.SaveRequest\x1a\x16.focus.v1.SaveResponse\"\x03\x90\x02\x02B\x9f\x01\n" +
 	"\fcom.focus.v1B\x11FocusServiceProtoP\x01Z;github.com/EthanKim8683/cpenv/internal/gen/focus/v1;focusv1\xa2\x02\x03FXX\xaa\x02\bFocus.V1\xca\x02\bFocus\\V1\xe2\x02\x14Focus\\V1\\GPBMetadata\xea\x02\tFocus::V1b\x06proto3"
 
 var (
@@ -127,14 +127,14 @@ func file_focus_v1_focus_service_proto_rawDescGZIP() []byte {
 
 var file_focus_v1_focus_service_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
 var file_focus_v1_focus_service_proto_goTypes = []any{
-	(*SetFocusRequest)(nil),  // 0: focus.v1.SetFocusRequest
-	(*SetFocusResponse)(nil), // 1: focus.v1.SetFocusResponse
-	(*Focus)(nil),            // 2: focus.v1.Focus
+	(*SaveRequest)(nil),  // 0: focus.v1.SaveRequest
+	(*SaveResponse)(nil), // 1: focus.v1.SaveResponse
+	(*Focus)(nil),        // 2: focus.v1.Focus
 }
 var file_focus_v1_focus_service_proto_depIdxs = []int32{
-	2, // 0: focus.v1.SetFocusRequest.focus:type_name -> focus.v1.Focus
-	0, // 1: focus.v1.FocusService.SetFocus:input_type -> focus.v1.SetFocusRequest
-	1, // 2: focus.v1.FocusService.SetFocus:output_type -> focus.v1.SetFocusResponse
+	2, // 0: focus.v1.SaveRequest.focus:type_name -> focus.v1.Focus
+	0, // 1: focus.v1.FocusService.Save:input_type -> focus.v1.SaveRequest
+	1, // 2: focus.v1.FocusService.Save:output_type -> focus.v1.SaveResponse
 	2, // [2:3] is the sub-list for method output_type
 	1, // [1:2] is the sub-list for method input_type
 	1, // [1:1] is the sub-list for extension type_name

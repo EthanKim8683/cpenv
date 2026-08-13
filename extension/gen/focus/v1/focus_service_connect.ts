@@ -3,7 +3,7 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import { SetFocusRequest, SetFocusResponse } from "./focus_service_pb.js";
+import { SaveRequest, SaveResponse } from "./focus_service_pb.js";
 import { MethodIdempotency, MethodKind } from "@bufbuild/protobuf";
 
 /**
@@ -13,12 +13,12 @@ export const FocusService = {
   typeName: "focus.v1.FocusService",
   methods: {
     /**
-     * @generated from rpc focus.v1.FocusService.SetFocus
+     * @generated from rpc focus.v1.FocusService.Save
      */
-    setFocus: {
-      name: "SetFocus",
-      I: SetFocusRequest,
-      O: SetFocusResponse,
+    save: {
+      name: "Save",
+      I: SaveRequest,
+      O: SaveResponse,
       kind: MethodKind.Unary,
       idempotency: MethodIdempotency.Idempotent,
     },

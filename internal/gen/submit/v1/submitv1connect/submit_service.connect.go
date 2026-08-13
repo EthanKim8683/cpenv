@@ -33,8 +33,8 @@ const (
 // reflection-formatted method names, remove the leading slash and convert the remaining slash to a
 // period.
 const (
-	// SubmitServiceRequestProcedure is the fully-qualified name of the SubmitService's Request RPC.
-	SubmitServiceRequestProcedure = "/submit.v1.SubmitService/Request"
+	// SubmitServiceSubmitProcedure is the fully-qualified name of the SubmitService's Submit RPC.
+	SubmitServiceSubmitProcedure = "/submit.v1.SubmitService/Submit"
 	// SubmitServiceClaimProcedure is the fully-qualified name of the SubmitService's Claim RPC.
 	SubmitServiceClaimProcedure = "/submit.v1.SubmitService/Claim"
 	// SubmitServiceReplyProcedure is the fully-qualified name of the SubmitService's Reply RPC.
@@ -43,7 +43,7 @@ const (
 
 // SubmitServiceClient is a client for the submit.v1.SubmitService service.
 type SubmitServiceClient interface {
-	Request(context.Context, *v1.RequestRequest) (*v1.RequestResponse, error)
+	Submit(context.Context, *v1.SubmitRequest) (*v1.SubmitResponse, error)
 	Claim(context.Context, *v1.ClaimRequest) (*v1.ClaimResponse, error)
 	Reply(context.Context, *v1.ReplyRequest) (*v1.ReplyResponse, error)
 }
@@ -59,10 +59,10 @@ func NewSubmitServiceClient(httpClient connect.HTTPClient, baseURL string, opts 
 	baseURL = strings.TrimRight(baseURL, "/")
 	submitServiceMethods := v1.File_submit_v1_submit_service_proto.Services().ByName("SubmitService").Methods()
 	return &submitServiceClient{
-		request: connect.NewClient[v1.RequestRequest, v1.RequestResponse](
+		submit: connect.NewClient[v1.SubmitRequest, v1.SubmitResponse](
 			httpClient,
-			baseURL+SubmitServiceRequestProcedure,
-			connect.WithSchema(submitServiceMethods.ByName("Request")),
+			baseURL+SubmitServiceSubmitProcedure,
+			connect.WithSchema(submitServiceMethods.ByName("Submit")),
 			connect.WithClientOptions(opts...),
 		),
 		claim: connect.NewClient[v1.ClaimRequest, v1.ClaimResponse](
@@ -82,14 +82,14 @@ func NewSubmitServiceClient(httpClient connect.HTTPClient, baseURL string, opts 
 
 // submitServiceClient implements SubmitServiceClient.
 type submitServiceClient struct {
-	request *connect.Client[v1.RequestRequest, v1.RequestResponse]
-	claim   *connect.Client[v1.ClaimRequest, v1.ClaimResponse]
-	reply   *connect.Client[v1.ReplyRequest, v1.ReplyResponse]
+	submit *connect.Client[v1.SubmitRequest, v1.SubmitResponse]
+	claim  *connect.Client[v1.ClaimRequest, v1.ClaimResponse]
+	reply  *connect.Client[v1.ReplyRequest, v1.ReplyResponse]
 }
 
-// Request calls submit.v1.SubmitService.Request.
-func (c *submitServiceClient) Request(ctx context.Context, req *v1.RequestRequest) (*v1.RequestResponse, error) {
-	response, err := c.request.CallUnary(ctx, connect.NewRequest(req))
+// Submit calls submit.v1.SubmitService.Submit.
+func (c *submitServiceClient) Submit(ctx context.Context, req *v1.SubmitRequest) (*v1.SubmitResponse, error) {
+	response, err := c.submit.CallUnary(ctx, connect.NewRequest(req))
 	if response != nil {
 		return response.Msg, err
 	}
@@ -116,7 +116,7 @@ func (c *submitServiceClient) Reply(ctx context.Context, req *v1.ReplyRequest) (
 
 // SubmitServiceHandler is an implementation of the submit.v1.SubmitService service.
 type SubmitServiceHandler interface {
-	Request(context.Context, *v1.RequestRequest) (*v1.RequestResponse, error)
+	Submit(context.Context, *v1.SubmitRequest) (*v1.SubmitResponse, error)
 	Claim(context.Context, *v1.ClaimRequest) (*v1.ClaimResponse, error)
 	Reply(context.Context, *v1.ReplyRequest) (*v1.ReplyResponse, error)
 }
@@ -128,10 +128,10 @@ type SubmitServiceHandler interface {
 // and JSON codecs. They also support gzip compression.
 func NewSubmitServiceHandler(svc SubmitServiceHandler, opts ...connect.HandlerOption) (string, http.Handler) {
 	submitServiceMethods := v1.File_submit_v1_submit_service_proto.Services().ByName("SubmitService").Methods()
-	submitServiceRequestHandler := connect.NewUnaryHandlerSimple(
-		SubmitServiceRequestProcedure,
-		svc.Request,
-		connect.WithSchema(submitServiceMethods.ByName("Request")),
+	submitServiceSubmitHandler := connect.NewUnaryHandlerSimple(
+		SubmitServiceSubmitProcedure,
+		svc.Submit,
+		connect.WithSchema(submitServiceMethods.ByName("Submit")),
 		connect.WithHandlerOptions(opts...),
 	)
 	submitServiceClaimHandler := connect.NewUnaryHandlerSimple(
@@ -148,8 +148,8 @@ func NewSubmitServiceHandler(svc SubmitServiceHandler, opts ...connect.HandlerOp
 	)
 	return "/submit.v1.SubmitService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
-		case SubmitServiceRequestProcedure:
-			submitServiceRequestHandler.ServeHTTP(w, r)
+		case SubmitServiceSubmitProcedure:
+			submitServiceSubmitHandler.ServeHTTP(w, r)
 		case SubmitServiceClaimProcedure:
 			submitServiceClaimHandler.ServeHTTP(w, r)
 		case SubmitServiceReplyProcedure:
@@ -163,8 +163,8 @@ func NewSubmitServiceHandler(svc SubmitServiceHandler, opts ...connect.HandlerOp
 // UnimplementedSubmitServiceHandler returns CodeUnimplemented from all methods.
 type UnimplementedSubmitServiceHandler struct{}
 
-func (UnimplementedSubmitServiceHandler) Request(context.Context, *v1.RequestRequest) (*v1.RequestResponse, error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("submit.v1.SubmitService.Request is not implemented"))
+func (UnimplementedSubmitServiceHandler) Submit(context.Context, *v1.SubmitRequest) (*v1.SubmitResponse, error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("submit.v1.SubmitService.Submit is not implemented"))
 }
 
 func (UnimplementedSubmitServiceHandler) Claim(context.Context, *v1.ClaimRequest) (*v1.ClaimResponse, error) {

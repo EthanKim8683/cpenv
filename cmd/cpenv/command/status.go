@@ -46,6 +46,6 @@ var statusCmd = &cobra.Command{
 }
 
 func init() {
-	rootCmd.AddCommand(resetCmd)
+	rootCmd.AddCommand(statusCmd)
 	statusCmd.Flags().IntVarP(&statusLimit, "limit", "l", 10, "maximum number of submission results to output")
 }

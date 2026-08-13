@@ -5,6 +5,6 @@ package focus.v1;
 import "problem/v1/problem.proto";
 
 message Focus {
-	problem.v1.Problem problem = 1;
-	string error = 2;
+  problem.v1.Problem problem = 1;
+  string error = 2;
 }

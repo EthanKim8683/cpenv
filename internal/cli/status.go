@@ -14,7 +14,7 @@ func (c *CLI) Status(limit int) ([]*submissionv1.Submission, error) {
 		defer w.close()
 		subs, err = c.Submissions.TailProblem(w.problem.GetId(), limit)
 		if err != nil {
-			return nil, fmt.Errorf("status for %q: %w", w.problem.GetId(), err)
+			return nil, fmt.Errorf("status: %w", err)
 		}
 	} else if errors.Is(err, os.ErrNotExist) {
 		subs, err = c.Submissions.Tail(limit)

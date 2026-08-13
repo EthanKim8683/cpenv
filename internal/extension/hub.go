@@ -25,24 +25,24 @@ type hub[Req, Reply any] struct {
 	replyIDSeq atomic.Uint32
 }
 
-func (h *hub[Req, Reply]) acquireClaimCh(subj string) chan *message[Req] {
+func (h *hub[Req, Reply]) acquireClaimCh(subject string) chan *message[Req] {
 	h.mu.Lock()
 	defer h.mu.Unlock()
-	if _, ok := h.claimChs[subj]; !ok {
-		h.claimChs[subj] = &claimChRef[Req]{ch: make(chan *message[Req])}
+	if _, ok := h.claimChs[subject]; !ok {
+		h.claimChs[subject] = &claimChRef[Req]{ch: make(chan *message[Req])}
 	}
-	ref := h.claimChs[subj]
+	ref := h.claimChs[subject]
 	ref.count++
 	return ref.ch
 }
 
-func (h *hub[Req, Reply]) releaseClaimCh(subj string) {
+func (h *hub[Req, Reply]) releaseClaimCh(subject string) {
 	h.mu.Lock()
 	defer h.mu.Unlock()
-	ref := h.claimChs[subj]
+	ref := h.claimChs[subject]
 	ref.count--
 	if ref.count == 0 {
-		delete(h.claimChs, subj)
+		delete(h.claimChs, subject)
 	}
 }
 
@@ -61,26 +61,26 @@ func (h *hub[Req, Reply]) takeReplyCh(id uint32) (chan Reply, bool) {
 	return ch.(chan Reply), true
 }
 
-func (h *hub[Req, Reply]) claim(ctx context.Context, subj string) (*message[Req], error) {
-	ch := h.acquireClaimCh(subj)
-	defer h.releaseClaimCh(subj)
+func (h *hub[Req, Reply]) claim(ctx context.Context, subject string) (*message[Req], error) {
+	ch := h.acquireClaimCh(subject)
+	defer h.releaseClaimCh(subject)
 
 	select {
 	case <-ctx.Done():
-		return nil, fmt.Errorf("claim %q: receive request: %w", subj, ctx.Err())
+		return nil, fmt.Errorf("claim %q: receive request: %w", subject, ctx.Err())
 	case msg := <-ch:
 		return msg, nil
 	}
 }
 
-func (h *hub[Req, Reply]) doRequest(ctx context.Context, subj string, req Req, wait bool) (Reply, error) {
+func (h *hub[Req, Reply]) doRequest(ctx context.Context, subject string, req Req, wait bool) (Reply, error) {
 	var zero Reply
 
 	rID, rCh := h.makeReplyCh()
 	defer h.takeReplyCh(rID)
 
-	cCh := h.acquireClaimCh(subj)
-	defer h.releaseClaimCh(subj)
+	cCh := h.acquireClaimCh(subject)
+	defer h.releaseClaimCh(subject)
 
 	msg := &message[Req]{req: req, replyID: rID}
 	if wait {
@@ -105,20 +105,20 @@ func (h *hub[Req, Reply]) doRequest(ctx context.Context, subj string, req Req, w
 	}
 }
 
-func (h *hub[Req, Reply]) request(ctx context.Context, subj string, req Req) (Reply, error) {
-	reply, err := h.doRequest(ctx, subj, req, true)
+func (h *hub[Req, Reply]) request(ctx context.Context, subject string, req Req) (Reply, error) {
+	reply, err := h.doRequest(ctx, subject, req, true)
 	if err != nil {
 		var zero Reply
-		return zero, fmt.Errorf("request %q: %w", subj, err)
+		return zero, fmt.Errorf("request %q: %w", subject, err)
 	}
 	return reply, nil
 }
 
-func (h *hub[Req, Reply]) tryRequest(ctx context.Context, subj string, req Req) (Reply, error) {
-	reply, err := h.doRequest(ctx, subj, req, false)
+func (h *hub[Req, Reply]) tryRequest(ctx context.Context, subject string, req Req) (Reply, error) {
+	reply, err := h.doRequest(ctx, subject, req, false)
 	if err != nil {
 		var zero Reply
-		return zero, fmt.Errorf("try request %q: %w", subj, err)
+		return zero, fmt.Errorf("try request %q: %w", subject, err)
 	}
 	return reply, nil
 }

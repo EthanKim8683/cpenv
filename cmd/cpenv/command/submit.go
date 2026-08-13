@@ -2,7 +2,6 @@ package command
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/spf13/cobra"
 )
@@ -19,7 +18,7 @@ var submitCmd = &cobra.Command{
 		}
 
 		if err := c.Submit(context.Background(), path); err != nil {
-			return fmt.Errorf("submit: %w", err)
+			return err
 		}
 		return nil
 	},

@@ -3,7 +3,7 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import { ClaimRequest, ClaimResponse, ReplyRequest, ReplyResponse, RequestRequest, RequestResponse } from "./submit_service_pb.js";
+import { ClaimRequest, ClaimResponse, ReplyRequest, ReplyResponse, SubmitRequest, SubmitResponse } from "./submit_service_pb.js";
 import { MethodKind } from "@bufbuild/protobuf";
 
 /**
@@ -13,12 +13,12 @@ export const SubmitService = {
   typeName: "submit.v1.SubmitService",
   methods: {
     /**
-     * @generated from rpc submit.v1.SubmitService.Request
+     * @generated from rpc submit.v1.SubmitService.Submit
      */
-    request: {
-      name: "Request",
-      I: RequestRequest,
-      O: RequestResponse,
+    submit: {
+      name: "Submit",
+      I: SubmitRequest,
+      O: SubmitResponse,
       kind: MethodKind.Unary,
     },
     /**

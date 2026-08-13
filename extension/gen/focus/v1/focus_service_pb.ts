@@ -12,12 +12,12 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file focus/v1/focus_service.proto.
  */
 export const file_focus_v1_focus_service: GenFile = /*@__PURE__*/
-  fileDesc("Chxmb2N1cy92MS9mb2N1c19zZXJ2aWNlLnByb3RvEghmb2N1cy52MSIxCg9TZXRGb2N1c1JlcXVlc3QSHgoFZm9jdXMYASABKAsyDy5mb2N1cy52MS5Gb2N1cyISChBTZXRGb2N1c1Jlc3BvbnNlMlYKDEZvY3VzU2VydmljZRJGCghTZXRGb2N1cxIZLmZvY3VzLnYxLlNldEZvY3VzUmVxdWVzdBoaLmZvY3VzLnYxLlNldEZvY3VzUmVzcG9uc2UiA5ACAkKfAQoMY29tLmZvY3VzLnYxQhFGb2N1c1NlcnZpY2VQcm90b1ABWjtnaXRodWIuY29tL0V0aGFuS2ltODY4My9jcGVudi9pbnRlcm5hbC9nZW4vZm9jdXMvdjE7Zm9jdXN2MaICA0ZYWKoCCEZvY3VzLlYxygIIRm9jdXNcVjHiAhRGb2N1c1xWMVxHUEJNZXRhZGF0YeoCCUZvY3VzOjpWMWIGcHJvdG8z", [file_focus_v1_focus]);
+  fileDesc("Chxmb2N1cy92MS9mb2N1c19zZXJ2aWNlLnByb3RvEghmb2N1cy52MSItCgtTYXZlUmVxdWVzdBIeCgVmb2N1cxgBIAEoCzIPLmZvY3VzLnYxLkZvY3VzIg4KDFNhdmVSZXNwb25zZTJKCgxGb2N1c1NlcnZpY2USOgoEU2F2ZRIVLmZvY3VzLnYxLlNhdmVSZXF1ZXN0GhYuZm9jdXMudjEuU2F2ZVJlc3BvbnNlIgOQAgJCnwEKDGNvbS5mb2N1cy52MUIRRm9jdXNTZXJ2aWNlUHJvdG9QAVo7Z2l0aHViLmNvbS9FdGhhbktpbTg2ODMvY3BlbnYvaW50ZXJuYWwvZ2VuL2ZvY3VzL3YxO2ZvY3VzdjGiAgNGWFiqAghGb2N1cy5WMcoCCEZvY3VzXFYx4gIURm9jdXNcVjFcR1BCTWV0YWRhdGHqAglGb2N1czo6VjFiBnByb3RvMw", [file_focus_v1_focus]);
 
 /**
- * @generated from message focus.v1.SetFocusRequest
+ * @generated from message focus.v1.SaveRequest
  */
-export type SetFocusRequest = Message<"focus.v1.SetFocusRequest"> & {
+export type SaveRequest = Message<"focus.v1.SaveRequest"> & {
   /**
    * @generated from field: focus.v1.Focus focus = 1;
    */
@@ -25,23 +25,23 @@ export type SetFocusRequest = Message<"focus.v1.SetFocusRequest"> & {
 };
 
 /**
- * Describes the message focus.v1.SetFocusRequest.
- * Use `create(SetFocusRequestSchema)` to create a new message.
+ * Describes the message focus.v1.SaveRequest.
+ * Use `create(SaveRequestSchema)` to create a new message.
  */
-export const SetFocusRequestSchema: GenMessage<SetFocusRequest> = /*@__PURE__*/
+export const SaveRequestSchema: GenMessage<SaveRequest> = /*@__PURE__*/
   messageDesc(file_focus_v1_focus_service, 0);
 
 /**
- * @generated from message focus.v1.SetFocusResponse
+ * @generated from message focus.v1.SaveResponse
  */
-export type SetFocusResponse = Message<"focus.v1.SetFocusResponse"> & {
+export type SaveResponse = Message<"focus.v1.SaveResponse"> & {
 };
 
 /**
- * Describes the message focus.v1.SetFocusResponse.
- * Use `create(SetFocusResponseSchema)` to create a new message.
+ * Describes the message focus.v1.SaveResponse.
+ * Use `create(SaveResponseSchema)` to create a new message.
  */
-export const SetFocusResponseSchema: GenMessage<SetFocusResponse> = /*@__PURE__*/
+export const SaveResponseSchema: GenMessage<SaveResponse> = /*@__PURE__*/
   messageDesc(file_focus_v1_focus_service, 1);
 
 /**
@@ -49,12 +49,12 @@ export const SetFocusResponseSchema: GenMessage<SetFocusResponse> = /*@__PURE__*
  */
 export const FocusService: GenService<{
   /**
-   * @generated from rpc focus.v1.FocusService.SetFocus
+   * @generated from rpc focus.v1.FocusService.Save
    */
-  setFocus: {
+  save: {
     methodKind: "unary";
-    input: typeof SetFocusRequestSchema;
-    output: typeof SetFocusResponseSchema;
+    input: typeof SaveRequestSchema;
+    output: typeof SaveResponseSchema;
   },
 }> = /*@__PURE__*/
   serviceDesc(file_focus_v1_focus_service, 0);
