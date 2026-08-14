@@ -3,7 +3,7 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import { SaveRequest, SaveResponse } from "./status_service_pb.js";
+import { SaveRequest, SaveResponse, TailRequest, TailResponse } from "./status_service_pb.js";
 import { MethodIdempotency, MethodKind } from "@bufbuild/protobuf";
 
 /**
@@ -21,6 +21,16 @@ export const StatusService = {
       O: SaveResponse,
       kind: MethodKind.Unary,
       idempotency: MethodIdempotency.Idempotent,
+    },
+    /**
+     * @generated from rpc status.v1.StatusService.Tail
+     */
+    tail: {
+      name: "Tail",
+      I: TailRequest,
+      O: TailResponse,
+      kind: MethodKind.Unary,
+      idempotency: MethodIdempotency.NoSideEffects,
     },
   }
 } as const;

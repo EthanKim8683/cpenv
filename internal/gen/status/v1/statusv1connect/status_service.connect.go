@@ -35,11 +35,14 @@ const (
 const (
 	// StatusServiceSaveProcedure is the fully-qualified name of the StatusService's Save RPC.
 	StatusServiceSaveProcedure = "/status.v1.StatusService/Save"
+	// StatusServiceTailProcedure is the fully-qualified name of the StatusService's Tail RPC.
+	StatusServiceTailProcedure = "/status.v1.StatusService/Tail"
 )
 
 // StatusServiceClient is a client for the status.v1.StatusService service.
 type StatusServiceClient interface {
 	Save(context.Context, *v1.SaveRequest) (*v1.SaveResponse, error)
+	Tail(context.Context, *v1.TailRequest) (*v1.TailResponse, error)
 }
 
 // NewStatusServiceClient constructs a client for the status.v1.StatusService service. By default,
@@ -60,12 +63,20 @@ func NewStatusServiceClient(httpClient connect.HTTPClient, baseURL string, opts 
 			connect.WithIdempotency(connect.IdempotencyIdempotent),
 			connect.WithClientOptions(opts...),
 		),
+		tail: connect.NewClient[v1.TailRequest, v1.TailResponse](
+			httpClient,
+			baseURL+StatusServiceTailProcedure,
+			connect.WithSchema(statusServiceMethods.ByName("Tail")),
+			connect.WithIdempotency(connect.IdempotencyNoSideEffects),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
 // statusServiceClient implements StatusServiceClient.
 type statusServiceClient struct {
 	save *connect.Client[v1.SaveRequest, v1.SaveResponse]
+	tail *connect.Client[v1.TailRequest, v1.TailResponse]
 }
 
 // Save calls status.v1.StatusService.Save.
@@ -77,9 +88,19 @@ func (c *statusServiceClient) Save(ctx context.Context, req *v1.SaveRequest) (*v
 	return nil, err
 }
 
+// Tail calls status.v1.StatusService.Tail.
+func (c *statusServiceClient) Tail(ctx context.Context, req *v1.TailRequest) (*v1.TailResponse, error) {
+	response, err := c.tail.CallUnary(ctx, connect.NewRequest(req))
+	if response != nil {
+		return response.Msg, err
+	}
+	return nil, err
+}
+
 // StatusServiceHandler is an implementation of the status.v1.StatusService service.
 type StatusServiceHandler interface {
 	Save(context.Context, *v1.SaveRequest) (*v1.SaveResponse, error)
+	Tail(context.Context, *v1.TailRequest) (*v1.TailResponse, error)
 }
 
 // NewStatusServiceHandler builds an HTTP handler from the service implementation. It returns the
@@ -96,10 +117,19 @@ func NewStatusServiceHandler(svc StatusServiceHandler, opts ...connect.HandlerOp
 		connect.WithIdempotency(connect.IdempotencyIdempotent),
 		connect.WithHandlerOptions(opts...),
 	)
+	statusServiceTailHandler := connect.NewUnaryHandlerSimple(
+		StatusServiceTailProcedure,
+		svc.Tail,
+		connect.WithSchema(statusServiceMethods.ByName("Tail")),
+		connect.WithIdempotency(connect.IdempotencyNoSideEffects),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/status.v1.StatusService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case StatusServiceSaveProcedure:
 			statusServiceSaveHandler.ServeHTTP(w, r)
+		case StatusServiceTailProcedure:
+			statusServiceTailHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -111,4 +141,8 @@ type UnimplementedStatusServiceHandler struct{}
 
 func (UnimplementedStatusServiceHandler) Save(context.Context, *v1.SaveRequest) (*v1.SaveResponse, error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("status.v1.StatusService.Save is not implemented"))
+}
+
+func (UnimplementedStatusServiceHandler) Tail(context.Context, *v1.TailRequest) (*v1.TailResponse, error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("status.v1.StatusService.Tail is not implemented"))
 }

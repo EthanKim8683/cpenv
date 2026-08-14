@@ -1,68 +1,78 @@
 package main
 
-// import (
-// 	"context"
-// 	"errors"
-// 	"log"
-// 	"net/http"
-// 	"os"
-// 	"os/signal"
-// 	"path/filepath"
-// 	"syscall"
-// 	"time"
+import (
+	"context"
+	"errors"
+	"fmt"
+	"log"
+	"net/http"
+	"os"
+	"os/signal"
+	"path/filepath"
+	"syscall"
+	"time"
 
-// 	"github.com/EthanKim8683/cpenv/gen/focus/v1/focusv1connect"
-// 	"github.com/EthanKim8683/cpenv/gen/submit/v1/submitv1connect"
-// 	"github.com/EthanKim8683/cpenv/internal/config"
-// 	"github.com/EthanKim8683/cpenv/internal/domain"
-// 	"github.com/EthanKim8683/cpenv/internal/focus"
-// 	"github.com/EthanKim8683/cpenv/internal/submit"
-// 	"github.com/rs/cors"
-// )
+	"github.com/EthanKim8683/cpenv/internal/config"
+	extension "github.com/EthanKim8683/cpenv/internal/daemon"
+	"github.com/EthanKim8683/cpenv/internal/gen/focus/v1/focusv1connect"
+	"github.com/EthanKim8683/cpenv/internal/gen/status/v1/statusv1connect"
+	"github.com/EthanKim8683/cpenv/internal/gen/submit/v1/submitv1connect"
+	"github.com/adrg/xdg"
+	"github.com/rs/cors"
+	bolt "go.etcd.io/bbolt"
+)
 
-// func main() {
-// 	cfg, err := config.Load()
-// 	if err != nil {
-// 		log.Fatalf("cpenvd: %v", err)
-// 	}
+func main() {
+	cfg, err := config.Load()
+	if err != nil {
+		log.Fatalf("cpenvd: %v", err)
+	}
 
-// 	focusStore := focus.NewStore(filepath.Join(cfg.Home, domain.FocusFile))
-// 	focusSvc := &focus.Service{
-// 		Store: focusStore,
-// 	}
+	dbPath := filepath.Join(xdg.StateHome, "cpenv", "cpenv.db")
+	if err := os.MkdirAll(filepath.Dir(dbPath), 0700); err != nil {
+		log.Fatalf("cpenvd: %v", err)
+	}
 
-// 	submitSvc := submit.NewService()
+	db, err := bolt.Open(dbPath, 0600, nil)
+	if err != nil {
+		log.Fatalf("cpenvd: %v", err)
+	}
 
-// 	mux := http.NewServeMux()
-// 	mux.Handle(focusv1connect.NewFocusServiceHandler(focusSvc))
-// 	mux.Handle(submitv1connect.NewSubmitServiceHandler(submitSvc))
+	focusSvc := &extension.FocusService{DB: db}
+	statusSvc := &extension.StatusService{DB: db}
+	submitSvc := extension.NewSubmitService()
 
-// 	handler := cors.New(cors.Options{
-// 		AllowedOrigins: []string{"*"},
-// 		AllowedHeaders: []string{"*"},
-// 	}).Handler(mux)
+	mux := http.NewServeMux()
+	mux.Handle(focusv1connect.NewFocusServiceHandler(focusSvc))
+	mux.Handle(statusv1connect.NewStatusServiceHandler(statusSvc))
+	mux.Handle(submitv1connect.NewSubmitServiceHandler(submitSvc))
 
-// 	srv := &http.Server{
-// 		Addr:    "localhost:" + cfg.Port,
-// 		Handler: handler,
-// 	}
+	handler := cors.New(cors.Options{
+		AllowedOrigins: []string{"*"},
+		AllowedHeaders: []string{"*"},
+	}).Handler(mux)
 
-// 	go func() {
-// 		if err := srv.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
-// 			log.Fatalf("cpenvd: %v", err)
-// 		}
-// 	}()
+	srv := &http.Server{
+		Addr:    fmt.Sprintf("localhost:%d", cfg.Port),
+		Handler: handler,
+	}
 
-// 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
-// 	defer stop()
+	go func() {
+		if err := srv.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
+			log.Fatalf("cpenvd: %v", err)
+		}
+	}()
 
-// 	<-ctx.Done()
-// 	stop()
+	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+	defer stop()
 
-// 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-// 	defer cancel()
+	<-ctx.Done()
+	stop()
 
-// 	if err := srv.Shutdown(ctx); err != nil {
-// 		log.Fatalf("cpenvd: %v", err)
-// 	}
-// }
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	if err := srv.Shutdown(ctx); err != nil {
+		log.Fatalf("cpenvd: %v", err)
+	}
+}

@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 )
 
-func removeAll(dir string) error {
+func clearDir(dir string) error {
 	entries, err := os.ReadDir(dir)
 	if err != nil {
 		return err
@@ -26,7 +26,7 @@ func (c *CLI) Reset(templateName string) error {
 		return fmt.Errorf("reset: %w", err)
 	}
 
-	if err := removeAll(c.CWD); err != nil {
+	if err := clearDir(c.CWD); err != nil {
 		_ = w.close()
 		return fmt.Errorf("reset: %w", err)
 	}

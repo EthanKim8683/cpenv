@@ -232,7 +232,7 @@ func (x *ClaimResponse) GetContent() []byte {
 type ReplyRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	ReplyId       uint32                 `protobuf:"varint,1,opt,name=reply_id,json=replyId,proto3" json:"reply_id,omitempty"`
-	Error         string                 `protobuf:"bytes,2,opt,name=error,proto3" json:"error,omitempty"`
+	Error         *string                `protobuf:"bytes,2,opt,name=error,proto3,oneof" json:"error,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -275,8 +275,8 @@ func (x *ReplyRequest) GetReplyId() uint32 {
 }
 
 func (x *ReplyRequest) GetError() string {
-	if x != nil {
-		return x.Error
+	if x != nil && x.Error != nil {
+		return *x.Error
 	}
 	return ""
 }
@@ -335,10 +335,11 @@ const file_submit_v1_submit_service_proto_rawDesc = "" +
 	"\rClaimResponse\x12\x19\n" +
 	"\breply_id\x18\x01 \x01(\rR\areplyId\x12\x1b\n" +
 	"\tfile_name\x18\x02 \x01(\tR\bfileName\x12\x18\n" +
-	"\acontent\x18\x03 \x01(\fR\acontent\"?\n" +
+	"\acontent\x18\x03 \x01(\fR\acontent\"N\n" +
 	"\fReplyRequest\x12\x19\n" +
-	"\breply_id\x18\x01 \x01(\rR\areplyId\x12\x14\n" +
-	"\x05error\x18\x02 \x01(\tR\x05error\"\x0f\n" +
+	"\breply_id\x18\x01 \x01(\rR\areplyId\x12\x19\n" +
+	"\x05error\x18\x02 \x01(\tH\x00R\x05error\x88\x01\x01B\b\n" +
+	"\x06_error\"\x0f\n" +
 	"\rReplyResponse2\xc6\x01\n" +
 	"\rSubmitService\x12=\n" +
 	"\x06Submit\x12\x18.submit.v1.SubmitRequest\x1a\x19.submit.v1.SubmitResponse\x12:\n" +
@@ -387,6 +388,7 @@ func file_submit_v1_submit_service_proto_init() {
 	if File_submit_v1_submit_service_proto != nil {
 		return
 	}
+	file_submit_v1_submit_service_proto_msgTypes[4].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{

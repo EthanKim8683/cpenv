@@ -1,15 +1,12 @@
-- make app code nice
 - daemon health command + way to manage the daemon
 - error sentinels -> user-friendly error messages
 - add url to problem proto so that if the right tab isn't open, the extension
   can open it
 - use adrg/xdg for config and state and stuff
-- add submission status stuff. i feel like this could be a really simple sqlite
-  db and server that receives requests to update it. i'm debating whether the
-	extension should be responsible for ensuring that we see the final verdict of
-	all the in-progress stuff or the cli
-
 - consolidate focus, submission, submit to extension package; use bolt db for
   all and have common ExtensionError
-- i think everything can live on a single bolt db
-- maybe rename submission stuff to status after the command?
+- add tests
+- replace CLI DB field with an interface
+
+maybe in extension, change helpers from struct to function? so that DB can be
+passed as field rather than requiring explict constructor function?

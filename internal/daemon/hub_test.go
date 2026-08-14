@@ -1,4 +1,4 @@
-package extension
+package daemon
 
 import (
 	"context"
@@ -41,11 +41,10 @@ func newCollectT(t *testing.T) *collectT {
 func TestHub(t *testing.T) {
 	t.Parallel()
 
-	subject := "subject"
-
 	t.Run("round trip", func(t *testing.T) {
 		t.Parallel()
 
+		subject := "subject"
 		req := "req"
 		reply := "reply"
 
@@ -70,6 +69,8 @@ func TestHub(t *testing.T) {
 	t.Run("try request", func(t *testing.T) {
 		t.Parallel()
 
+		subject := "subject"
+
 		h := newHub[struct{}, struct{}]()
 		c := newCollectT(t)
 		var wg sync.WaitGroup
@@ -90,6 +91,8 @@ func TestHub(t *testing.T) {
 
 	t.Run("request consumes claim", func(t *testing.T) {
 		t.Parallel()
+
+		subject := "subject"
 
 		h := newHub[struct{}, struct{}]()
 		c := newCollectT(t)
@@ -112,6 +115,8 @@ func TestHub(t *testing.T) {
 	t.Run("claim context done", func(t *testing.T) {
 		t.Parallel()
 
+		subject := "subject"
+
 		ctx, cancel := context.WithCancel(t.Context())
 		cancel()
 		h := newHub[struct{}, struct{}]()
@@ -126,6 +131,8 @@ func TestHub(t *testing.T) {
 
 		t.Run("send", func(t *testing.T) {
 			t.Parallel()
+
+			subject := "subject"
 
 			ctx, cancel := context.WithCancel(t.Context())
 			cancel()
@@ -149,6 +156,8 @@ func TestHub(t *testing.T) {
 
 		t.Run("receive", func(t *testing.T) {
 			t.Parallel()
+
+			subject := "subject"
 
 			ctx, cancel := context.WithCancel(t.Context())
 			h := newHub[struct{}, struct{}]()

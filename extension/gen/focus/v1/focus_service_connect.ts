@@ -3,7 +3,7 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import { SaveRequest, SaveResponse } from "./focus_service_pb.js";
+import { LoadRequest, LoadResponse, SaveRequest, SaveResponse } from "./focus_service_pb.js";
 import { MethodIdempotency, MethodKind } from "@bufbuild/protobuf";
 
 /**
@@ -21,6 +21,16 @@ export const FocusService = {
       O: SaveResponse,
       kind: MethodKind.Unary,
       idempotency: MethodIdempotency.Idempotent,
+    },
+    /**
+     * @generated from rpc focus.v1.FocusService.Load
+     */
+    load: {
+      name: "Load",
+      I: LoadRequest,
+      O: LoadResponse,
+      kind: MethodKind.Unary,
+      idempotency: MethodIdempotency.NoSideEffects,
     },
   }
 } as const;

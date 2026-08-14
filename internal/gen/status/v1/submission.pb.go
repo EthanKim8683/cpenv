@@ -26,12 +26,12 @@ type Status int32
 const (
 	Status_STATUS_UNSPECIFIED           Status = 0
 	Status_STATUS_PENDING               Status = 1
-	Status_STATUS_ACCEPTED              Status = 3
-	Status_STATUS_WRONG_ANSWER          Status = 4
-	Status_STATUS_TIME_LIMIT_EXCEEDED   Status = 5
-	Status_STATUS_MEMORY_LIMIT_EXCEEDED Status = 6
-	Status_STATUS_RUNTIME_ERROR         Status = 7
-	Status_STATUS_COMPILATION_ERROR     Status = 8
+	Status_STATUS_ACCEPTED              Status = 2
+	Status_STATUS_WRONG_ANSWER          Status = 3
+	Status_STATUS_TIME_LIMIT_EXCEEDED   Status = 4
+	Status_STATUS_MEMORY_LIMIT_EXCEEDED Status = 5
+	Status_STATUS_RUNTIME_ERROR         Status = 6
+	Status_STATUS_COMPILATION_ERROR     Status = 7
 )
 
 // Enum value maps for Status.
@@ -39,22 +39,22 @@ var (
 	Status_name = map[int32]string{
 		0: "STATUS_UNSPECIFIED",
 		1: "STATUS_PENDING",
-		3: "STATUS_ACCEPTED",
-		4: "STATUS_WRONG_ANSWER",
-		5: "STATUS_TIME_LIMIT_EXCEEDED",
-		6: "STATUS_MEMORY_LIMIT_EXCEEDED",
-		7: "STATUS_RUNTIME_ERROR",
-		8: "STATUS_COMPILATION_ERROR",
+		2: "STATUS_ACCEPTED",
+		3: "STATUS_WRONG_ANSWER",
+		4: "STATUS_TIME_LIMIT_EXCEEDED",
+		5: "STATUS_MEMORY_LIMIT_EXCEEDED",
+		6: "STATUS_RUNTIME_ERROR",
+		7: "STATUS_COMPILATION_ERROR",
 	}
 	Status_value = map[string]int32{
 		"STATUS_UNSPECIFIED":           0,
 		"STATUS_PENDING":               1,
-		"STATUS_ACCEPTED":              3,
-		"STATUS_WRONG_ANSWER":          4,
-		"STATUS_TIME_LIMIT_EXCEEDED":   5,
-		"STATUS_MEMORY_LIMIT_EXCEEDED": 6,
-		"STATUS_RUNTIME_ERROR":         7,
-		"STATUS_COMPILATION_ERROR":     8,
+		"STATUS_ACCEPTED":              2,
+		"STATUS_WRONG_ANSWER":          3,
+		"STATUS_TIME_LIMIT_EXCEEDED":   4,
+		"STATUS_MEMORY_LIMIT_EXCEEDED": 5,
+		"STATUS_RUNTIME_ERROR":         6,
+		"STATUS_COMPILATION_ERROR":     7,
 	}
 )
 
@@ -177,12 +177,12 @@ const file_status_v1_submission_proto_rawDesc = "" +
 	"\x06Status\x12\x16\n" +
 	"\x12STATUS_UNSPECIFIED\x10\x00\x12\x12\n" +
 	"\x0eSTATUS_PENDING\x10\x01\x12\x13\n" +
-	"\x0fSTATUS_ACCEPTED\x10\x03\x12\x17\n" +
-	"\x13STATUS_WRONG_ANSWER\x10\x04\x12\x1e\n" +
-	"\x1aSTATUS_TIME_LIMIT_EXCEEDED\x10\x05\x12 \n" +
-	"\x1cSTATUS_MEMORY_LIMIT_EXCEEDED\x10\x06\x12\x18\n" +
-	"\x14STATUS_RUNTIME_ERROR\x10\a\x12\x1c\n" +
-	"\x18STATUS_COMPILATION_ERROR\x10\bB\xa4\x01\n" +
+	"\x0fSTATUS_ACCEPTED\x10\x02\x12\x17\n" +
+	"\x13STATUS_WRONG_ANSWER\x10\x03\x12\x1e\n" +
+	"\x1aSTATUS_TIME_LIMIT_EXCEEDED\x10\x04\x12 \n" +
+	"\x1cSTATUS_MEMORY_LIMIT_EXCEEDED\x10\x05\x12\x18\n" +
+	"\x14STATUS_RUNTIME_ERROR\x10\x06\x12\x1c\n" +
+	"\x18STATUS_COMPILATION_ERROR\x10\aB\xa4\x01\n" +
 	"\rcom.status.v1B\x0fSubmissionProtoP\x01Z=github.com/EthanKim8683/cpenv/internal/gen/status/v1;statusv1\xa2\x02\x03SXX\xaa\x02\tStatus.V1\xca\x02\tStatus\\V1\xe2\x02\x15Status\\V1\\GPBMetadata\xea\x02\n" +
 	"Status::V1b\x06proto3"
 

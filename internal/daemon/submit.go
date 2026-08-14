@@ -1,9 +1,8 @@
-package extension
+package daemon
 
 import (
 	"context"
 
-	"github.com/EthanKim8683/cpenv/internal/cli"
 	submitv1 "github.com/EthanKim8683/cpenv/internal/gen/submit/v1"
 	"github.com/EthanKim8683/cpenv/internal/gen/submit/v1/submitv1connect"
 )
@@ -13,7 +12,7 @@ type SubmitService struct {
 }
 
 func (s *SubmitService) Submit(ctx context.Context, req *submitv1.SubmitRequest) (*submitv1.SubmitResponse, error) {
-	res, err := s.hub.request(ctx, req.GetProblemId(), req)
+	res, err := s.hub.tryRequest(ctx, req.GetProblemId(), req)
 	if err != nil {
 		return nil, err
 	}
@@ -45,21 +44,3 @@ var _ submitv1connect.SubmitServiceHandler = (*SubmitService)(nil)
 func NewSubmitService() *SubmitService {
 	return &SubmitService{hub: newHub[*submitv1.SubmitRequest, *submitv1.SubmitResponse]()}
 }
-
-type Submitter struct {
-	client submitv1connect.SubmitServiceClient
-}
-
-func (r *Submitter) Submit(ctx context.Context, req *submitv1.SubmitRequest) error {
-	res, err := r.client.Submit(ctx, req)
-	if err != nil {
-		return err
-	}
-
-	if errMsg := res.GetError(); errMsg != "" {
-		return &ExtensionError{Msg: errMsg}
-	}
-	return nil
-}
-
-var _ cli.Submitter = (*Submitter)(nil)

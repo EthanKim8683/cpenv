@@ -8,8 +8,15 @@ service FocusService {
   rpc Save(SaveRequest) returns (SaveResponse) {
     option idempotency_level = IDEMPOTENT;
   }
+  rpc Load(LoadRequest) returns (LoadResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
 }
 
 message SaveRequest { focus.v1.Focus focus = 1; }
 
 message SaveResponse {}
+
+message LoadRequest {}
+
+message LoadResponse { focus.v1.Focus focus = 1; }

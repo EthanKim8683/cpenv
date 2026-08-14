@@ -5,11 +5,11 @@ import (
 	"fmt"
 	"os"
 
-	submissionv1 "github.com/EthanKim8683/cpenv/internal/gen/status/v1"
+	statusv1 "github.com/EthanKim8683/cpenv/internal/gen/status/v1"
 )
 
-func (c *CLI) Status(limit int) ([]*submissionv1.Submission, error) {
-	var subs []*submissionv1.Submission
+func (c *CLI) Status(limit int) ([]*statusv1.Submission, error) {
+	var subs []*statusv1.Submission
 	if w, err := openWorkspace(c.CWD); err == nil {
 		defer w.close()
 		subs, err = c.Submissions.TailProblem(w.problem.GetId(), limit)

@@ -8,8 +8,18 @@ service StatusService {
   rpc Save(SaveRequest) returns (SaveResponse) {
     option idempotency_level = IDEMPOTENT;
   }
+  rpc Tail(TailRequest) returns (TailResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
 }
 
 message SaveRequest { repeated status.v1.Submission submissions = 1; }
 
 message SaveResponse {}
+
+message TailRequest {
+  optional uint32 limit = 1;
+  optional string problem_id = 2;
+}
+
+message TailResponse { repeated status.v1.Submission submissions = 1; }

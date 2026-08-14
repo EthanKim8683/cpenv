@@ -3,20 +3,19 @@ package config
 import (
 	"errors"
 	"fmt"
-	"strconv"
 
 	"github.com/caarlos0/env/v11"
 )
 
 type Config struct {
-	Port    string `env:"CPENV_PORT" envDefault:"8683"`
-	HomeDir string `env:"CPENV_HOME,noEmpty"`
+	Port    int    `env:"CPENV_PORT" envDefault:"8683"`
+	HomeDir string `env:"CPENV_HOME,notEmpty"`
 }
 
 func (c *Config) Validate() error {
 	var errs error
-	if port, err := strconv.Atoi(c.Port); err != nil || !(1 <= port && port <= 65535) {
-		errs = errors.Join(errs, fmt.Errorf("CPENV_PORT %q must be an integer between 1 and 65535", c.Port))
+	if !(1 <= c.Port && c.Port <= 65535) {
+		errs = errors.Join(errs, fmt.Errorf("CPENV_PORT %d must be between 1 and 65535", c.Port))
 	}
 	return errs
 }

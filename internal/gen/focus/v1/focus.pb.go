@@ -25,7 +25,7 @@ const (
 type Focus struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Problem       *v1.Problem            `protobuf:"bytes,1,opt,name=problem,proto3" json:"problem,omitempty"`
-	Error         string                 `protobuf:"bytes,2,opt,name=error,proto3" json:"error,omitempty"`
+	Error         *string                `protobuf:"bytes,2,opt,name=error,proto3,oneof" json:"error,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -68,8 +68,8 @@ func (x *Focus) GetProblem() *v1.Problem {
 }
 
 func (x *Focus) GetError() string {
-	if x != nil {
-		return x.Error
+	if x != nil && x.Error != nil {
+		return *x.Error
 	}
 	return ""
 }
@@ -78,10 +78,11 @@ var File_focus_v1_focus_proto protoreflect.FileDescriptor
 
 const file_focus_v1_focus_proto_rawDesc = "" +
 	"\n" +
-	"\x14focus/v1/focus.proto\x12\bfocus.v1\x1a\x18problem/v1/problem.proto\"L\n" +
+	"\x14focus/v1/focus.proto\x12\bfocus.v1\x1a\x18problem/v1/problem.proto\"[\n" +
 	"\x05Focus\x12-\n" +
-	"\aproblem\x18\x01 \x01(\v2\x13.problem.v1.ProblemR\aproblem\x12\x14\n" +
-	"\x05error\x18\x02 \x01(\tR\x05errorB\x98\x01\n" +
+	"\aproblem\x18\x01 \x01(\v2\x13.problem.v1.ProblemR\aproblem\x12\x19\n" +
+	"\x05error\x18\x02 \x01(\tH\x00R\x05error\x88\x01\x01B\b\n" +
+	"\x06_errorB\x98\x01\n" +
 	"\fcom.focus.v1B\n" +
 	"FocusProtoP\x01Z;github.com/EthanKim8683/cpenv/internal/gen/focus/v1;focusv1\xa2\x02\x03FXX\xaa\x02\bFocus.V1\xca\x02\bFocus\\V1\xe2\x02\x14Focus\\V1\\GPBMetadata\xea\x02\tFocus::V1b\x06proto3"
 
@@ -116,6 +117,7 @@ func file_focus_v1_focus_proto_init() {
 	if File_focus_v1_focus_proto != nil {
 		return
 	}
+	file_focus_v1_focus_proto_msgTypes[0].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{

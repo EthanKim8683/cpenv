@@ -101,6 +101,102 @@ func (*SaveResponse) Descriptor() ([]byte, []int) {
 	return file_status_v1_status_service_proto_rawDescGZIP(), []int{1}
 }
 
+type TailRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Limit         *uint32                `protobuf:"varint,1,opt,name=limit,proto3,oneof" json:"limit,omitempty"`
+	ProblemId     *string                `protobuf:"bytes,2,opt,name=problem_id,json=problemId,proto3,oneof" json:"problem_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *TailRequest) Reset() {
+	*x = TailRequest{}
+	mi := &file_status_v1_status_service_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *TailRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TailRequest) ProtoMessage() {}
+
+func (x *TailRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_status_v1_status_service_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TailRequest.ProtoReflect.Descriptor instead.
+func (*TailRequest) Descriptor() ([]byte, []int) {
+	return file_status_v1_status_service_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *TailRequest) GetLimit() uint32 {
+	if x != nil && x.Limit != nil {
+		return *x.Limit
+	}
+	return 0
+}
+
+func (x *TailRequest) GetProblemId() string {
+	if x != nil && x.ProblemId != nil {
+		return *x.ProblemId
+	}
+	return ""
+}
+
+type TailResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Submissions   []*Submission          `protobuf:"bytes,1,rep,name=submissions,proto3" json:"submissions,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *TailResponse) Reset() {
+	*x = TailResponse{}
+	mi := &file_status_v1_status_service_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *TailResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TailResponse) ProtoMessage() {}
+
+func (x *TailResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_status_v1_status_service_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TailResponse.ProtoReflect.Descriptor instead.
+func (*TailResponse) Descriptor() ([]byte, []int) {
+	return file_status_v1_status_service_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *TailResponse) GetSubmissions() []*Submission {
+	if x != nil {
+		return x.Submissions
+	}
+	return nil
+}
+
 var File_status_v1_status_service_proto protoreflect.FileDescriptor
 
 const file_status_v1_status_service_proto_rawDesc = "" +
@@ -108,9 +204,18 @@ const file_status_v1_status_service_proto_rawDesc = "" +
 	"\x1estatus/v1/status_service.proto\x12\tstatus.v1\x1a\x1astatus/v1/submission.proto\"F\n" +
 	"\vSaveRequest\x127\n" +
 	"\vsubmissions\x18\x01 \x03(\v2\x15.status.v1.SubmissionR\vsubmissions\"\x0e\n" +
-	"\fSaveResponse2M\n" +
+	"\fSaveResponse\"e\n" +
+	"\vTailRequest\x12\x19\n" +
+	"\x05limit\x18\x01 \x01(\rH\x00R\x05limit\x88\x01\x01\x12\"\n" +
+	"\n" +
+	"problem_id\x18\x02 \x01(\tH\x01R\tproblemId\x88\x01\x01B\b\n" +
+	"\x06_limitB\r\n" +
+	"\v_problem_id\"G\n" +
+	"\fTailResponse\x127\n" +
+	"\vsubmissions\x18\x01 \x03(\v2\x15.status.v1.SubmissionR\vsubmissions2\x8b\x01\n" +
 	"\rStatusService\x12<\n" +
-	"\x04Save\x12\x16.status.v1.SaveRequest\x1a\x17.status.v1.SaveResponse\"\x03\x90\x02\x02B\xa7\x01\n" +
+	"\x04Save\x12\x16.status.v1.SaveRequest\x1a\x17.status.v1.SaveResponse\"\x03\x90\x02\x02\x12<\n" +
+	"\x04Tail\x12\x16.status.v1.TailRequest\x1a\x17.status.v1.TailResponse\"\x03\x90\x02\x01B\xa7\x01\n" +
 	"\rcom.status.v1B\x12StatusServiceProtoP\x01Z=github.com/EthanKim8683/cpenv/internal/gen/status/v1;statusv1\xa2\x02\x03SXX\xaa\x02\tStatus.V1\xca\x02\tStatus\\V1\xe2\x02\x15Status\\V1\\GPBMetadata\xea\x02\n" +
 	"Status::V1b\x06proto3"
 
@@ -126,21 +231,26 @@ func file_status_v1_status_service_proto_rawDescGZIP() []byte {
 	return file_status_v1_status_service_proto_rawDescData
 }
 
-var file_status_v1_status_service_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_status_v1_status_service_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
 var file_status_v1_status_service_proto_goTypes = []any{
 	(*SaveRequest)(nil),  // 0: status.v1.SaveRequest
 	(*SaveResponse)(nil), // 1: status.v1.SaveResponse
-	(*Submission)(nil),   // 2: status.v1.Submission
+	(*TailRequest)(nil),  // 2: status.v1.TailRequest
+	(*TailResponse)(nil), // 3: status.v1.TailResponse
+	(*Submission)(nil),   // 4: status.v1.Submission
 }
 var file_status_v1_status_service_proto_depIdxs = []int32{
-	2, // 0: status.v1.SaveRequest.submissions:type_name -> status.v1.Submission
-	0, // 1: status.v1.StatusService.Save:input_type -> status.v1.SaveRequest
-	1, // 2: status.v1.StatusService.Save:output_type -> status.v1.SaveResponse
-	2, // [2:3] is the sub-list for method output_type
-	1, // [1:2] is the sub-list for method input_type
-	1, // [1:1] is the sub-list for extension type_name
-	1, // [1:1] is the sub-list for extension extendee
-	0, // [0:1] is the sub-list for field type_name
+	4, // 0: status.v1.SaveRequest.submissions:type_name -> status.v1.Submission
+	4, // 1: status.v1.TailResponse.submissions:type_name -> status.v1.Submission
+	0, // 2: status.v1.StatusService.Save:input_type -> status.v1.SaveRequest
+	2, // 3: status.v1.StatusService.Tail:input_type -> status.v1.TailRequest
+	1, // 4: status.v1.StatusService.Save:output_type -> status.v1.SaveResponse
+	3, // 5: status.v1.StatusService.Tail:output_type -> status.v1.TailResponse
+	4, // [4:6] is the sub-list for method output_type
+	2, // [2:4] is the sub-list for method input_type
+	2, // [2:2] is the sub-list for extension type_name
+	2, // [2:2] is the sub-list for extension extendee
+	0, // [0:2] is the sub-list for field type_name
 }
 
 func init() { file_status_v1_status_service_proto_init() }
@@ -149,13 +259,14 @@ func file_status_v1_status_service_proto_init() {
 		return
 	}
 	file_status_v1_submission_proto_init()
+	file_status_v1_status_service_proto_msgTypes[2].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_status_v1_status_service_proto_rawDesc), len(file_status_v1_status_service_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   2,
+			NumMessages:   4,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

@@ -101,6 +101,86 @@ func (*SaveResponse) Descriptor() ([]byte, []int) {
 	return file_focus_v1_focus_service_proto_rawDescGZIP(), []int{1}
 }
 
+type LoadRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *LoadRequest) Reset() {
+	*x = LoadRequest{}
+	mi := &file_focus_v1_focus_service_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *LoadRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*LoadRequest) ProtoMessage() {}
+
+func (x *LoadRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_focus_v1_focus_service_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use LoadRequest.ProtoReflect.Descriptor instead.
+func (*LoadRequest) Descriptor() ([]byte, []int) {
+	return file_focus_v1_focus_service_proto_rawDescGZIP(), []int{2}
+}
+
+type LoadResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Focus         *Focus                 `protobuf:"bytes,1,opt,name=focus,proto3" json:"focus,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *LoadResponse) Reset() {
+	*x = LoadResponse{}
+	mi := &file_focus_v1_focus_service_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *LoadResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*LoadResponse) ProtoMessage() {}
+
+func (x *LoadResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_focus_v1_focus_service_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use LoadResponse.ProtoReflect.Descriptor instead.
+func (*LoadResponse) Descriptor() ([]byte, []int) {
+	return file_focus_v1_focus_service_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *LoadResponse) GetFocus() *Focus {
+	if x != nil {
+		return x.Focus
+	}
+	return nil
+}
+
 var File_focus_v1_focus_service_proto protoreflect.FileDescriptor
 
 const file_focus_v1_focus_service_proto_rawDesc = "" +
@@ -108,9 +188,13 @@ const file_focus_v1_focus_service_proto_rawDesc = "" +
 	"\x1cfocus/v1/focus_service.proto\x12\bfocus.v1\x1a\x14focus/v1/focus.proto\"4\n" +
 	"\vSaveRequest\x12%\n" +
 	"\x05focus\x18\x01 \x01(\v2\x0f.focus.v1.FocusR\x05focus\"\x0e\n" +
-	"\fSaveResponse2J\n" +
+	"\fSaveResponse\"\r\n" +
+	"\vLoadRequest\"5\n" +
+	"\fLoadResponse\x12%\n" +
+	"\x05focus\x18\x01 \x01(\v2\x0f.focus.v1.FocusR\x05focus2\x86\x01\n" +
 	"\fFocusService\x12:\n" +
-	"\x04Save\x12\x15.focus.v1.SaveRequest\x1a\x16.focus.v1.SaveResponse\"\x03\x90\x02\x02B\x9f\x01\n" +
+	"\x04Save\x12\x15.focus.v1.SaveRequest\x1a\x16.focus.v1.SaveResponse\"\x03\x90\x02\x02\x12:\n" +
+	"\x04Load\x12\x15.focus.v1.LoadRequest\x1a\x16.focus.v1.LoadResponse\"\x03\x90\x02\x01B\x9f\x01\n" +
 	"\fcom.focus.v1B\x11FocusServiceProtoP\x01Z;github.com/EthanKim8683/cpenv/internal/gen/focus/v1;focusv1\xa2\x02\x03FXX\xaa\x02\bFocus.V1\xca\x02\bFocus\\V1\xe2\x02\x14Focus\\V1\\GPBMetadata\xea\x02\tFocus::V1b\x06proto3"
 
 var (
@@ -125,21 +209,26 @@ func file_focus_v1_focus_service_proto_rawDescGZIP() []byte {
 	return file_focus_v1_focus_service_proto_rawDescData
 }
 
-var file_focus_v1_focus_service_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_focus_v1_focus_service_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
 var file_focus_v1_focus_service_proto_goTypes = []any{
 	(*SaveRequest)(nil),  // 0: focus.v1.SaveRequest
 	(*SaveResponse)(nil), // 1: focus.v1.SaveResponse
-	(*Focus)(nil),        // 2: focus.v1.Focus
+	(*LoadRequest)(nil),  // 2: focus.v1.LoadRequest
+	(*LoadResponse)(nil), // 3: focus.v1.LoadResponse
+	(*Focus)(nil),        // 4: focus.v1.Focus
 }
 var file_focus_v1_focus_service_proto_depIdxs = []int32{
-	2, // 0: focus.v1.SaveRequest.focus:type_name -> focus.v1.Focus
-	0, // 1: focus.v1.FocusService.Save:input_type -> focus.v1.SaveRequest
-	1, // 2: focus.v1.FocusService.Save:output_type -> focus.v1.SaveResponse
-	2, // [2:3] is the sub-list for method output_type
-	1, // [1:2] is the sub-list for method input_type
-	1, // [1:1] is the sub-list for extension type_name
-	1, // [1:1] is the sub-list for extension extendee
-	0, // [0:1] is the sub-list for field type_name
+	4, // 0: focus.v1.SaveRequest.focus:type_name -> focus.v1.Focus
+	4, // 1: focus.v1.LoadResponse.focus:type_name -> focus.v1.Focus
+	0, // 2: focus.v1.FocusService.Save:input_type -> focus.v1.SaveRequest
+	2, // 3: focus.v1.FocusService.Load:input_type -> focus.v1.LoadRequest
+	1, // 4: focus.v1.FocusService.Save:output_type -> focus.v1.SaveResponse
+	3, // 5: focus.v1.FocusService.Load:output_type -> focus.v1.LoadResponse
+	4, // [4:6] is the sub-list for method output_type
+	2, // [2:4] is the sub-list for method input_type
+	2, // [2:2] is the sub-list for extension type_name
+	2, // [2:2] is the sub-list for extension extendee
+	0, // [0:2] is the sub-list for field type_name
 }
 
 func init() { file_focus_v1_focus_service_proto_init() }
@@ -154,7 +243,7 @@ func file_focus_v1_focus_service_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_focus_v1_focus_service_proto_rawDesc), len(file_focus_v1_focus_service_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   2,
+			NumMessages:   4,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

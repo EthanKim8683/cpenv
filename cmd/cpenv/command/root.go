@@ -1,7 +1,16 @@
 package command
 
 import (
+	"fmt"
+	"net/http"
+	"os"
+	"path/filepath"
+
 	"github.com/EthanKim8683/cpenv/internal/cli"
+	"github.com/EthanKim8683/cpenv/internal/config"
+	extension "github.com/EthanKim8683/cpenv/internal/daemon"
+	"github.com/EthanKim8683/cpenv/internal/gen/submit/v1/submitv1connect"
+	"github.com/adrg/xdg"
 	"github.com/spf13/cobra"
 	bolt "go.etcd.io/bbolt"
 )
@@ -13,44 +22,43 @@ var rootCmd = &cobra.Command{
 	Use:   "cpenv",
 	Short: "Competitive programming environment CLI.",
 	PersistentPreRunE: func(_ *cobra.Command, _ []string) error {
-		// cfg, err := config.Load()
-		// if err != nil {
-		// 	return err
-		// }
+		cfg, err := config.Load()
+		if err != nil {
+			return err
+		}
 
-		// db, err = bolt.Open(filepath.Join(xdg.StateHome, "cpenv", "cpenv.db"), 0600, nil)
-		// if err != nil {
-		// 	return err
-		// }
+		cwd, err := os.Getwd()
+		if err != nil {
+			return err
+		}
 
-		// focusStore := &focus.FileStore{Path: filepath.Join(xdg.StateHome, "cpenv", "focus.json")}
-		// submissionStore := &submission.DBStore{DB: db}
-		// submitClient := submitv1connect.NewSubmitServiceClient(
-		// 	http.DefaultClient,
-		// 	"http://localhost:"+cfg.Port,
-		// )
+		dbPath := filepath.Join(xdg.StateHome, "cpenv", "cpenv.db")
+		if err := os.MkdirAll(filepath.Dir(dbPath), 0700); err != nil {
+			return err
+		}
 
-		// c = &cli.CLI{
-		// 	Cfg:             cfg,
-		// 	FocusStore:      focusStore,
-		// 	SubmissionStore: submissionStore,
-		// 	SubmitClient:    submitClient,
-		// }
+		db, err = bolt.Open(dbPath, 0600, nil)
+		if err != nil {
+			return err
+		}
 
-		// cwd, err := os.Getwd()
-		// if err != nil {
-		// 	return err
-		// }
-		// w, err = cli.NewWorkspace(
-		// 	cwd,
-		// 	submissionStore,
-		// 	submitClient,
-		// 	c.NewHome(),
-		// )
-		// if err != nil && errors.Is(err, os.ErrNotExist) {
-		// 	return err
-		// }
+		submitClient := submitv1connect.NewSubmitServiceClient(
+			http.DefaultClient,
+			fmt.Sprintf("http://localhost:%d", cfg.Port),
+		)
 
+		focusedProblemLoader := &extension.FocusedProblemLoader{DB: db}
+		submissionsTailer := &extension.SubmissionsTailer{DB: db}
+		submitter := &extension.Submitter{Client: submitClient}
+
+		c = &cli.CLI{
+			Cfg:            cfg,
+			DB:             db,
+			CWD:            cwd,
+			FocusedProblem: focusedProblemLoader,
+			Submissions:    submissionsTailer,
+			Submitter:      submitter,
+		}
 		return nil
 	},
 	PersistentPostRunE: func(_ *cobra.Command, _ []string) error {

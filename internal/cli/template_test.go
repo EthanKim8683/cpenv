@@ -95,32 +95,37 @@ func TestRenderTemplate(t *testing.T) {
 func TestCLI_resolveTemplate(t *testing.T) {
 	t.Parallel()
 
-	t.Run("coverage", func(t *testing.T) {
-		t.Parallel()
+	homeDir := filepath.Join(t.TempDir(), "home")
+	cwd := filepath.Join(t.TempDir(), "cwd")
 
-		homeDir := filepath.Join(t.TempDir(), "home")
-		cwd := filepath.Join(t.TempDir(), "cwd")
+	db, err := bolt.Open(filepath.Join(t.TempDir(), "db.db"), 0600, nil)
+	require.NoError(t, err)
+	cli := &CLI{
+		Cfg: &config.Config{HomeDir: homeDir},
+		CWD: cwd,
+		DB:  db,
+	}
 
-		db, err := bolt.Open(filepath.Join(t.TempDir(), "db.db"), 0600, nil)
-		require.NoError(t, err)
-		cli := &CLI{
-			Cfg: &config.Config{HomeDir: homeDir},
-			CWD: cwd,
-			DB:  db,
-		}
-
+	t.Run("void", func(t *testing.T) {
 		path, err := cli.resolveTemplate("")
 		require.NoError(t, err)
 		assert.Equal(t, "", path)
+	})
 
+	t.Run("glob", func(t *testing.T) {
 		relName := "rel.star"
+
 		require.NoError(t, os.MkdirAll(cli.templatesDir(), 0755))
 		require.NoError(t, os.WriteFile(filepath.Join(cli.templatesDir(), relName), nil, 0644))
-		path, err = cli.resolveTemplate("")
+
+		path, err := cli.resolveTemplate("")
 		require.NoError(t, err)
 		assert.Equal(t, filepath.Join(cli.templatesDir(), relName), path)
+	})
 
+	t.Run("default template", func(t *testing.T) {
 		defaultPath := filepath.Join(t.TempDir(), "default.star")
+
 		require.NoError(t, os.WriteFile(defaultPath, nil, 0644))
 		_ = db.Update(func(tx *bolt.Tx) error {
 			b, err := tx.CreateBucket(templateBucketKey)
@@ -128,23 +133,36 @@ func TestCLI_resolveTemplate(t *testing.T) {
 			require.NoError(t, b.Put(defaultTemplateKey, []byte(defaultPath)))
 			return nil
 		})
-		path, err = cli.resolveTemplate("")
+
+		path, err := cli.resolveTemplate("")
 		require.NoError(t, err)
 		assert.Equal(t, defaultPath, path)
+	})
 
-		path, err = cli.resolveTemplate(relName)
+	t.Run("templates dir relative path", func(t *testing.T) {
+		relName := "rel.star"
+
+		path, err := cli.resolveTemplate(relName)
 		require.NoError(t, err)
 		assert.Equal(t, filepath.Join(cli.templatesDir(), relName), path)
+	})
+
+	t.Run("cwd relative path", func(t *testing.T) {
+		relName := "rel.star"
 
 		require.NoError(t, os.MkdirAll(cwd, 0755))
 		require.NoError(t, os.WriteFile(filepath.Join(cwd, relName), nil, 0644))
-		path, err = cli.resolveTemplate(relName)
+
+		path, err := cli.resolveTemplate(relName)
 		require.NoError(t, err)
 		assert.Equal(t, filepath.Join(cwd, relName), path)
+	})
 
+	t.Run("absolute path", func(t *testing.T) {
 		absName := filepath.Join(t.TempDir(), "abs.star")
 		require.NoError(t, os.WriteFile(absName, nil, 0644))
-		path, err = cli.resolveTemplate(absName)
+
+		path, err := cli.resolveTemplate(absName)
 		require.NoError(t, err)
 		assert.Equal(t, absName, path)
 	})

@@ -1,4 +1,4 @@
-package extension
+package daemon
 
 import (
 	"context"
@@ -76,22 +76,22 @@ func (h *hub[Req, Reply]) claim(ctx context.Context, subject string) (*message[R
 func (h *hub[Req, Reply]) doRequest(ctx context.Context, subject string, req Req, wait bool) (Reply, error) {
 	var zero Reply
 
-	rID, rCh := h.makeReplyCh()
-	defer h.takeReplyCh(rID)
+	replyID, replyCh := h.makeReplyCh()
+	defer h.takeReplyCh(replyID)
 
-	cCh := h.acquireClaimCh(subject)
+	claimCh := h.acquireClaimCh(subject)
 	defer h.releaseClaimCh(subject)
 
-	msg := &message[Req]{req: req, replyID: rID}
+	msg := &message[Req]{req: req, replyID: replyID}
 	if wait {
 		select {
 		case <-ctx.Done():
 			return zero, fmt.Errorf("send: %w", ctx.Err())
-		case cCh <- msg:
+		case claimCh <- msg:
 		}
 	} else {
 		select {
-		case cCh <- msg:
+		case claimCh <- msg:
 		default:
 			return zero, errors.New("no receiver")
 		}
@@ -99,8 +99,8 @@ func (h *hub[Req, Reply]) doRequest(ctx context.Context, subject string, req Req
 
 	select {
 	case <-ctx.Done():
-		return zero, fmt.Errorf("receive reply %d: %w", rID, ctx.Err())
-	case reply := <-rCh:
+		return zero, fmt.Errorf("receive reply %d: %w", replyID, ctx.Err())
+	case reply := <-replyCh:
 		return reply, nil
 	}
 }

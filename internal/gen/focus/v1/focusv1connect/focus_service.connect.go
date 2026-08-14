@@ -35,11 +35,14 @@ const (
 const (
 	// FocusServiceSaveProcedure is the fully-qualified name of the FocusService's Save RPC.
 	FocusServiceSaveProcedure = "/focus.v1.FocusService/Save"
+	// FocusServiceLoadProcedure is the fully-qualified name of the FocusService's Load RPC.
+	FocusServiceLoadProcedure = "/focus.v1.FocusService/Load"
 )
 
 // FocusServiceClient is a client for the focus.v1.FocusService service.
 type FocusServiceClient interface {
 	Save(context.Context, *v1.SaveRequest) (*v1.SaveResponse, error)
+	Load(context.Context, *v1.LoadRequest) (*v1.LoadResponse, error)
 }
 
 // NewFocusServiceClient constructs a client for the focus.v1.FocusService service. By default, it
@@ -60,12 +63,20 @@ func NewFocusServiceClient(httpClient connect.HTTPClient, baseURL string, opts .
 			connect.WithIdempotency(connect.IdempotencyIdempotent),
 			connect.WithClientOptions(opts...),
 		),
+		load: connect.NewClient[v1.LoadRequest, v1.LoadResponse](
+			httpClient,
+			baseURL+FocusServiceLoadProcedure,
+			connect.WithSchema(focusServiceMethods.ByName("Load")),
+			connect.WithIdempotency(connect.IdempotencyNoSideEffects),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
 // focusServiceClient implements FocusServiceClient.
 type focusServiceClient struct {
 	save *connect.Client[v1.SaveRequest, v1.SaveResponse]
+	load *connect.Client[v1.LoadRequest, v1.LoadResponse]
 }
 
 // Save calls focus.v1.FocusService.Save.
@@ -77,9 +88,19 @@ func (c *focusServiceClient) Save(ctx context.Context, req *v1.SaveRequest) (*v1
 	return nil, err
 }
 
+// Load calls focus.v1.FocusService.Load.
+func (c *focusServiceClient) Load(ctx context.Context, req *v1.LoadRequest) (*v1.LoadResponse, error) {
+	response, err := c.load.CallUnary(ctx, connect.NewRequest(req))
+	if response != nil {
+		return response.Msg, err
+	}
+	return nil, err
+}
+
 // FocusServiceHandler is an implementation of the focus.v1.FocusService service.
 type FocusServiceHandler interface {
 	Save(context.Context, *v1.SaveRequest) (*v1.SaveResponse, error)
+	Load(context.Context, *v1.LoadRequest) (*v1.LoadResponse, error)
 }
 
 // NewFocusServiceHandler builds an HTTP handler from the service implementation. It returns the
@@ -96,10 +117,19 @@ func NewFocusServiceHandler(svc FocusServiceHandler, opts ...connect.HandlerOpti
 		connect.WithIdempotency(connect.IdempotencyIdempotent),
 		connect.WithHandlerOptions(opts...),
 	)
+	focusServiceLoadHandler := connect.NewUnaryHandlerSimple(
+		FocusServiceLoadProcedure,
+		svc.Load,
+		connect.WithSchema(focusServiceMethods.ByName("Load")),
+		connect.WithIdempotency(connect.IdempotencyNoSideEffects),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/focus.v1.FocusService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case FocusServiceSaveProcedure:
 			focusServiceSaveHandler.ServeHTTP(w, r)
+		case FocusServiceLoadProcedure:
+			focusServiceLoadHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -111,4 +141,8 @@ type UnimplementedFocusServiceHandler struct{}
 
 func (UnimplementedFocusServiceHandler) Save(context.Context, *v1.SaveRequest) (*v1.SaveResponse, error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("focus.v1.FocusService.Save is not implemented"))
+}
+
+func (UnimplementedFocusServiceHandler) Load(context.Context, *v1.LoadRequest) (*v1.LoadResponse, error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("focus.v1.FocusService.Load is not implemented"))
 }
