@@ -13,7 +13,7 @@ import (
 	"time"
 
 	"github.com/EthanKim8683/cpenv/internal/config"
-	extension "github.com/EthanKim8683/cpenv/internal/daemon"
+	"github.com/EthanKim8683/cpenv/internal/daemon"
 	"github.com/EthanKim8683/cpenv/internal/gen/focus/v1/focusv1connect"
 	"github.com/EthanKim8683/cpenv/internal/gen/status/v1/statusv1connect"
 	"github.com/EthanKim8683/cpenv/internal/gen/submit/v1/submitv1connect"
@@ -28,7 +28,7 @@ func main() {
 		log.Fatalf("cpenvd: %v", err)
 	}
 
-	dbPath := filepath.Join(xdg.StateHome, "cpenv", "cpenv.db")
+	dbPath := filepath.Join(xdg.StateHome, "cpenv", "daemon.db")
 	if err := os.MkdirAll(filepath.Dir(dbPath), 0700); err != nil {
 		log.Fatalf("cpenvd: %v", err)
 	}
@@ -38,9 +38,9 @@ func main() {
 		log.Fatalf("cpenvd: %v", err)
 	}
 
-	focusSvc := &extension.FocusService{DB: db}
-	statusSvc := &extension.StatusService{DB: db}
-	submitSvc := extension.NewSubmitService()
+	focusSvc := &daemon.FocusService{DB: db}
+	statusSvc := &daemon.StatusService{DB: db}
+	submitSvc := daemon.NewSubmitService()
 
 	mux := http.NewServeMux()
 	mux.Handle(focusv1connect.NewFocusServiceHandler(focusSvc))

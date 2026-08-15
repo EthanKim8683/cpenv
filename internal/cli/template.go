@@ -7,18 +7,16 @@ import (
 	"path/filepath"
 
 	problemv1 "github.com/EthanKim8683/cpenv/internal/gen/problem/v1"
-	"github.com/bmatcuk/doublestar/v4"
-	bolt "go.etcd.io/bbolt"
 	starlarkjson "go.starlark.net/lib/json"
 	"go.starlark.net/starlark"
 	"go.starlark.net/syntax"
 	"google.golang.org/protobuf/encoding/protojson"
 )
 
-var (
-	templateBucketKey  = []byte("template")
-	defaultTemplateKey = []byte("default-template")
-)
+type template struct {
+	path string
+	src  []byte
+}
 
 func encodeProblem(thread *starlark.Thread, problem *problemv1.Problem) (starlark.Value, error) {
 	data, err := protojson.Marshal(problem)
@@ -53,12 +51,12 @@ func execTemplate(thread *starlark.Thread, name string, src []byte, problem star
 		},
 	)
 	if err != nil {
-		return nil, fmt.Errorf("exec template: %w", err)
+		return nil, err
 	}
 
 	v, ok := globals["files"]
 	if !ok {
-		return nil, errors.New("exec template: files is unbound")
+		return nil, errors.New("files is unbound")
 	}
 	return v, nil
 }
@@ -103,7 +101,7 @@ func writeFiles(dir string, files map[string]string) error {
 	for fileName, content := range files {
 		fileName = filepath.Clean(fileName)
 		if !filepath.IsLocal(fileName) || fileName == "." {
-			errs = errors.Join(errs, fmt.Errorf("file name %q is not local", fileName))
+			errs = errors.Join(errs, fmt.Errorf("filename is not local: %q", fileName))
 			continue
 		}
 
@@ -122,30 +120,25 @@ func writeFiles(dir string, files map[string]string) error {
 	return nil
 }
 
-func renderTemplate(path string, dir string, problem *problemv1.Problem) error {
-	src, err := os.ReadFile(path)
-	if err != nil {
-		return fmt.Errorf("render %q: %w", path, err)
-	}
-
+func (t *template) render(dir string, problem *problemv1.Problem) error {
 	thread := &starlark.Thread{}
-	pValue, err := encodeProblem(thread, problem)
+	problemValue, err := encodeProblem(thread, problem)
 	if err != nil {
-		return fmt.Errorf("render %q: %w", path, err)
+		return fmt.Errorf("render template %q: %w", t.path, err)
 	}
 
-	fValue, err := execTemplate(thread, path, src, pValue)
+	filesValue, err := execTemplate(thread, filepath.Base(t.path), t.src, problemValue)
 	if err != nil {
-		return fmt.Errorf("render %q: %w", path, err)
+		return fmt.Errorf("render template %q: %w", t.path, err)
 	}
 
-	files, err := decodeFiles(fValue)
+	files, err := decodeFiles(filesValue)
 	if err != nil {
-		return fmt.Errorf("render %q: %w", path, err)
+		return fmt.Errorf("render template %q: %w", t.path, err)
 	}
 
 	if err := writeFiles(dir, files); err != nil {
-		return fmt.Errorf("render %q: %w", path, err)
+		return fmt.Errorf("render template %q: %w", t.path, err)
 	}
 	return nil
 }
@@ -154,101 +147,55 @@ func (c *CLI) templatesDir() string {
 	return filepath.Join(c.Cfg.HomeDir, "templates")
 }
 
-func (c *CLI) getDefaultTemplate() (string, error) {
-	var path string
-	if err := c.DB.View(func(tx *bolt.Tx) error {
-		b := tx.Bucket(templateBucketKey)
-		if b == nil {
-			return nil
+func resolveTemplate(name string, cwd string, templatesDir string, defaultTemplate string) (*template, error) {
+	if filepath.IsAbs(name) {
+		src, err := os.ReadFile(name)
+		if err != nil {
+			return nil, err
 		}
-
-		v := b.Get(defaultTemplateKey)
-		if v == nil {
-			return nil
-		}
-
-		path = string(v)
-		return nil
-	}); err != nil {
-		return "", fmt.Errorf("get default template: %w", err)
-	}
-	return path, nil
-}
-
-func (c *CLI) resolveTemplate(name string) (string, error) {
-	if path := name; filepath.IsAbs(path) {
-		if _, err := os.Stat(path); err != nil {
-			return "", fmt.Errorf("resolve template %q: %w", name, err)
-		}
-		return path, nil
+		return &template{path: name, src: src}, nil
 	}
 
 	if name != "" {
 		var errs error
 
-		path := filepath.Join(c.CWD, name)
-		if _, err := os.Stat(path); err == nil {
-			return path, nil
-		} else {
-			errs = errors.Join(errs, err)
+		path := filepath.Join(cwd, name)
+		src, err := os.ReadFile(path)
+		if err == nil {
+			return &template{path: path, src: src}, nil
 		}
+		errs = errors.Join(errs, err)
 
-		path = filepath.Join(c.templatesDir(), name)
-		if _, err := os.Stat(path); err == nil {
-			return path, nil
-		} else {
-			errs = errors.Join(errs, err)
+		path = filepath.Join(templatesDir, name)
+		src, err = os.ReadFile(path)
+		if err == nil {
+			return &template{path: path, src: src}, nil
 		}
+		errs = errors.Join(errs, err)
 
-		return "", fmt.Errorf("resolve template %q: %w", name, errs)
+		return nil, errs
 	}
 
-	path, err := c.getDefaultTemplate()
-	if err != nil {
-		return "", fmt.Errorf("resolve template: %w", err)
-	}
-	if path != "" {
-		if _, err := os.Stat(path); err == nil {
-			return path, nil
-		}
-	}
-
-	matches, err := doublestar.FilepathGlob(filepath.Join(c.templatesDir(), "**", "*.star"))
-	if err != nil {
-		return "", fmt.Errorf("resolve template: %w", err)
-	}
-	for _, path := range matches {
-		return path, nil
-	}
-
-	return "", nil
-}
-
-func (c *CLI) setDefaultTemplate(path string) error {
-	if err := c.DB.Update(func(tx *bolt.Tx) error {
-		b, err := tx.CreateBucketIfNotExists(templateBucketKey)
+	if defaultTemplate != "" {
+		src, err := os.ReadFile(defaultTemplate)
 		if err != nil {
-			return err
+			return nil, err
 		}
-		return b.Put(defaultTemplateKey, []byte(path))
-	}); err != nil {
-		return fmt.Errorf("set default template to %q: %w", path, err)
+		return &template{path: defaultTemplate, src: src}, nil
 	}
-	return nil
-}
 
-func (c *CLI) renderTemplate(name string, dir string, problem *problemv1.Problem) error {
-	path, err := c.resolveTemplate(name)
+	matches, err := filepath.Glob(filepath.Join(templatesDir, "*.star"))
 	if err != nil {
-		return err
+		return nil, err
 	}
-	if path == "" {
-		return nil
+	if len(matches) >= 1 {
+		path := matches[0]
+		src, err := os.ReadFile(path)
+		if err != nil {
+			return nil, err
+		}
+		return &template{path: path, src: src}, nil
 	}
 
-	if err := renderTemplate(path, dir, problem); err != nil {
-		return err
-	}
-
-	return c.setDefaultTemplate(path)
+	return nil, nil
 }

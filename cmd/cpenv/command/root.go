@@ -8,15 +8,16 @@ import (
 
 	"github.com/EthanKim8683/cpenv/internal/cli"
 	"github.com/EthanKim8683/cpenv/internal/config"
-	extension "github.com/EthanKim8683/cpenv/internal/daemon"
+	"github.com/EthanKim8683/cpenv/internal/gen/focus/v1/focusv1connect"
+	"github.com/EthanKim8683/cpenv/internal/gen/status/v1/statusv1connect"
 	"github.com/EthanKim8683/cpenv/internal/gen/submit/v1/submitv1connect"
 	"github.com/adrg/xdg"
 	"github.com/spf13/cobra"
 	bolt "go.etcd.io/bbolt"
 )
 
-var db *bolt.DB
 var c *cli.CLI
+var db *bolt.DB
 
 var rootCmd = &cobra.Command{
 	Use:   "cpenv",
@@ -32,7 +33,7 @@ var rootCmd = &cobra.Command{
 			return err
 		}
 
-		dbPath := filepath.Join(xdg.StateHome, "cpenv", "cpenv.db")
+		dbPath := filepath.Join(xdg.StateHome, "cpenv", "cli.db")
 		if err := os.MkdirAll(filepath.Dir(dbPath), 0700); err != nil {
 			return err
 		}
@@ -42,22 +43,19 @@ var rootCmd = &cobra.Command{
 			return err
 		}
 
-		submitClient := submitv1connect.NewSubmitServiceClient(
-			http.DefaultClient,
-			fmt.Sprintf("http://localhost:%d", cfg.Port),
-		)
-
-		focusedProblemLoader := &extension.FocusedProblemLoader{DB: db}
-		submissionsTailer := &extension.SubmissionsTailer{DB: db}
-		submitter := &extension.Submitter{Client: submitClient}
+		baseURL := fmt.Sprintf("http://localhost:%d", cfg.Port)
+		focusClient := focusv1connect.NewFocusServiceClient(http.DefaultClient, baseURL)
+		statusClient := statusv1connect.NewStatusServiceClient(http.DefaultClient, baseURL)
+		submitClient := submitv1connect.NewSubmitServiceClient(http.DefaultClient, baseURL)
+		preferences := &cli.DBPreferences{DB: db}
 
 		c = &cli.CLI{
-			Cfg:            cfg,
-			DB:             db,
-			CWD:            cwd,
-			FocusedProblem: focusedProblemLoader,
-			Submissions:    submissionsTailer,
-			Submitter:      submitter,
+			Cfg:          cfg,
+			CWD:          cwd,
+			FocusClient:  focusClient,
+			StatusClient: statusClient,
+			SubmitClient: submitClient,
+			Preferences:  preferences,
 		}
 		return nil
 	},

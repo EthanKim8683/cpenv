@@ -8,61 +8,78 @@ import (
 	"path/filepath"
 
 	submitv1 "github.com/EthanKim8683/cpenv/internal/gen/submit/v1"
-	"github.com/bmatcuk/doublestar/v4"
 )
 
-func (c *CLI) resolveSolution(name string) (string, error) {
-	if path := name; filepath.IsAbs(path) {
-		if _, err := os.Stat(path); err != nil {
-			return "", fmt.Errorf("resolve solution %q: %w", name, err)
+type solution struct {
+	path    string
+	content []byte
+}
+
+func resolveSolution(cwd string, name string) (*solution, error) {
+	if filepath.IsAbs(name) {
+		content, err := os.ReadFile(name)
+		if err != nil {
+			return nil, err
 		}
-		return path, nil
+		return &solution{
+			path:    name,
+			content: content,
+		}, nil
 	}
 
 	if name != "" {
-		path := filepath.Join(c.CWD, name)
-		if _, err := os.Stat(path); err != nil {
-			return "", fmt.Errorf("resolve solution %q: %w", name, err)
+		path := filepath.Join(cwd, name)
+		content, err := os.ReadFile(path)
+		if err != nil {
+			return nil, err
 		}
-		return path, nil
+		return &solution{
+			path:    path,
+			content: content,
+		}, nil
 	}
 
-	matches, err := doublestar.FilepathGlob(filepath.Join(c.CWD, "**", "sol.*"))
+	matches, err := filepath.Glob(filepath.Join(cwd, "sol.*"))
 	if err != nil {
-		return "", fmt.Errorf("resolve solution: %w", err)
+		return nil, err
 	}
 	if len(matches) == 0 {
-		return "", errors.New("resolve solution: no sol.* files")
+		return nil, errors.New("no sol.* files")
 	}
 	if len(matches) > 1 {
-		return "", errors.New("resolve solution: multiple sol.* files")
+		return nil, errors.New("multiple sol.* files")
 	}
-	return matches[0], nil
+	content, err := os.ReadFile(matches[0])
+	if err != nil {
+		return nil, err
+	}
+	return &solution{
+		path:    matches[0],
+		content: content,
+	}, nil
 }
 
 func (c *CLI) Submit(ctx context.Context, name string) error {
-	path, err := c.resolveSolution(name)
+	s, err := resolveSolution(c.CWD, name)
 	if err != nil {
 		return fmt.Errorf("submit %q: %w", name, err)
 	}
 
-	content, err := os.ReadFile(path)
-	if err != nil {
-		return fmt.Errorf("submit %q: %w", path, err)
-	}
-
 	w, err := openWorkspace(c.CWD)
 	if err != nil {
-		return fmt.Errorf("submit %q: %w", path, err)
+		return fmt.Errorf("submit %q: %w", name, err)
 	}
-	defer w.close()
 
-	if err := c.Submitter.Submit(ctx, &submitv1.SubmitRequest{
+	res, err := c.SubmitClient.Submit(ctx, &submitv1.SubmitRequest{
 		ProblemId: w.problem.GetId(),
-		FileName:  filepath.Base(path),
-		Content:   content,
-	}); err != nil {
-		return fmt.Errorf("submit %q to %q: %w", path, w.problem.GetId(), err)
+		FileName:  filepath.Base(s.path),
+		Content:   s.content,
+	})
+	if err != nil {
+		return fmt.Errorf("submit %q: %w", name, err)
+	}
+	if res.Error != nil {
+		return fmt.Errorf("submit %q: extension error: %s", name, res.GetError())
 	}
 	return nil
 }

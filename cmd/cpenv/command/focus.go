@@ -1,6 +1,7 @@
 package command
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/spf13/cobra"
@@ -15,7 +16,7 @@ var focusCmd = &cobra.Command{
 	Example: "cd \"$(cpenv focus -t template.star)\"",
 	Args:    cobra.NoArgs,
 	RunE: func(_ *cobra.Command, _ []string) error {
-		path, err := c.Focus(focusTmpl)
+		path, err := c.Focus(context.Background(), focusTmpl)
 		if err != nil {
 			return err
 		}

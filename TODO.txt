@@ -2,11 +2,3 @@
 - error sentinels -> user-friendly error messages
 - add url to problem proto so that if the right tab isn't open, the extension
   can open it
-- use adrg/xdg for config and state and stuff
-- consolidate focus, submission, submit to extension package; use bolt db for
-  all and have common ExtensionError
-- add tests
-- replace CLI DB field with an interface
-
-maybe in extension, change helpers from struct to function? so that DB can be
-passed as field rather than requiring explict constructor function?

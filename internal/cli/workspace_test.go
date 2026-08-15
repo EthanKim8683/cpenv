@@ -17,35 +17,27 @@ func TestWorkspace(t *testing.T) {
 		dir := t.TempDir()
 		problem := &problemv1.Problem{Id: "id"}
 
+		_, err := createWorkspace(dir, problem)
+		require.NoError(t, err)
+
+		w, err := openWorkspace(dir)
+		require.NoError(t, err)
+		assert.Equal(t, problem, w.problem)
+	})
+
+	t.Run("clear", func(t *testing.T) {
+		t.Parallel()
+
+		dir := t.TempDir()
+		problem := &problemv1.Problem{Id: "id"}
+
 		w1, err := createWorkspace(dir, problem)
 		require.NoError(t, err)
-		require.NoError(t, w1.close())
+
+		require.NoError(t, w1.clear())
 
 		w2, err := openWorkspace(dir)
 		require.NoError(t, err)
 		assert.Equal(t, problem, w2.problem)
-		require.NoError(t, w1.close())
-	})
-
-	t.Run("idempotent close", func(t *testing.T) {
-		t.Parallel()
-
-		dir := t.TempDir()
-		problem1 := &problemv1.Problem{Id: "id1"}
-		problem2 := &problemv1.Problem{Id: "id2"}
-
-		w1, err := createWorkspace(dir, problem1)
-		require.NoError(t, err)
-		require.NoError(t, w1.close())
-
-		w2, err := createWorkspace(dir, problem2)
-		require.NoError(t, err)
-		require.NoError(t, w2.close())
-
-		require.NoError(t, w1.close())
-
-		w3, err := openWorkspace(dir)
-		require.NoError(t, err)
-		assert.Equal(t, problem2, w3.problem)
 	})
 }

@@ -14,7 +14,7 @@ message SubmitRequest {
   bytes content = 3;
 }
 
-message SubmitResponse { string error = 1; }
+message SubmitResponse { optional string error = 1; }
 
 message ClaimRequest { string problem_id = 1; }
 

@@ -8,6 +8,8 @@ import (
 	"sync/atomic"
 )
 
+var ErrNoReceiver = errors.New("no receiver")
+
 type message[Req any] struct {
 	req     Req
 	replyID uint32
@@ -93,7 +95,7 @@ func (h *hub[Req, Reply]) doRequest(ctx context.Context, subject string, req Req
 		select {
 		case claimCh <- msg:
 		default:
-			return zero, errors.New("no receiver")
+			return zero, ErrNoReceiver
 		}
 	}
 

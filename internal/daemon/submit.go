@@ -32,7 +32,7 @@ func (s *SubmitService) Claim(ctx context.Context, req *submitv1.ClaimRequest) (
 }
 
 func (s *SubmitService) Reply(ctx context.Context, req *submitv1.ReplyRequest) (*submitv1.ReplyResponse, error) {
-	reply := &submitv1.SubmitResponse{Error: req.GetError()}
+	reply := &submitv1.SubmitResponse{Error: req.Error}
 	if err := s.hub.reply(req.GetReplyId(), reply); err != nil {
 		return nil, err
 	}

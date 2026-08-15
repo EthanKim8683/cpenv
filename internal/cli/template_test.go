@@ -6,11 +6,9 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/EthanKim8683/cpenv/internal/config"
 	problemv1 "github.com/EthanKim8683/cpenv/internal/gen/problem/v1"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	bolt "go.etcd.io/bbolt"
 )
 
 func readFiles(t *testing.T, dir string) map[string]string {
@@ -36,18 +34,7 @@ func readFiles(t *testing.T, dir string) map[string]string {
 	return files
 }
 
-func removeFiles(t *testing.T, dir string) {
-	t.Helper()
-
-	entries, err := os.ReadDir(dir)
-	require.NoError(t, err)
-
-	for _, entry := range entries {
-		require.NoError(t, os.RemoveAll(filepath.Join(dir, entry.Name())))
-	}
-}
-
-func TestRenderTemplate(t *testing.T) {
+func TestTemplate(t *testing.T) {
 	t.Parallel()
 
 	t.Run("coverage", func(t *testing.T) {
@@ -64,8 +51,11 @@ func TestRenderTemplate(t *testing.T) {
 			},
 		}
 
-		require.NoError(t, renderTemplate(path, dir, problem))
+		src, err := os.ReadFile(path)
+		require.NoError(t, err)
 
+		tl := &template{path: path, src: src}
+		require.NoError(t, tl.render(dir, problem))
 		files := readFiles(t, dir)
 		assert.Equal(t, map[string]string{
 			"id":               "id",
@@ -83,7 +73,11 @@ func TestRenderTemplate(t *testing.T) {
 		path := filepath.Join("testdata", "template", "decode-error.star")
 		dir := t.TempDir()
 
-		err := renderTemplate(path, dir, nil)
+		src, err := os.ReadFile(path)
+		require.NoError(t, err)
+
+		tl := &template{path: path, src: src}
+		err = tl.render(dir, nil)
 		require.ErrorContains(t, err, "decode files")
 		assert.ErrorContains(t, err, "0: expected string file name, got int")
 		assert.ErrorContains(t, err, "0: expected string content, got int")
@@ -92,109 +86,69 @@ func TestRenderTemplate(t *testing.T) {
 	})
 }
 
-func TestCLI_resolveTemplate(t *testing.T) {
+func TestResolveTemplate(t *testing.T) {
 	t.Parallel()
 
-	homeDir := filepath.Join(t.TempDir(), "home")
 	cwd := filepath.Join(t.TempDir(), "cwd")
+	templatesDir := filepath.Join(t.TempDir(), "templates")
+	defaultTemplate := filepath.Join(cwd, "default.star")
+	relPath := "template.star"
+	cwdRelPath := filepath.Join(cwd, "template.star")
+	templatesDirRelPath := filepath.Join(templatesDir, "template.star")
+	absPath := filepath.Join(t.TempDir(), "template.star")
 
-	db, err := bolt.Open(filepath.Join(t.TempDir(), "db.db"), 0600, nil)
-	require.NoError(t, err)
-	cli := &CLI{
-		Cfg: &config.Config{HomeDir: homeDir},
-		CWD: cwd,
-		DB:  db,
-	}
+	require.NoError(t, os.MkdirAll(cwd, 0755))
+	require.NoError(t, os.MkdirAll(templatesDir, 0755))
+	require.NoError(t, os.WriteFile(defaultTemplate, nil, 0644))
+	require.NoError(t, os.WriteFile(cwdRelPath, nil, 0644))
+	require.NoError(t, os.WriteFile(templatesDirRelPath, nil, 0644))
+	require.NoError(t, os.WriteFile(absPath, nil, 0644))
 
-	t.Run("void", func(t *testing.T) {
-		path, err := cli.resolveTemplate("")
+	t.Run("no templates", func(t *testing.T) {
+		t.Parallel()
+
+		tl, err := resolveTemplate("", t.TempDir(), t.TempDir(), "")
 		require.NoError(t, err)
-		assert.Equal(t, "", path)
+		assert.Nil(t, tl)
 	})
 
 	t.Run("glob", func(t *testing.T) {
-		relName := "rel.star"
+		t.Parallel()
 
-		require.NoError(t, os.MkdirAll(cli.templatesDir(), 0755))
-		require.NoError(t, os.WriteFile(filepath.Join(cli.templatesDir(), relName), nil, 0644))
-
-		path, err := cli.resolveTemplate("")
+		tl, err := resolveTemplate("", t.TempDir(), templatesDir, "")
 		require.NoError(t, err)
-		assert.Equal(t, filepath.Join(cli.templatesDir(), relName), path)
+		assert.Equal(t, templatesDirRelPath, tl.path)
 	})
 
 	t.Run("default template", func(t *testing.T) {
-		defaultPath := filepath.Join(t.TempDir(), "default.star")
+		t.Parallel()
 
-		require.NoError(t, os.WriteFile(defaultPath, nil, 0644))
-		_ = db.Update(func(tx *bolt.Tx) error {
-			b, err := tx.CreateBucket(templateBucketKey)
-			require.NoError(t, err)
-			require.NoError(t, b.Put(defaultTemplateKey, []byte(defaultPath)))
-			return nil
-		})
-
-		path, err := cli.resolveTemplate("")
+		tl, err := resolveTemplate("", t.TempDir(), t.TempDir(), defaultTemplate)
 		require.NoError(t, err)
-		assert.Equal(t, defaultPath, path)
+		assert.Equal(t, defaultTemplate, tl.path)
 	})
 
-	t.Run("templates dir relative path", func(t *testing.T) {
-		relName := "rel.star"
+	t.Run("relative to templates dir", func(t *testing.T) {
+		t.Parallel()
 
-		path, err := cli.resolveTemplate(relName)
+		tl, err := resolveTemplate(relPath, t.TempDir(), templatesDir, defaultTemplate)
 		require.NoError(t, err)
-		assert.Equal(t, filepath.Join(cli.templatesDir(), relName), path)
+		assert.Equal(t, templatesDirRelPath, tl.path)
 	})
 
-	t.Run("cwd relative path", func(t *testing.T) {
-		relName := "rel.star"
+	t.Run("relative to cwd", func(t *testing.T) {
+		t.Parallel()
 
-		require.NoError(t, os.MkdirAll(cwd, 0755))
-		require.NoError(t, os.WriteFile(filepath.Join(cwd, relName), nil, 0644))
-
-		path, err := cli.resolveTemplate(relName)
+		tl, err := resolveTemplate(relPath, cwd, templatesDir, defaultTemplate)
 		require.NoError(t, err)
-		assert.Equal(t, filepath.Join(cwd, relName), path)
+		assert.Equal(t, cwdRelPath, tl.path)
 	})
 
 	t.Run("absolute path", func(t *testing.T) {
-		absName := filepath.Join(t.TempDir(), "abs.star")
-		require.NoError(t, os.WriteFile(absName, nil, 0644))
-
-		path, err := cli.resolveTemplate(absName)
-		require.NoError(t, err)
-		assert.Equal(t, absName, path)
-	})
-}
-
-func TestCLI_renderTemplate(t *testing.T) {
-	t.Parallel()
-
-	t.Run("default template round trip", func(t *testing.T) {
 		t.Parallel()
 
-		homeDir := filepath.Join(t.TempDir(), "home")
-		cwd := filepath.Join(t.TempDir(), "cwd")
-		name, err := filepath.Abs(filepath.Join("testdata", "template", "minimal.star"))
+		tl, err := resolveTemplate(absPath, cwd, templatesDir, defaultTemplate)
 		require.NoError(t, err)
-		problem1 := &problemv1.Problem{Id: "id1"}
-		problem2 := &problemv1.Problem{Id: "id2"}
-
-		db, err := bolt.Open(filepath.Join(t.TempDir(), "db.db"), 0600, nil)
-		require.NoError(t, err)
-		cli := &CLI{
-			Cfg: &config.Config{HomeDir: homeDir},
-			CWD: cwd,
-			DB:  db,
-		}
-
-		require.NoError(t, cli.renderTemplate(name, cwd, problem1))
-		assert.Equal(t, map[string]string{"id": "id1"}, readFiles(t, cwd))
-
-		removeFiles(t, cwd)
-
-		require.NoError(t, cli.renderTemplate("", cwd, problem2))
-		assert.Equal(t, map[string]string{"id": "id2"}, readFiles(t, cwd))
+		assert.Equal(t, absPath, tl.path)
 	})
 }

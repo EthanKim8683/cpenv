@@ -9,44 +9,42 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestCLI_resolveSolution(t *testing.T) {
+func TestResolveSolution(t *testing.T) {
 	t.Parallel()
 
-	cwd := t.TempDir()
+	cwd := filepath.Join(t.TempDir(), "cwd")
+	relPath := "sol.cpp"
+	cwdRelPath := filepath.Join(cwd, "sol.cpp")
+	absPath := filepath.Join(t.TempDir(), "sol.cpp")
 
-	cli := &CLI{CWD: cwd}
+	require.NoError(t, os.MkdirAll(cwd, 0755))
+	require.NoError(t, os.WriteFile(cwdRelPath, nil, 0644))
+	require.NoError(t, os.WriteFile(absPath, nil, 0644))
 
-	t.Run("void", func(t *testing.T) {
-		path, err := cli.resolveSolution("")
-		assert.Error(t, err)
-		assert.Empty(t, path)
+	t.Run("no solutions", func(t *testing.T) {
+		t.Parallel()
+
+		s, err := resolveSolution(t.TempDir(), "")
+		require.Error(t, err)
+		assert.ErrorContains(t, err, "no sol.* files")
+		assert.Nil(t, s)
 	})
 
-	t.Run("glob", func(t *testing.T) {
-		relName := "sol.cpp"
+	t.Run("relative to cwd", func(t *testing.T) {
+		t.Parallel()
 
-		require.NoError(t, os.WriteFile(filepath.Join(cwd, relName), nil, 0644))
-
-		path, err := cli.resolveSolution("")
-		assert.NoError(t, err)
-		assert.Equal(t, filepath.Join(cwd, relName), path)
-	})
-
-	t.Run("relative path", func(t *testing.T) {
-		relName := "sol.cpp"
-
-		path, err := cli.resolveSolution(relName)
-		assert.NoError(t, err)
-		assert.Equal(t, filepath.Join(cwd, relName), path)
+		s, err := resolveSolution(cwd, relPath)
+		require.NoError(t, err)
+		assert.Equal(t, cwdRelPath, s.path)
+		assert.Equal(t, []byte(""), s.content)
 	})
 
 	t.Run("absolute path", func(t *testing.T) {
-		absPath := filepath.Join(cwd, "abs.cpp")
+		t.Parallel()
 
-		require.NoError(t, os.WriteFile(absPath, nil, 0644))
-
-		path, err := cli.resolveSolution(absPath)
-		assert.NoError(t, err)
-		assert.Equal(t, absPath, path)
+		s, err := resolveSolution(t.TempDir(), absPath)
+		require.NoError(t, err)
+		assert.Equal(t, absPath, s.path)
+		assert.Equal(t, []byte(""), s.content)
 	})
 }
