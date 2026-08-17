@@ -8,7 +8,10 @@ import (
 	"sync/atomic"
 )
 
-var ErrNoReceiver = errors.New("no receiver")
+var (
+	ErrNoReceiver    = errors.New("no receiver")
+	ErrReplyNotFound = errors.New("not found")
+)
 
 type message[Req any] struct {
 	req     Req
@@ -128,7 +131,7 @@ func (h *hub[Req, Reply]) tryRequest(ctx context.Context, subject string, req Re
 func (h *hub[Req, Reply]) reply(id uint32, reply Reply) error {
 	ch, ok := h.takeReplyCh(id)
 	if !ok {
-		return fmt.Errorf("reply %d: not found", id)
+		return fmt.Errorf("reply %d: %w", id, ErrReplyNotFound)
 	}
 	ch <- reply
 	return nil

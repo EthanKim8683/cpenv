@@ -3,6 +3,7 @@ package daemon
 import (
 	"context"
 
+	"connectrpc.com/connect"
 	statusv1 "github.com/EthanKim8683/cpenv/internal/gen/status/v1"
 	"github.com/EthanKim8683/cpenv/internal/gen/status/v1/statusv1connect"
 	bolt "go.etcd.io/bbolt"
@@ -37,7 +38,7 @@ func submissionKey(sub *statusv1.Submission) []byte {
 	return key
 }
 
-func (s *StatusService) Save(ctx context.Context, req *statusv1.SaveRequest) (*statusv1.SaveResponse, error) {
+func (s *StatusService) save(subs []*statusv1.Submission) error {
 	if err := s.DB.Update(func(tx *bolt.Tx) error {
 		b, err := tx.CreateBucketIfNotExists(submissionsBucketKey)
 		if err != nil {
@@ -49,7 +50,7 @@ func (s *StatusService) Save(ctx context.Context, req *statusv1.SaveRequest) (*s
 			return err
 		}
 
-		for _, sub := range req.GetSubmissions() {
+		for _, sub := range subs {
 			data, err := proto.Marshal(sub)
 			if err != nil {
 				return err
@@ -71,17 +72,12 @@ func (s *StatusService) Save(ctx context.Context, req *statusv1.SaveRequest) (*s
 		}
 		return nil
 	}); err != nil {
-		return nil, err
+		return err
 	}
-	return &statusv1.SaveResponse{}, nil
+	return nil
 }
 
-func (s *StatusService) Tail(ctx context.Context, req *statusv1.TailRequest) (*statusv1.TailResponse, error) {
-	limit := defaultTailLimit
-	if req.Limit != nil {
-		limit = min(int(req.GetLimit()), maxTailLimit)
-	}
-
+func (s *StatusService) tail(limit int, problemID *string) ([]*statusv1.Submission, error) {
 	subs := []*statusv1.Submission{}
 	if err := s.DB.View(func(tx *bolt.Tx) error {
 		b := tx.Bucket(submissionsBucketKey)
@@ -89,7 +85,7 @@ func (s *StatusService) Tail(ctx context.Context, req *statusv1.TailRequest) (*s
 			return nil
 		}
 
-		if req.ProblemId == nil {
+		if problemID == nil {
 			subs = make([]*statusv1.Submission, limit)
 			c := b.Cursor()
 			k, v := c.Last()
@@ -110,7 +106,7 @@ func (s *StatusService) Tail(ctx context.Context, req *statusv1.TailRequest) (*s
 				return nil
 			}
 
-			pb := pbb.Bucket([]byte(req.GetProblemId()))
+			pb := pbb.Bucket([]byte(*problemID))
 			if pb == nil {
 				return nil
 			}
@@ -133,6 +129,26 @@ func (s *StatusService) Tail(ctx context.Context, req *statusv1.TailRequest) (*s
 		return nil
 	}); err != nil {
 		return nil, err
+	}
+	return subs, nil
+}
+
+func (s *StatusService) Save(_ context.Context, req *statusv1.SaveRequest) (*statusv1.SaveResponse, error) {
+	if err := s.save(req.GetSubmissions()); err != nil {
+		return nil, connect.NewError(connect.CodeInternal, err)
+	}
+	return &statusv1.SaveResponse{}, nil
+}
+
+func (s *StatusService) Tail(_ context.Context, req *statusv1.TailRequest) (*statusv1.TailResponse, error) {
+	limit := defaultTailLimit
+	if req.Limit != nil {
+		limit = min(int(req.GetLimit()), maxTailLimit)
+	}
+
+	subs, err := s.tail(limit, req.ProblemId)
+	if err != nil {
+		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 	return &statusv1.TailResponse{Submissions: subs}, nil
 }

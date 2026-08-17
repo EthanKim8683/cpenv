@@ -178,10 +178,9 @@ func resolveTemplate(name string, cwd string, templatesDir string, defaultTempla
 
 	if defaultTemplate != "" {
 		src, err := os.ReadFile(defaultTemplate)
-		if err != nil {
-			return nil, err
+		if err == nil {
+			return &template{path: defaultTemplate, src: src}, nil
 		}
-		return &template{path: defaultTemplate, src: src}, nil
 	}
 
 	matches, err := filepath.Glob(filepath.Join(templatesDir, "*.star"))

@@ -67,7 +67,7 @@ func (c *CLI) Submit(ctx context.Context, name string) error {
 
 	w, err := openWorkspace(c.CWD)
 	if err != nil {
-		return fmt.Errorf("submit %q: %w", name, err)
+		return fmt.Errorf("submit %q: %w", s.path, err)
 	}
 
 	res, err := c.SubmitClient.Submit(ctx, &submitv1.SubmitRequest{
@@ -76,10 +76,10 @@ func (c *CLI) Submit(ctx context.Context, name string) error {
 		Content:   s.content,
 	})
 	if err != nil {
-		return fmt.Errorf("submit %q: %w", name, err)
+		return fmt.Errorf("submit %q: %w", s.path, err)
 	}
 	if res.Error != nil {
-		return fmt.Errorf("submit %q: extension error: %s", name, res.GetError())
+		return fmt.Errorf("submit %q: extension error: %s", s.path, res.GetError())
 	}
 	return nil
 }

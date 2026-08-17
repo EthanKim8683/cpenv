@@ -20,7 +20,7 @@ func (c *CLI) Focus(ctx context.Context, templateName string) (string, error) {
 	}
 	problem := focus.GetProblem()
 	if problem == nil {
-		return "", errors.New("focus: no problem")
+		return "", errors.New("focus: no focused problem")
 	}
 
 	dir := c.workspaceDir(problem.GetId())

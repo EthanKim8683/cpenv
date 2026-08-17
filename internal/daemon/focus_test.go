@@ -31,11 +31,10 @@ func TestFocusService(t *testing.T) {
 
 		svc := &FocusService{DB: db}
 
-		_, err = svc.Save(t.Context(), &focusv1.SaveRequest{Focus: focus})
-		require.NoError(t, err)
+		require.NoError(t, svc.save(focus))
 
-		gotFocus, err := svc.Load(t.Context(), &focusv1.LoadRequest{})
+		gotFocus, err := svc.load()
 		require.NoError(t, err)
-		assert.True(t, proto.Equal(focus, gotFocus.GetFocus()))
+		assert.True(t, proto.Equal(focus, gotFocus))
 	})
 }

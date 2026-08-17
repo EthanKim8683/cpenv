@@ -30,12 +30,12 @@ func TestStatus(t *testing.T) {
 			{TimestampMs: 2, ProblemId: "1"},
 		}
 
-		_, err = svc.Save(t.Context(), &statusv1.SaveRequest{Submissions: subs})
+		err = svc.save(subs)
 		require.NoError(t, err)
 
-		res, err := svc.Tail(t.Context(), &statusv1.TailRequest{})
+		subs, err := svc.tail(defaultTailLimit, nil)
 		require.NoError(t, err)
-		assert.Empty(t, cmp.Diff(subs, res.GetSubmissions(), protocmp.Transform()))
+		assert.Empty(t, cmp.Diff(subs, subs, protocmp.Transform()))
 	})
 
 	t.Run("tail with limit", func(t *testing.T) {
@@ -45,9 +45,9 @@ func TestStatus(t *testing.T) {
 			{TimestampMs: 2, ProblemId: "1"},
 		}
 
-		res, err := svc.Tail(t.Context(), &statusv1.TailRequest{Limit: new(uint32(limit))})
+		subs, err := svc.tail(limit, nil)
 		require.NoError(t, err)
-		assert.Empty(t, cmp.Diff(subs, res.GetSubmissions(), protocmp.Transform()))
+		assert.Empty(t, cmp.Diff(subs, subs, protocmp.Transform()))
 	})
 
 	t.Run("tail with problem ID", func(t *testing.T) {
@@ -57,9 +57,9 @@ func TestStatus(t *testing.T) {
 			{TimestampMs: 2, ProblemId: "1"},
 		}
 
-		res, err := svc.Tail(t.Context(), &statusv1.TailRequest{ProblemId: &problemID})
+		subs, err := svc.tail(defaultTailLimit, &problemID)
 		require.NoError(t, err)
-		assert.Empty(t, cmp.Diff(subs, res.GetSubmissions(), protocmp.Transform()))
+		assert.Empty(t, cmp.Diff(subs, subs, protocmp.Transform()))
 	})
 
 	t.Run("overwrite", func(t *testing.T) {
@@ -72,11 +72,11 @@ func TestStatus(t *testing.T) {
 			{TimestampMs: 2, ProblemId: "1"},
 		}
 
-		_, err := svc.Save(t.Context(), &statusv1.SaveRequest{Submissions: saveSubs})
+		err := svc.save(saveSubs)
 		require.NoError(t, err)
 
-		res, err := svc.Tail(t.Context(), &statusv1.TailRequest{})
+		subs, err := svc.tail(defaultTailLimit, nil)
 		require.NoError(t, err)
-		assert.Empty(t, cmp.Diff(loadSubs, res.GetSubmissions(), protocmp.Transform()))
+		assert.Empty(t, cmp.Diff(loadSubs, subs, protocmp.Transform()))
 	})
 }

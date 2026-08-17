@@ -35,7 +35,7 @@ var statusCmd = &cobra.Command{
 		}
 
 		table := tablewriter.NewWriter(os.Stdout)
-		table.Header([]string{"timestamp (ms)", "problem ID", "status", "time (ms)", "memory (kB)"})
+		table.Header([]string{"timestamp", "problem ID", "status", "time (ms)", "memory (kB)"})
 		if err := table.Bulk(rows); err != nil {
 			return err
 		}
