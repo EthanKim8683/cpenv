@@ -34,47 +34,39 @@ export function createProblemMain({
   return async () => {
     let focus: MessageInitShape<typeof FocusSchema> | undefined;
     try {
-      focus = {
-        problem: await scrapeProblem(),
-      };
+      focus = { problem: await scrapeProblem() };
     } catch (caughtError: unknown) {
-      focus = {
-        error: String(caughtError),
-      };
+      if (typeof caughtError !== "string") {
+        focus = { error: `uncaught error: ${caughtError}` };
+      } else {
+        focus = { error: caughtError };
+      }
     }
 
     const handleVisibilityChange = async () => {
       if (document.visibilityState !== "visible") return;
-
-      await focusClient.save(
-        create(SaveRequestSchema, {
-          focus,
-        }),
-      );
+      await focusClient.save(create(SaveRequestSchema, { focus }));
     };
     handleVisibilityChange();
     document.addEventListener("visibilitychange", handleVisibilityChange);
 
     while (true) {
       const { content, fileName, replyId } = await submitClient.claim(
-        create(ClaimRequestSchema, {
-          problemId: getProblemId(),
-        }),
+        create(ClaimRequestSchema, { problemId: getProblemId() }),
       );
 
       let error: string | undefined;
       try {
         await submit(new File([new Uint8Array(content)], fileName));
       } catch (caughtError: unknown) {
-        error = String(caughtError);
+        if (typeof caughtError !== "string") {
+          error = `uncaught error: ${caughtError}`;
+        } else {
+          error = caughtError;
+        }
       }
 
-      await submitClient.reply(
-        create(ReplyRequestSchema, {
-          replyId,
-          error,
-        }),
-      );
+      await submitClient.reply(create(ReplyRequestSchema, { replyId, error }));
     }
   };
 }

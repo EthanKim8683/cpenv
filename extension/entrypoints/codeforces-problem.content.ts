@@ -111,6 +111,17 @@ function getProgramTypeId(sourceFile: File) {
   return value.toString();
 }
 
+function parseSubscriptionRowErrors(html: string) {
+  const parser = new DOMParser();
+  const document = parser.parseFromString(html, "text/html");
+  return Array.from(
+    document
+      .querySelectorAll("tr.subscription-row span.error")
+      .values()
+      .map((element) => (element as HTMLSpanElement).innerText.trim()),
+  );
+}
+
 async function submit(sourceFile: File) {
   const formElement = document.querySelector(".submitForm") as HTMLFormElement;
   const formData = new FormData(formElement);
@@ -128,7 +139,12 @@ async function submit(sourceFile: File) {
   });
 
   if (!response.ok) {
-    throw new Error(`Failed to submit problem: ${response.statusText}.`);
+    throw response.statusText;
+  }
+
+  const errors = parseSubscriptionRowErrors(await response.text());
+  if (errors.length > 0) {
+    throw errors.join("; ");
   }
 }
 
