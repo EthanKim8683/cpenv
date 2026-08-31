@@ -6,3 +6,4 @@
 - add logging for cli control flow
 - add auto-update
 - add submission tracking in extension
+- write jetbrains platform plugin (for clion)
