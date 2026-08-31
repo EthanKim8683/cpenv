@@ -1,7 +1,2 @@
+.DS_Store
 .env
-
-/bin/
-
-/templates/
-/workspaces/
-/state.json

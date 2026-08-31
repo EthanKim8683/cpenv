@@ -17,7 +17,7 @@ func TestWorkspace(t *testing.T) {
 		dir := t.TempDir()
 		problem := &problemv1.Problem{Id: "id"}
 
-		_, err := createWorkspace(dir, problem)
+		_, err := initWorkspace(dir, problem)
 		require.NoError(t, err)
 
 		w, err := openWorkspace(dir)
@@ -31,7 +31,7 @@ func TestWorkspace(t *testing.T) {
 		dir := t.TempDir()
 		problem := &problemv1.Problem{Id: "id"}
 
-		w1, err := createWorkspace(dir, problem)
+		w1, err := initWorkspace(dir, problem)
 		require.NoError(t, err)
 
 		require.NoError(t, w1.clear())

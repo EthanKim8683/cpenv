@@ -1,7 +1,6 @@
 package command
 
 import (
-	"context"
 	"os"
 	"strconv"
 	"time"
@@ -17,8 +16,8 @@ var statusCmd = &cobra.Command{
 	Short: "Tail submission results.",
 	Long:  "Tail submission results for the problem corresponding to the current workspace, or globally if not in a workspace.",
 	Args:  cobra.NoArgs,
-	RunE: func(_ *cobra.Command, _ []string) error {
-		subs, err := c.Status(context.Background(), statusLimit)
+	RunE: func(cmd *cobra.Command, _ []string) error {
+		subs, err := c.Status(cmd.Context(), statusLimit)
 		if err != nil {
 			return err
 		}

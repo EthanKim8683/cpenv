@@ -2,3 +2,6 @@
 - error sentinels -> user-friendly error messages
 - add url to problem proto so that if the right tab isn't open, the extension
   can open it
+- add logging for cli control flow
+- add auto-update
+- add submission tracking in extension

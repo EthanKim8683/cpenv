@@ -1,7 +1,6 @@
 package command
 
 import (
-	"context"
 	"fmt"
 
 	"github.com/spf13/cobra"
@@ -15,8 +14,8 @@ var focusCmd = &cobra.Command{
 	Long:    "Output the path to the workspace for the last opened problem, creating and initializing it if necessary.",
 	Example: "cd \"$(cpenv focus -t template.star)\"",
 	Args:    cobra.NoArgs,
-	RunE: func(_ *cobra.Command, _ []string) error {
-		path, err := c.Focus(context.Background(), focusTmpl)
+	RunE: func(cmd *cobra.Command, _ []string) error {
+		path, err := c.Focus(cmd.Context(), focusTmpl)
 		if err != nil {
 			return err
 		}

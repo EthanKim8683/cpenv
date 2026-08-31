@@ -13,10 +13,12 @@ import { create, MessageInitShape } from "@bufbuild/protobuf";
 import { ProblemSchema } from "@/gen/problem/v1/problem_pb";
 import { FocusSchema } from "@/gen/focus/v1/focus_pb";
 
+const PORT = import.meta.env.WXT_PORT ?? "8683";
+
 type MaybePromise<T> = T | PromiseLike<T>;
 
 const transport = createConnectTransport({
-  baseUrl: `http://localhost:${import.meta.env.WXT_PORT}`,
+  baseUrl: `http://localhost:${PORT}`,
 });
 
 const focusClient = createClient(FocusService, transport);

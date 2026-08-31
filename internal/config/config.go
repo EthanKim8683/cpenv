@@ -8,7 +8,7 @@ import (
 )
 
 type Config struct {
-	Port    int    `env:"CPENV_PORT,notEmpty"`
+	Port    int    `env:"CPENV_PORT" envDefault:"8683"`
 	HomeDir string `env:"CPENV_HOME,notEmpty"`
 }
 

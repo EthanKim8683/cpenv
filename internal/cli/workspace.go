@@ -49,7 +49,7 @@ func openWorkspace(dir string) (*workspace, error) {
 	return &workspace{dir: dir, problem: problem}, nil
 }
 
-func createWorkspace(dir string, problem *problemv1.Problem) (*workspace, error) {
+func initWorkspace(dir string, problem *problemv1.Problem) (*workspace, error) {
 	data, err := protojson.Marshal(problem)
 	if err != nil {
 		return nil, fmt.Errorf("create workspace %q: %w", dir, err)

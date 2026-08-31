@@ -56,6 +56,7 @@ func (s *FocusService) load() (*focusv1.Focus, error) {
 	}
 	return focus, nil
 }
+
 func (s *FocusService) Save(_ context.Context, req *focusv1.SaveRequest) (*focusv1.SaveResponse, error) {
 	if err := s.save(req.GetFocus()); err != nil {
 		return nil, connect.NewError(connect.CodeInternal, err)
