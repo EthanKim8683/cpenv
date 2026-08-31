@@ -89,20 +89,12 @@ func TestTemplate(t *testing.T) {
 func TestResolveTemplate(t *testing.T) {
 	t.Parallel()
 
-	cwd := filepath.Join(t.TempDir(), "cwd")
-	templatesDir := filepath.Join(t.TempDir(), "templates")
-	defaultTemplate := filepath.Join(cwd, "default.star")
-	relPath := "template.star"
-	cwdRelPath := filepath.Join(cwd, "template.star")
-	templatesDirRelPath := filepath.Join(templatesDir, "template.star")
-	absPath := filepath.Join(t.TempDir(), "template.star")
-
-	require.NoError(t, os.MkdirAll(cwd, 0755))
-	require.NoError(t, os.MkdirAll(templatesDir, 0755))
-	require.NoError(t, os.WriteFile(defaultTemplate, nil, 0644))
-	require.NoError(t, os.WriteFile(cwdRelPath, nil, 0644))
-	require.NoError(t, os.WriteFile(templatesDirRelPath, nil, 0644))
-	require.NoError(t, os.WriteFile(absPath, nil, 0644))
+	cwd, err := filepath.Abs(filepath.Join("testdata", "resolve-template", "cwd"))
+	require.NoError(t, err)
+	templatesDir, err := filepath.Abs(filepath.Join("testdata", "resolve-template", "templates"))
+	require.NoError(t, err)
+	defaultTemplate, err := filepath.Abs(filepath.Join("testdata", "resolve-template", "default.star"))
+	require.NoError(t, err)
 
 	t.Run("no templates", func(t *testing.T) {
 		t.Parallel()
@@ -117,7 +109,7 @@ func TestResolveTemplate(t *testing.T) {
 
 		tl, err := resolveTemplate("", t.TempDir(), templatesDir, "")
 		require.NoError(t, err)
-		assert.Equal(t, templatesDirRelPath, tl.path)
+		assert.Equal(t, filepath.Join(templatesDir, "rel.star"), tl.path)
 	})
 
 	t.Run("default template", func(t *testing.T) {
@@ -131,21 +123,24 @@ func TestResolveTemplate(t *testing.T) {
 	t.Run("relative to templates dir", func(t *testing.T) {
 		t.Parallel()
 
-		tl, err := resolveTemplate(relPath, t.TempDir(), templatesDir, defaultTemplate)
+		tl, err := resolveTemplate("rel.star", t.TempDir(), templatesDir, defaultTemplate)
 		require.NoError(t, err)
-		assert.Equal(t, templatesDirRelPath, tl.path)
+		assert.Equal(t, filepath.Join(templatesDir, "rel.star"), tl.path)
 	})
 
 	t.Run("relative to cwd", func(t *testing.T) {
 		t.Parallel()
 
-		tl, err := resolveTemplate(relPath, cwd, templatesDir, defaultTemplate)
+		tl, err := resolveTemplate("rel.star", cwd, templatesDir, defaultTemplate)
 		require.NoError(t, err)
-		assert.Equal(t, cwdRelPath, tl.path)
+		assert.Equal(t, filepath.Join(cwd, "rel.star"), tl.path)
 	})
 
 	t.Run("absolute path", func(t *testing.T) {
 		t.Parallel()
+
+		absPath, err := filepath.Abs(filepath.Join("testdata", "resolve-template", "abs.star"))
+		require.NoError(t, err)
 
 		tl, err := resolveTemplate(absPath, cwd, templatesDir, defaultTemplate)
 		require.NoError(t, err)

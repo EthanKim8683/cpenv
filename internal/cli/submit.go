@@ -49,12 +49,13 @@ func resolveSolution(cwd string, name string) (*solution, error) {
 	if len(matches) > 1 {
 		return nil, errors.New("multiple sol.* files")
 	}
-	content, err := os.ReadFile(matches[0])
+	path := matches[0]
+	content, err := os.ReadFile(path)
 	if err != nil {
 		return nil, err
 	}
 	return &solution{
-		path:    matches[0],
+		path:    path,
 		content: content,
 	}, nil
 }

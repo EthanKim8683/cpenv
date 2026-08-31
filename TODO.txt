@@ -1,4 +1,5 @@
 - daemon health command + way to manage the daemon
+- daemon logging
 - error sentinels -> user-friendly error messages
 - add url to problem proto so that if the right tab isn't open, the extension
   can open it

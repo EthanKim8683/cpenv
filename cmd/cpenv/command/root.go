@@ -47,7 +47,7 @@ var rootCmd = &cobra.Command{
 		focusClient := focusv1connect.NewFocusServiceClient(http.DefaultClient, baseURL)
 		statusClient := statusv1connect.NewStatusServiceClient(http.DefaultClient, baseURL)
 		submitClient := submitv1connect.NewSubmitServiceClient(http.DefaultClient, baseURL)
-		preferences := &cli.DBPreferences{DB: db}
+		prefs := &cli.DBPreferences{DB: db}
 
 		c = &cli.CLI{
 			Cfg:          cfg,
@@ -55,7 +55,7 @@ var rootCmd = &cobra.Command{
 			FocusClient:  focusClient,
 			StatusClient: statusClient,
 			SubmitClient: submitClient,
-			Preferences:  preferences,
+			Preferences:  prefs,
 		}
 		return nil
 	},
