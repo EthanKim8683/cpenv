@@ -23,12 +23,12 @@ func (c *CLI) templatesDir() string {
 	return filepath.Join(c.Cfg.HomeDir, "templates")
 }
 
-type resolveFunc[T any] func() (T, error)
+type resolver[T any] func(name string) (T, error)
 
-func resolveFirst[T any](resolveFuncs []resolveFunc[T]) (T, error) {
+func resolveFirst[T any](name string, resolvers []resolver[T]) (T, error) {
 	var errs error
-	for _, resolve := range resolveFuncs {
-		v, err := resolve()
+	for _, resolve := range resolvers {
+		v, err := resolve(name)
 		if err == nil {
 			return v, nil
 		}
@@ -44,8 +44,8 @@ func resolveFirst[T any](resolveFuncs []resolveFunc[T]) (T, error) {
 	return zero, err
 }
 
-func resolveTemplateAbsPath(name string) resolveFunc[*template] {
-	return func() (*template, error) {
+func resolveTemplateAbsPath() resolver[*template] {
+	return func(name string) (*template, error) {
 		if !filepath.IsAbs(name) {
 			return nil, skipResolver
 		}
@@ -53,8 +53,8 @@ func resolveTemplateAbsPath(name string) resolveFunc[*template] {
 	}
 }
 
-func resolveTemplateRelPath(name string, dir string) resolveFunc[*template] {
-	return func() (*template, error) {
+func resolveTemplateRelPath(dir string) resolver[*template] {
+	return func(name string) (*template, error) {
 		if filepath.IsAbs(name) || name == "" {
 			return nil, skipResolver
 		}
@@ -62,8 +62,8 @@ func resolveTemplateRelPath(name string, dir string) resolveFunc[*template] {
 	}
 }
 
-func resolveTemplateDefault(name string, p Preferences) resolveFunc[*template] {
-	return func() (*template, error) {
+func resolveTemplateDefault(p Preferences) resolver[*template] {
+	return func(name string) (*template, error) {
 		if name != "" {
 			return nil, skipResolver
 		}
@@ -75,8 +75,8 @@ func resolveTemplateDefault(name string, p Preferences) resolveFunc[*template] {
 	}
 }
 
-func resolveTemplateGlob(name string, dir string) resolveFunc[*template] {
-	return func() (*template, error) {
+func resolveTemplateGlob(dir string) resolver[*template] {
+	return func(name string) (*template, error) {
 		if name != "" {
 			return nil, skipResolver
 		}
@@ -91,18 +91,18 @@ func resolveTemplateGlob(name string, dir string) resolveFunc[*template] {
 	}
 }
 
-func (c *CLI) resolveTemplate(templateName string) (*template, error) {
-	return resolveFirst([]resolveFunc[*template]{
-		resolveTemplateAbsPath(templateName),
-		resolveTemplateRelPath(templateName, c.CWD),
-		resolveTemplateRelPath(templateName, c.templatesDir()),
-		resolveTemplateDefault(templateName, c.Preferences),
-		resolveTemplateGlob(templateName, c.templatesDir()),
+func (c *CLI) resolveTemplate(name string) (*template, error) {
+	return resolveFirst(name, []resolver[*template]{
+		resolveTemplateAbsPath(),
+		resolveTemplateRelPath(c.CWD),
+		resolveTemplateRelPath(c.templatesDir()),
+		resolveTemplateDefault(c.Preferences),
+		resolveTemplateGlob(c.templatesDir()),
 	})
 }
 
-func resolveSolutionAbsPath(name string) resolveFunc[*solution] {
-	return func() (*solution, error) {
+func resolveSolutionAbsPath() resolver[*solution] {
+	return func(name string) (*solution, error) {
 		if !filepath.IsAbs(name) {
 			return nil, skipResolver
 		}
@@ -110,8 +110,8 @@ func resolveSolutionAbsPath(name string) resolveFunc[*solution] {
 	}
 }
 
-func resolveSolutionRelPath(name string, dir string) resolveFunc[*solution] {
-	return func() (*solution, error) {
+func resolveSolutionRelPath(dir string) resolver[*solution] {
+	return func(name string) (*solution, error) {
 		if filepath.IsAbs(name) || name == "" {
 			return nil, skipResolver
 		}
@@ -119,8 +119,8 @@ func resolveSolutionRelPath(name string, dir string) resolveFunc[*solution] {
 	}
 }
 
-func resolveSolutionGlob(name string, dir string) resolveFunc[*solution] {
-	return func() (*solution, error) {
+func resolveSolutionGlob(dir string) resolver[*solution] {
+	return func(name string) (*solution, error) {
 		if name != "" {
 			return nil, skipResolver
 		}
@@ -138,10 +138,10 @@ func resolveSolutionGlob(name string, dir string) resolveFunc[*solution] {
 	}
 }
 
-func (c *CLI) resolveSolution(solutionName string) (*solution, error) {
-	return resolveFirst([]resolveFunc[*solution]{
-		resolveSolutionAbsPath(solutionName),
-		resolveSolutionRelPath(solutionName, c.CWD),
-		resolveSolutionGlob(solutionName, c.CWD),
+func (c *CLI) resolveSolution(name string) (*solution, error) {
+	return resolveFirst(name, []resolver[*solution]{
+		resolveSolutionAbsPath(),
+		resolveSolutionRelPath(c.CWD),
+		resolveSolutionGlob(c.CWD),
 	})
 }

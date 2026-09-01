@@ -38,6 +38,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("cpenvd: %v", err)
 	}
+	defer db.Close()
 
 	activeProblemSvc := &daemon.ActiveProblemService{DB: db}
 	focusSvc := daemon.NewFocusService()

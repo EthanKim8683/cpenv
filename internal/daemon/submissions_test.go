@@ -33,9 +33,9 @@ func TestSubmissionsService(t *testing.T) {
 		err = svc.save(subs)
 		require.NoError(t, err)
 
-		subs, err := svc.tail(defaultTailLimit, nil)
+		gotSubs, err := svc.tail(defaultTailLimit, nil)
 		require.NoError(t, err)
-		assert.Empty(t, cmp.Diff(subs, subs, protocmp.Transform()))
+		assert.Empty(t, cmp.Diff(subs, gotSubs, protocmp.Transform()))
 	})
 
 	t.Run("tail with limit", func(t *testing.T) {
@@ -45,9 +45,9 @@ func TestSubmissionsService(t *testing.T) {
 			{TimestampMs: 2, ProblemId: "1"},
 		}
 
-		subs, err := svc.tail(limit, nil)
+		gotSubs, err := svc.tail(limit, nil)
 		require.NoError(t, err)
-		assert.Empty(t, cmp.Diff(subs, subs, protocmp.Transform()))
+		assert.Empty(t, cmp.Diff(subs, gotSubs, protocmp.Transform()))
 	})
 
 	t.Run("tail with problem ID", func(t *testing.T) {
@@ -57,9 +57,9 @@ func TestSubmissionsService(t *testing.T) {
 			{TimestampMs: 2, ProblemId: "1"},
 		}
 
-		subs, err := svc.tail(defaultTailLimit, &problemID)
+		gotSubs, err := svc.tail(defaultTailLimit, &problemID)
 		require.NoError(t, err)
-		assert.Empty(t, cmp.Diff(subs, subs, protocmp.Transform()))
+		assert.Empty(t, cmp.Diff(subs, gotSubs, protocmp.Transform()))
 	})
 
 	t.Run("overwrite", func(t *testing.T) {
@@ -75,8 +75,8 @@ func TestSubmissionsService(t *testing.T) {
 		err := svc.save(saveSubs)
 		require.NoError(t, err)
 
-		subs, err := svc.tail(defaultTailLimit, nil)
+		gotSubs, err := svc.tail(defaultTailLimit, nil)
 		require.NoError(t, err)
-		assert.Empty(t, cmp.Diff(loadSubs, subs, protocmp.Transform()))
+		assert.Empty(t, cmp.Diff(loadSubs, gotSubs, protocmp.Transform()))
 	})
 }

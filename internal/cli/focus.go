@@ -24,7 +24,12 @@ func (c *CLI) activeProblem(ctx context.Context) (*problemv1.Problem, error) {
 	if activeProblem.Error != nil {
 		return nil, fmt.Errorf("extension error: %s", activeProblem.GetError())
 	}
-	return activeProblem.GetProblem(), nil
+
+	problem := activeProblem.GetProblem()
+	if problem == nil {
+		return nil, errors.New("no active problem")
+	}
+	return problem, nil
 }
 
 func (c *CLI) focus(ctx context.Context, dir string) error {
