@@ -105,7 +105,7 @@ func (s *SubmissionsService) tail(limit int, problemID *string) ([]*submissionsv
 				subs = subs[i+1:]
 				break
 			}
-			if v == nil {
+			if len(v) == 0 {
 				v = b.Get(k)
 			}
 			subs[i] = &submissionsv1.Submission{}
