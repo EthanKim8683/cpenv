@@ -16,15 +16,10 @@ type SubmitService struct {
 func (s *SubmitService) Submit(ctx context.Context, req *submitv1.SubmitRequest) (*submitv1.SubmitResponse, error) {
 	res, err := s.hub.tryRequest(ctx, req.GetProblemId(), req)
 	if err != nil {
-		switch {
-		case errors.Is(err, ErrNoReceiver):
+		if errors.Is(err, ErrNoReceiver) {
 			return nil, connect.NewError(connect.CodeFailedPrecondition, err)
-		case errors.Is(err, context.Canceled):
-			return nil, connect.NewError(connect.CodeCanceled, err)
-		case errors.Is(err, context.DeadlineExceeded):
-			return nil, connect.NewError(connect.CodeDeadlineExceeded, err)
 		}
-		return nil, connect.NewError(connect.CodeInternal, err)
+		return nil, err
 	}
 	return res, nil
 }
@@ -32,13 +27,7 @@ func (s *SubmitService) Submit(ctx context.Context, req *submitv1.SubmitRequest)
 func (s *SubmitService) Claim(ctx context.Context, req *submitv1.ClaimRequest) (*submitv1.ClaimResponse, error) {
 	msg, err := s.hub.claim(ctx, req.GetProblemId())
 	if err != nil {
-		switch {
-		case errors.Is(err, context.Canceled):
-			return nil, connect.NewError(connect.CodeCanceled, err)
-		case errors.Is(err, context.DeadlineExceeded):
-			return nil, connect.NewError(connect.CodeDeadlineExceeded, err)
-		}
-		return nil, connect.NewError(connect.CodeInternal, err)
+		return nil, err
 	}
 	return &submitv1.ClaimResponse{
 		ReplyId:  msg.replyID,
@@ -50,15 +39,10 @@ func (s *SubmitService) Claim(ctx context.Context, req *submitv1.ClaimRequest) (
 func (s *SubmitService) Reply(ctx context.Context, req *submitv1.ReplyRequest) (*submitv1.ReplyResponse, error) {
 	reply := &submitv1.SubmitResponse{Error: req.Error}
 	if err := s.hub.reply(req.GetReplyId(), reply); err != nil {
-		switch {
-		case errors.Is(err, ErrReplyNotFound):
+		if errors.Is(err, ErrReplyNotFound) {
 			return nil, connect.NewError(connect.CodeNotFound, err)
-		case errors.Is(err, context.Canceled):
-			return nil, connect.NewError(connect.CodeCanceled, err)
-		case errors.Is(err, context.DeadlineExceeded):
-			return nil, connect.NewError(connect.CodeDeadlineExceeded, err)
 		}
-		return nil, connect.NewError(connect.CodeInternal, err)
+		return nil, err
 	}
 	return &submitv1.ReplyResponse{}, nil
 }

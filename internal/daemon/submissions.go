@@ -3,9 +3,8 @@ package daemon
 import (
 	"context"
 
-	"connectrpc.com/connect"
-	statusv1 "github.com/EthanKim8683/cpenv/internal/gen/status/v1"
-	"github.com/EthanKim8683/cpenv/internal/gen/status/v1/statusv1connect"
+	submissionsv1 "github.com/EthanKim8683/cpenv/internal/gen/submissions/v1"
+	"github.com/EthanKim8683/cpenv/internal/gen/submissions/v1/submissionsv1connect"
 	bolt "go.etcd.io/bbolt"
 	"google.golang.org/protobuf/proto"
 )
@@ -20,11 +19,11 @@ var (
 	submissionsByProblemBucketKey = []byte("submissions_by_problem")
 )
 
-type StatusService struct {
+type SubmissionsService struct {
 	DB *bolt.DB
 }
 
-func submissionKey(sub *statusv1.Submission) []byte {
+func submissionKey(sub *submissionsv1.Submission) []byte {
 	ts := sub.GetTimestampMs()
 	id := sub.GetProblemId()
 	key := make([]byte, 6+len(id))
@@ -38,7 +37,7 @@ func submissionKey(sub *statusv1.Submission) []byte {
 	return key
 }
 
-func (s *StatusService) save(subs []*statusv1.Submission) error {
+func (s *SubmissionsService) save(subs []*submissionsv1.Submission) error {
 	if err := s.DB.Update(func(tx *bolt.Tx) error {
 		b, err := tx.CreateBucketIfNotExists(submissionsBucketKey)
 		if err != nil {
@@ -65,7 +64,6 @@ func (s *StatusService) save(subs []*statusv1.Submission) error {
 			if err != nil {
 				return err
 			}
-
 			if err := pb.Put(key, nil); err != nil {
 				return err
 			}
@@ -77,54 +75,44 @@ func (s *StatusService) save(subs []*statusv1.Submission) error {
 	return nil
 }
 
-func (s *StatusService) tail(limit int, problemID *string) ([]*statusv1.Submission, error) {
-	subs := []*statusv1.Submission{}
+func (s *SubmissionsService) tail(limit int, problemID *string) ([]*submissionsv1.Submission, error) {
+	subs := []*submissionsv1.Submission{}
 	if err := s.DB.View(func(tx *bolt.Tx) error {
 		b := tx.Bucket(submissionsBucketKey)
 		if b == nil {
 			return nil
 		}
 
+		var c *bolt.Cursor
 		if problemID == nil {
-			subs = make([]*statusv1.Submission, limit)
-			c := b.Cursor()
-			k, v := c.Last()
-			for i := limit - 1; i >= 0; i-- {
-				if k == nil {
-					subs = subs[i+1:]
-					break
-				}
-				subs[i] = &statusv1.Submission{}
-				if err := proto.Unmarshal(v, subs[i]); err != nil {
-					return err
-				}
-				k, v = c.Prev()
-			}
+			c = b.Cursor()
 		} else {
 			pbb := tx.Bucket(submissionsByProblemBucketKey)
 			if pbb == nil {
 				return nil
 			}
-
 			pb := pbb.Bucket([]byte(*problemID))
 			if pb == nil {
 				return nil
 			}
+			c = pb.Cursor()
+		}
 
-			subs = make([]*statusv1.Submission, limit)
-			c := pb.Cursor()
-			k, _ := c.Last()
-			for i := limit - 1; i >= 0; i-- {
-				if k == nil {
-					subs = subs[i+1:]
-					break
-				}
-				subs[i] = &statusv1.Submission{}
-				if err := proto.Unmarshal(b.Get(k), subs[i]); err != nil {
-					return err
-				}
-				k, _ = c.Prev()
+		subs = make([]*submissionsv1.Submission, limit)
+		k, v := c.Last()
+		for i := limit - 1; i >= 0; i-- {
+			if k == nil {
+				subs = subs[i+1:]
+				break
 			}
+			if v == nil {
+				v = b.Get(k)
+			}
+			subs[i] = &submissionsv1.Submission{}
+			if err := proto.Unmarshal(v, subs[i]); err != nil {
+				return err
+			}
+			k, v = c.Prev()
 		}
 		return nil
 	}); err != nil {
@@ -133,14 +121,14 @@ func (s *StatusService) tail(limit int, problemID *string) ([]*statusv1.Submissi
 	return subs, nil
 }
 
-func (s *StatusService) Save(_ context.Context, req *statusv1.SaveRequest) (*statusv1.SaveResponse, error) {
+func (s *SubmissionsService) Save(_ context.Context, req *submissionsv1.SaveRequest) (*submissionsv1.SaveResponse, error) {
 	if err := s.save(req.GetSubmissions()); err != nil {
-		return nil, connect.NewError(connect.CodeInternal, err)
+		return nil, err
 	}
-	return &statusv1.SaveResponse{}, nil
+	return &submissionsv1.SaveResponse{}, nil
 }
 
-func (s *StatusService) Tail(_ context.Context, req *statusv1.TailRequest) (*statusv1.TailResponse, error) {
+func (s *SubmissionsService) Tail(_ context.Context, req *submissionsv1.TailRequest) (*submissionsv1.TailResponse, error) {
 	limit := defaultTailLimit
 	if req.Limit != nil {
 		limit = min(int(req.GetLimit()), maxTailLimit)
@@ -148,9 +136,9 @@ func (s *StatusService) Tail(_ context.Context, req *statusv1.TailRequest) (*sta
 
 	subs, err := s.tail(limit, req.ProblemId)
 	if err != nil {
-		return nil, connect.NewError(connect.CodeInternal, err)
+		return nil, err
 	}
-	return &statusv1.TailResponse{Submissions: subs}, nil
+	return &submissionsv1.TailResponse{Submissions: subs}, nil
 }
 
-var _ statusv1connect.StatusServiceHandler = (*StatusService)(nil)
+var _ submissionsv1connect.SubmissionsServiceHandler = (*SubmissionsService)(nil)

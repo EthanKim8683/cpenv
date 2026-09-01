@@ -2,9 +2,9 @@
 // versions:
 // 	protoc-gen-go v1.36.11
 // 	protoc        (unknown)
-// source: status/v1/status_service.proto
+// source: submissions/v1/submissions_service.proto
 
-package statusv1
+package submissionsv1
 
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
@@ -30,7 +30,7 @@ type SaveRequest struct {
 
 func (x *SaveRequest) Reset() {
 	*x = SaveRequest{}
-	mi := &file_status_v1_status_service_proto_msgTypes[0]
+	mi := &file_submissions_v1_submissions_service_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -42,7 +42,7 @@ func (x *SaveRequest) String() string {
 func (*SaveRequest) ProtoMessage() {}
 
 func (x *SaveRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_status_v1_status_service_proto_msgTypes[0]
+	mi := &file_submissions_v1_submissions_service_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -55,7 +55,7 @@ func (x *SaveRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SaveRequest.ProtoReflect.Descriptor instead.
 func (*SaveRequest) Descriptor() ([]byte, []int) {
-	return file_status_v1_status_service_proto_rawDescGZIP(), []int{0}
+	return file_submissions_v1_submissions_service_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *SaveRequest) GetSubmissions() []*Submission {
@@ -73,7 +73,7 @@ type SaveResponse struct {
 
 func (x *SaveResponse) Reset() {
 	*x = SaveResponse{}
-	mi := &file_status_v1_status_service_proto_msgTypes[1]
+	mi := &file_submissions_v1_submissions_service_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -85,7 +85,7 @@ func (x *SaveResponse) String() string {
 func (*SaveResponse) ProtoMessage() {}
 
 func (x *SaveResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_status_v1_status_service_proto_msgTypes[1]
+	mi := &file_submissions_v1_submissions_service_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -98,7 +98,7 @@ func (x *SaveResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SaveResponse.ProtoReflect.Descriptor instead.
 func (*SaveResponse) Descriptor() ([]byte, []int) {
-	return file_status_v1_status_service_proto_rawDescGZIP(), []int{1}
+	return file_submissions_v1_submissions_service_proto_rawDescGZIP(), []int{1}
 }
 
 type TailRequest struct {
@@ -111,7 +111,7 @@ type TailRequest struct {
 
 func (x *TailRequest) Reset() {
 	*x = TailRequest{}
-	mi := &file_status_v1_status_service_proto_msgTypes[2]
+	mi := &file_submissions_v1_submissions_service_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -123,7 +123,7 @@ func (x *TailRequest) String() string {
 func (*TailRequest) ProtoMessage() {}
 
 func (x *TailRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_status_v1_status_service_proto_msgTypes[2]
+	mi := &file_submissions_v1_submissions_service_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -136,7 +136,7 @@ func (x *TailRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TailRequest.ProtoReflect.Descriptor instead.
 func (*TailRequest) Descriptor() ([]byte, []int) {
-	return file_status_v1_status_service_proto_rawDescGZIP(), []int{2}
+	return file_submissions_v1_submissions_service_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *TailRequest) GetLimit() uint32 {
@@ -162,7 +162,7 @@ type TailResponse struct {
 
 func (x *TailResponse) Reset() {
 	*x = TailResponse{}
-	mi := &file_status_v1_status_service_proto_msgTypes[3]
+	mi := &file_submissions_v1_submissions_service_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -174,7 +174,7 @@ func (x *TailResponse) String() string {
 func (*TailResponse) ProtoMessage() {}
 
 func (x *TailResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_status_v1_status_service_proto_msgTypes[3]
+	mi := &file_submissions_v1_submissions_service_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -187,7 +187,7 @@ func (x *TailResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TailResponse.ProtoReflect.Descriptor instead.
 func (*TailResponse) Descriptor() ([]byte, []int) {
-	return file_status_v1_status_service_proto_rawDescGZIP(), []int{3}
+	return file_submissions_v1_submissions_service_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *TailResponse) GetSubmissions() []*Submission {
@@ -197,55 +197,54 @@ func (x *TailResponse) GetSubmissions() []*Submission {
 	return nil
 }
 
-var File_status_v1_status_service_proto protoreflect.FileDescriptor
+var File_submissions_v1_submissions_service_proto protoreflect.FileDescriptor
 
-const file_status_v1_status_service_proto_rawDesc = "" +
+const file_submissions_v1_submissions_service_proto_rawDesc = "" +
 	"\n" +
-	"\x1estatus/v1/status_service.proto\x12\tstatus.v1\x1a\x1astatus/v1/submission.proto\"F\n" +
-	"\vSaveRequest\x127\n" +
-	"\vsubmissions\x18\x01 \x03(\v2\x15.status.v1.SubmissionR\vsubmissions\"\x0e\n" +
+	"(submissions/v1/submissions_service.proto\x12\x0esubmissions.v1\x1a\x1fsubmissions/v1/submission.proto\"K\n" +
+	"\vSaveRequest\x12<\n" +
+	"\vsubmissions\x18\x01 \x03(\v2\x1a.submissions.v1.SubmissionR\vsubmissions\"\x0e\n" +
 	"\fSaveResponse\"e\n" +
 	"\vTailRequest\x12\x19\n" +
 	"\x05limit\x18\x01 \x01(\rH\x00R\x05limit\x88\x01\x01\x12\"\n" +
 	"\n" +
 	"problem_id\x18\x02 \x01(\tH\x01R\tproblemId\x88\x01\x01B\b\n" +
 	"\x06_limitB\r\n" +
-	"\v_problem_id\"G\n" +
-	"\fTailResponse\x127\n" +
-	"\vsubmissions\x18\x01 \x03(\v2\x15.status.v1.SubmissionR\vsubmissions2\x8b\x01\n" +
-	"\rStatusService\x12<\n" +
-	"\x04Save\x12\x16.status.v1.SaveRequest\x1a\x17.status.v1.SaveResponse\"\x03\x90\x02\x02\x12<\n" +
-	"\x04Tail\x12\x16.status.v1.TailRequest\x1a\x17.status.v1.TailResponse\"\x03\x90\x02\x01B\xa7\x01\n" +
-	"\rcom.status.v1B\x12StatusServiceProtoP\x01Z=github.com/EthanKim8683/cpenv/internal/gen/status/v1;statusv1\xa2\x02\x03SXX\xaa\x02\tStatus.V1\xca\x02\tStatus\\V1\xe2\x02\x15Status\\V1\\GPBMetadata\xea\x02\n" +
-	"Status::V1b\x06proto3"
+	"\v_problem_id\"L\n" +
+	"\fTailResponse\x12<\n" +
+	"\vsubmissions\x18\x01 \x03(\v2\x1a.submissions.v1.SubmissionR\vsubmissions2\xa4\x01\n" +
+	"\x12SubmissionsService\x12F\n" +
+	"\x04Save\x12\x1b.submissions.v1.SaveRequest\x1a\x1c.submissions.v1.SaveResponse\"\x03\x90\x02\x02\x12F\n" +
+	"\x04Tail\x12\x1b.submissions.v1.TailRequest\x1a\x1c.submissions.v1.TailResponse\"\x03\x90\x02\x01B\xcf\x01\n" +
+	"\x12com.submissions.v1B\x17SubmissionsServiceProtoP\x01ZGgithub.com/EthanKim8683/cpenv/internal/gen/submissions/v1;submissionsv1\xa2\x02\x03SXX\xaa\x02\x0eSubmissions.V1\xca\x02\x0eSubmissions\\V1\xe2\x02\x1aSubmissions\\V1\\GPBMetadata\xea\x02\x0fSubmissions::V1b\x06proto3"
 
 var (
-	file_status_v1_status_service_proto_rawDescOnce sync.Once
-	file_status_v1_status_service_proto_rawDescData []byte
+	file_submissions_v1_submissions_service_proto_rawDescOnce sync.Once
+	file_submissions_v1_submissions_service_proto_rawDescData []byte
 )
 
-func file_status_v1_status_service_proto_rawDescGZIP() []byte {
-	file_status_v1_status_service_proto_rawDescOnce.Do(func() {
-		file_status_v1_status_service_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_status_v1_status_service_proto_rawDesc), len(file_status_v1_status_service_proto_rawDesc)))
+func file_submissions_v1_submissions_service_proto_rawDescGZIP() []byte {
+	file_submissions_v1_submissions_service_proto_rawDescOnce.Do(func() {
+		file_submissions_v1_submissions_service_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_submissions_v1_submissions_service_proto_rawDesc), len(file_submissions_v1_submissions_service_proto_rawDesc)))
 	})
-	return file_status_v1_status_service_proto_rawDescData
+	return file_submissions_v1_submissions_service_proto_rawDescData
 }
 
-var file_status_v1_status_service_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
-var file_status_v1_status_service_proto_goTypes = []any{
-	(*SaveRequest)(nil),  // 0: status.v1.SaveRequest
-	(*SaveResponse)(nil), // 1: status.v1.SaveResponse
-	(*TailRequest)(nil),  // 2: status.v1.TailRequest
-	(*TailResponse)(nil), // 3: status.v1.TailResponse
-	(*Submission)(nil),   // 4: status.v1.Submission
+var file_submissions_v1_submissions_service_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
+var file_submissions_v1_submissions_service_proto_goTypes = []any{
+	(*SaveRequest)(nil),  // 0: submissions.v1.SaveRequest
+	(*SaveResponse)(nil), // 1: submissions.v1.SaveResponse
+	(*TailRequest)(nil),  // 2: submissions.v1.TailRequest
+	(*TailResponse)(nil), // 3: submissions.v1.TailResponse
+	(*Submission)(nil),   // 4: submissions.v1.Submission
 }
-var file_status_v1_status_service_proto_depIdxs = []int32{
-	4, // 0: status.v1.SaveRequest.submissions:type_name -> status.v1.Submission
-	4, // 1: status.v1.TailResponse.submissions:type_name -> status.v1.Submission
-	0, // 2: status.v1.StatusService.Save:input_type -> status.v1.SaveRequest
-	2, // 3: status.v1.StatusService.Tail:input_type -> status.v1.TailRequest
-	1, // 4: status.v1.StatusService.Save:output_type -> status.v1.SaveResponse
-	3, // 5: status.v1.StatusService.Tail:output_type -> status.v1.TailResponse
+var file_submissions_v1_submissions_service_proto_depIdxs = []int32{
+	4, // 0: submissions.v1.SaveRequest.submissions:type_name -> submissions.v1.Submission
+	4, // 1: submissions.v1.TailResponse.submissions:type_name -> submissions.v1.Submission
+	0, // 2: submissions.v1.SubmissionsService.Save:input_type -> submissions.v1.SaveRequest
+	2, // 3: submissions.v1.SubmissionsService.Tail:input_type -> submissions.v1.TailRequest
+	1, // 4: submissions.v1.SubmissionsService.Save:output_type -> submissions.v1.SaveResponse
+	3, // 5: submissions.v1.SubmissionsService.Tail:output_type -> submissions.v1.TailResponse
 	4, // [4:6] is the sub-list for method output_type
 	2, // [2:4] is the sub-list for method input_type
 	2, // [2:2] is the sub-list for extension type_name
@@ -253,28 +252,28 @@ var file_status_v1_status_service_proto_depIdxs = []int32{
 	0, // [0:2] is the sub-list for field type_name
 }
 
-func init() { file_status_v1_status_service_proto_init() }
-func file_status_v1_status_service_proto_init() {
-	if File_status_v1_status_service_proto != nil {
+func init() { file_submissions_v1_submissions_service_proto_init() }
+func file_submissions_v1_submissions_service_proto_init() {
+	if File_submissions_v1_submissions_service_proto != nil {
 		return
 	}
-	file_status_v1_submission_proto_init()
-	file_status_v1_status_service_proto_msgTypes[2].OneofWrappers = []any{}
+	file_submissions_v1_submission_proto_init()
+	file_submissions_v1_submissions_service_proto_msgTypes[2].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_status_v1_status_service_proto_rawDesc), len(file_status_v1_status_service_proto_rawDesc)),
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_submissions_v1_submissions_service_proto_rawDesc), len(file_submissions_v1_submissions_service_proto_rawDesc)),
 			NumEnums:      0,
 			NumMessages:   4,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
-		GoTypes:           file_status_v1_status_service_proto_goTypes,
-		DependencyIndexes: file_status_v1_status_service_proto_depIdxs,
-		MessageInfos:      file_status_v1_status_service_proto_msgTypes,
+		GoTypes:           file_submissions_v1_submissions_service_proto_goTypes,
+		DependencyIndexes: file_submissions_v1_submissions_service_proto_depIdxs,
+		MessageInfos:      file_submissions_v1_submissions_service_proto_msgTypes,
 	}.Build()
-	File_status_v1_status_service_proto = out.File
-	file_status_v1_status_service_proto_goTypes = nil
-	file_status_v1_status_service_proto_depIdxs = nil
+	File_submissions_v1_submissions_service_proto = out.File
+	file_submissions_v1_submissions_service_proto_goTypes = nil
+	file_submissions_v1_submissions_service_proto_depIdxs = nil
 }

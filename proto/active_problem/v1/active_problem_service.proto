@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package active_problem.v1;
+
+import "active_problem/v1/active_problem.proto";
+
+service ActiveProblemService {
+  rpc Save(SaveRequest) returns (SaveResponse) {
+    option idempotency_level = IDEMPOTENT;
+  }
+  rpc Load(LoadRequest) returns (LoadResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+}
+
+message SaveRequest {
+  active_problem.v1.ActiveProblem active_problem = 1;
+}
+
+message SaveResponse {}
+
+message LoadRequest {}
+
+message LoadResponse {
+  active_problem.v1.ActiveProblem active_problem = 1;
+}

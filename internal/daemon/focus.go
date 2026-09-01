@@ -2,74 +2,52 @@ package daemon
 
 import (
 	"context"
+	"errors"
 
 	"connectrpc.com/connect"
 	focusv1 "github.com/EthanKim8683/cpenv/internal/gen/focus/v1"
-	"github.com/EthanKim8683/cpenv/internal/gen/focus/v1/focusv1connect"
-	bolt "go.etcd.io/bbolt"
-	"google.golang.org/protobuf/proto"
-)
-
-var (
-	focusBucketKey = []byte("focus")
-	focusKey       = []byte("focus")
+	focusv1connect "github.com/EthanKim8683/cpenv/internal/gen/focus/v1/focusv1connect"
 )
 
 type FocusService struct {
-	DB *bolt.DB
+	hub *hub[*focusv1.FocusRequest, *focusv1.FocusResponse]
 }
 
-func (s *FocusService) save(focus *focusv1.Focus) error {
-	data, err := proto.Marshal(focus)
+func (s *FocusService) Focus(ctx context.Context, req *focusv1.FocusRequest) (*focusv1.FocusResponse, error) {
+	res, err := s.hub.tryRequest(ctx, req.GetEnvId(), req)
 	if err != nil {
-		return err
-	}
-
-	if err := s.DB.Update(func(tx *bolt.Tx) error {
-		b, err := tx.CreateBucketIfNotExists(focusBucketKey)
-		if err != nil {
-			return err
+		if errors.Is(err, ErrNoReceiver) {
+			return nil, connect.NewError(connect.CodeFailedPrecondition, err)
 		}
-		return b.Put(focusKey, data)
-	}); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *FocusService) load() (*focusv1.Focus, error) {
-	var data []byte
-	if err := s.DB.View(func(tx *bolt.Tx) error {
-		b := tx.Bucket(focusBucketKey)
-		if b == nil {
-			return nil
-		}
-		data = b.Get(focusKey)
-		return nil
-	}); err != nil {
 		return nil, err
 	}
+	return res, nil
+}
 
-	focus := &focusv1.Focus{}
-	if err := proto.Unmarshal(data, focus); err != nil {
+func (s *FocusService) Claim(ctx context.Context, req *focusv1.ClaimRequest) (*focusv1.ClaimResponse, error) {
+	msg, err := s.hub.claim(ctx, req.GetEnvId())
+	if err != nil {
 		return nil, err
 	}
-	return focus, nil
+	return &focusv1.ClaimResponse{
+		ReplyId: msg.replyID,
+		Path:    msg.req.GetPath(),
+	}, nil
 }
 
-func (s *FocusService) Save(_ context.Context, req *focusv1.SaveRequest) (*focusv1.SaveResponse, error) {
-	if err := s.save(req.GetFocus()); err != nil {
-		return nil, connect.NewError(connect.CodeInternal, err)
+func (s *FocusService) Reply(ctx context.Context, req *focusv1.ReplyRequest) (*focusv1.ReplyResponse, error) {
+	reply := &focusv1.FocusResponse{Error: req.Error}
+	if err := s.hub.reply(req.GetReplyId(), reply); err != nil {
+		if errors.Is(err, ErrReplyNotFound) {
+			return nil, connect.NewError(connect.CodeNotFound, err)
+		}
+		return nil, err
 	}
-	return &focusv1.SaveResponse{}, nil
-}
-
-func (s *FocusService) Load(_ context.Context, req *focusv1.LoadRequest) (*focusv1.LoadResponse, error) {
-	focus, err := s.load()
-	if err != nil {
-		return nil, connect.NewError(connect.CodeInternal, err)
-	}
-	return &focusv1.LoadResponse{Focus: focus}, nil
+	return &focusv1.ReplyResponse{}, nil
 }
 
 var _ focusv1connect.FocusServiceHandler = (*FocusService)(nil)
+
+func NewFocusService() *FocusService {
+	return &FocusService{hub: newHub[*focusv1.FocusRequest, *focusv1.FocusResponse]()}
+}

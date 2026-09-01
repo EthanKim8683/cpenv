@@ -8,8 +8,8 @@ import (
 
 	"github.com/EthanKim8683/cpenv/internal/cli"
 	"github.com/EthanKim8683/cpenv/internal/config"
-	"github.com/EthanKim8683/cpenv/internal/gen/focus/v1/focusv1connect"
-	"github.com/EthanKim8683/cpenv/internal/gen/status/v1/statusv1connect"
+	"github.com/EthanKim8683/cpenv/internal/gen/active_problem/v1/active_problemv1connect"
+	"github.com/EthanKim8683/cpenv/internal/gen/submissions/v1/submissionsv1connect"
 	"github.com/EthanKim8683/cpenv/internal/gen/submit/v1/submitv1connect"
 	"github.com/adrg/xdg"
 	"github.com/spf13/cobra"
@@ -44,18 +44,18 @@ var rootCmd = &cobra.Command{
 		}
 
 		baseURL := fmt.Sprintf("http://localhost:%d", cfg.Port)
-		focusClient := focusv1connect.NewFocusServiceClient(http.DefaultClient, baseURL)
-		statusClient := statusv1connect.NewStatusServiceClient(http.DefaultClient, baseURL)
+		activeProblemClient := active_problemv1connect.NewActiveProblemServiceClient(http.DefaultClient, baseURL)
+		submissionsClient := submissionsv1connect.NewSubmissionsServiceClient(http.DefaultClient, baseURL)
 		submitClient := submitv1connect.NewSubmitServiceClient(http.DefaultClient, baseURL)
 		prefs := &cli.DBPreferences{DB: db}
 
 		c = &cli.CLI{
-			Cfg:          cfg,
-			CWD:          cwd,
-			FocusClient:  focusClient,
-			StatusClient: statusClient,
-			SubmitClient: submitClient,
-			Preferences:  prefs,
+			Cfg:                 cfg,
+			CWD:                 cwd,
+			ActiveProblemClient: activeProblemClient,
+			SubmissionsClient:   submissionsClient,
+			SubmitClient:        submitClient,
+			Preferences:         prefs,
 		}
 		return nil
 	},

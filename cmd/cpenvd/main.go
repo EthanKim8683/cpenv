@@ -14,8 +14,8 @@ import (
 
 	"github.com/EthanKim8683/cpenv/internal/config"
 	"github.com/EthanKim8683/cpenv/internal/daemon"
-	"github.com/EthanKim8683/cpenv/internal/gen/focus/v1/focusv1connect"
-	"github.com/EthanKim8683/cpenv/internal/gen/status/v1/statusv1connect"
+	"github.com/EthanKim8683/cpenv/internal/gen/active_problem/v1/active_problemv1connect"
+	"github.com/EthanKim8683/cpenv/internal/gen/submissions/v1/submissionsv1connect"
 	"github.com/EthanKim8683/cpenv/internal/gen/submit/v1/submitv1connect"
 	"github.com/adrg/xdg"
 	"github.com/rs/cors"
@@ -38,13 +38,13 @@ func main() {
 		log.Fatalf("cpenvd: %v", err)
 	}
 
-	focusSvc := &daemon.FocusService{DB: db}
-	statusSvc := &daemon.StatusService{DB: db}
+	activeProblemSvc := &daemon.ActiveProblemService{DB: db}
+	submissionsSvc := &daemon.SubmissionsService{DB: db}
 	submitSvc := daemon.NewSubmitService()
 
 	mux := http.NewServeMux()
-	mux.Handle(focusv1connect.NewFocusServiceHandler(focusSvc))
-	mux.Handle(statusv1connect.NewStatusServiceHandler(statusSvc))
+	mux.Handle(active_problemv1connect.NewActiveProblemServiceHandler(activeProblemSvc))
+	mux.Handle(submissionsv1connect.NewSubmissionsServiceHandler(submissionsSvc))
 	mux.Handle(submitv1connect.NewSubmitServiceHandler(submitSvc))
 
 	handler := cors.New(cors.Options{

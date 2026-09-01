@@ -7,5 +7,8 @@
 - add auto-update
 - add submission tracking in extension
 - write jetbrains platform plugin (for clion)
+  - should be kind of like the extension in that the daemon is the hub, the plugin just does
+    the hub's bidding (in fact, use the hub struct)
+  - consider adding vscode support as well, since it's not too much work anyway
 - github workflows; making everything easy to install
 - make cli stuff prettier

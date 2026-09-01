@@ -14,9 +14,13 @@ message SubmitRequest {
   bytes content = 3;
 }
 
-message SubmitResponse { optional string error = 1; }
+message SubmitResponse {
+  optional string error = 1;
+}
 
-message ClaimRequest { string problem_id = 1; }
+message ClaimRequest {
+  string problem_id = 1;
+}
 
 message ClaimResponse {
   uint32 reply_id = 1;

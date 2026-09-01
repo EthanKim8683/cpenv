@@ -9,15 +9,15 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var statusLimit int
+var submissionsLimit int
 
-var statusCmd = &cobra.Command{
-	Use:   "status",
+var submissionsCmd = &cobra.Command{
+	Use:   "submissions",
 	Short: "Tail submission results.",
 	Long:  "Tail submission results for the problem corresponding to the current workspace, or globally if not in a workspace.",
 	Args:  cobra.NoArgs,
 	RunE: func(cmd *cobra.Command, _ []string) error {
-		subs, err := c.Status(cmd.Context(), statusLimit)
+		subs, err := c.Submissions(cmd.Context(), submissionsLimit)
 		if err != nil {
 			return err
 		}
@@ -46,6 +46,6 @@ var statusCmd = &cobra.Command{
 }
 
 func init() {
-	rootCmd.AddCommand(statusCmd)
-	statusCmd.Flags().IntVarP(&statusLimit, "limit", "l", 10, "maximum number of submission results to output")
+	rootCmd.AddCommand(submissionsCmd)
+	submissionsCmd.Flags().IntVarP(&submissionsLimit, "limit", "l", 10, "maximum number of submission results to output")
 }

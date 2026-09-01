@@ -2,21 +2,33 @@ syntax = "proto3";
 
 package focus.v1;
 
-import "focus/v1/focus.proto";
-
 service FocusService {
-  rpc Save(SaveRequest) returns (SaveResponse) {
-    option idempotency_level = IDEMPOTENT;
-  }
-  rpc Load(LoadRequest) returns (LoadResponse) {
-    option idempotency_level = NO_SIDE_EFFECTS;
-  }
+  rpc Focus(FocusRequest) returns (FocusResponse);
+  rpc Claim(ClaimRequest) returns (ClaimResponse);
+  rpc Reply(ReplyRequest) returns (ReplyResponse);
 }
 
-message SaveRequest { focus.v1.Focus focus = 1; }
+message FocusRequest {
+  string env_id = 1;
+  string path = 2;
+}
 
-message SaveResponse {}
+message FocusResponse {
+  optional string error = 1;
+}
 
-message LoadRequest {}
+message ClaimRequest {
+  string env_id = 1;
+}
 
-message LoadResponse { focus.v1.Focus focus = 1; }
+message ClaimResponse {
+  uint32 reply_id = 1;
+  string path = 2;
+}
+
+message ReplyRequest {
+  uint32 reply_id = 1;
+  optional string error = 2;
+}
+
+message ReplyResponse {}

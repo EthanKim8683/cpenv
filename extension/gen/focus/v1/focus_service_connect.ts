@@ -3,8 +3,8 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import { LoadRequest, LoadResponse, SaveRequest, SaveResponse } from "./focus_service_pb.js";
-import { MethodIdempotency, MethodKind } from "@bufbuild/protobuf";
+import { ClaimRequest, ClaimResponse, FocusRequest, FocusResponse, ReplyRequest, ReplyResponse } from "./focus_service_pb.js";
+import { MethodKind } from "@bufbuild/protobuf";
 
 /**
  * @generated from service focus.v1.FocusService
@@ -13,24 +13,31 @@ export const FocusService = {
   typeName: "focus.v1.FocusService",
   methods: {
     /**
-     * @generated from rpc focus.v1.FocusService.Save
+     * @generated from rpc focus.v1.FocusService.Focus
      */
-    save: {
-      name: "Save",
-      I: SaveRequest,
-      O: SaveResponse,
+    focus: {
+      name: "Focus",
+      I: FocusRequest,
+      O: FocusResponse,
       kind: MethodKind.Unary,
-      idempotency: MethodIdempotency.Idempotent,
     },
     /**
-     * @generated from rpc focus.v1.FocusService.Load
+     * @generated from rpc focus.v1.FocusService.Claim
      */
-    load: {
-      name: "Load",
-      I: LoadRequest,
-      O: LoadResponse,
+    claim: {
+      name: "Claim",
+      I: ClaimRequest,
+      O: ClaimResponse,
       kind: MethodKind.Unary,
-      idempotency: MethodIdempotency.NoSideEffects,
+    },
+    /**
+     * @generated from rpc focus.v1.FocusService.Reply
+     */
+    reply: {
+      name: "Reply",
+      I: ReplyRequest,
+      O: ReplyResponse,
+      kind: MethodKind.Unary,
     },
   }
 } as const;

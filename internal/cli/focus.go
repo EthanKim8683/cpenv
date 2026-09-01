@@ -7,34 +7,34 @@ import (
 	"os"
 	"path/filepath"
 
-	focusv1 "github.com/EthanKim8683/cpenv/internal/gen/focus/v1"
+	activeproblemv1 "github.com/EthanKim8683/cpenv/internal/gen/active_problem/v1"
 	problemv1 "github.com/EthanKim8683/cpenv/internal/gen/problem/v1"
 )
 
-func (c *CLI) focusedProblem(ctx context.Context) (*problemv1.Problem, error) {
-	res, err := c.FocusClient.Load(ctx, &focusv1.LoadRequest{})
+func (c *CLI) activeProblem(ctx context.Context) (*problemv1.Problem, error) {
+	res, err := c.ActiveProblemClient.Load(ctx, &activeproblemv1.LoadRequest{})
 	if err != nil {
 		return nil, fmt.Errorf("focus: %w", err)
 	}
 
-	focus := res.GetFocus()
-	if focus == nil {
+	activeProblem := res.GetActiveProblem()
+	if activeProblem == nil {
 		return nil, nil
 	}
 
-	if focus.Error != nil {
-		return nil, fmt.Errorf("focus: extension error: %s", focus.GetError())
+	if activeProblem.Error != nil {
+		return nil, fmt.Errorf("focus: extension error: %s", activeProblem.GetError())
 	}
-	return focus.GetProblem(), nil
+	return activeProblem.GetProblem(), nil
 }
 
 func (c *CLI) Focus(ctx context.Context, templateName string) (string, error) {
-	problem, err := c.focusedProblem(ctx)
+	problem, err := c.activeProblem(ctx)
 	if err != nil {
 		return "", fmt.Errorf("focus: %w", err)
 	}
 	if problem == nil {
-		return "", fmt.Errorf("focus: no focused problem")
+		return "", fmt.Errorf("focus: no active problem")
 	}
 
 	dir := c.workspaceDir(problem.GetId())

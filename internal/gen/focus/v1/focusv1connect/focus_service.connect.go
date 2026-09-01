@@ -33,16 +33,19 @@ const (
 // reflection-formatted method names, remove the leading slash and convert the remaining slash to a
 // period.
 const (
-	// FocusServiceSaveProcedure is the fully-qualified name of the FocusService's Save RPC.
-	FocusServiceSaveProcedure = "/focus.v1.FocusService/Save"
-	// FocusServiceLoadProcedure is the fully-qualified name of the FocusService's Load RPC.
-	FocusServiceLoadProcedure = "/focus.v1.FocusService/Load"
+	// FocusServiceFocusProcedure is the fully-qualified name of the FocusService's Focus RPC.
+	FocusServiceFocusProcedure = "/focus.v1.FocusService/Focus"
+	// FocusServiceClaimProcedure is the fully-qualified name of the FocusService's Claim RPC.
+	FocusServiceClaimProcedure = "/focus.v1.FocusService/Claim"
+	// FocusServiceReplyProcedure is the fully-qualified name of the FocusService's Reply RPC.
+	FocusServiceReplyProcedure = "/focus.v1.FocusService/Reply"
 )
 
 // FocusServiceClient is a client for the focus.v1.FocusService service.
 type FocusServiceClient interface {
-	Save(context.Context, *v1.SaveRequest) (*v1.SaveResponse, error)
-	Load(context.Context, *v1.LoadRequest) (*v1.LoadResponse, error)
+	Focus(context.Context, *v1.FocusRequest) (*v1.FocusResponse, error)
+	Claim(context.Context, *v1.ClaimRequest) (*v1.ClaimResponse, error)
+	Reply(context.Context, *v1.ReplyRequest) (*v1.ReplyResponse, error)
 }
 
 // NewFocusServiceClient constructs a client for the focus.v1.FocusService service. By default, it
@@ -56,18 +59,22 @@ func NewFocusServiceClient(httpClient connect.HTTPClient, baseURL string, opts .
 	baseURL = strings.TrimRight(baseURL, "/")
 	focusServiceMethods := v1.File_focus_v1_focus_service_proto.Services().ByName("FocusService").Methods()
 	return &focusServiceClient{
-		save: connect.NewClient[v1.SaveRequest, v1.SaveResponse](
+		focus: connect.NewClient[v1.FocusRequest, v1.FocusResponse](
 			httpClient,
-			baseURL+FocusServiceSaveProcedure,
-			connect.WithSchema(focusServiceMethods.ByName("Save")),
-			connect.WithIdempotency(connect.IdempotencyIdempotent),
+			baseURL+FocusServiceFocusProcedure,
+			connect.WithSchema(focusServiceMethods.ByName("Focus")),
 			connect.WithClientOptions(opts...),
 		),
-		load: connect.NewClient[v1.LoadRequest, v1.LoadResponse](
+		claim: connect.NewClient[v1.ClaimRequest, v1.ClaimResponse](
 			httpClient,
-			baseURL+FocusServiceLoadProcedure,
-			connect.WithSchema(focusServiceMethods.ByName("Load")),
-			connect.WithIdempotency(connect.IdempotencyNoSideEffects),
+			baseURL+FocusServiceClaimProcedure,
+			connect.WithSchema(focusServiceMethods.ByName("Claim")),
+			connect.WithClientOptions(opts...),
+		),
+		reply: connect.NewClient[v1.ReplyRequest, v1.ReplyResponse](
+			httpClient,
+			baseURL+FocusServiceReplyProcedure,
+			connect.WithSchema(focusServiceMethods.ByName("Reply")),
 			connect.WithClientOptions(opts...),
 		),
 	}
@@ -75,22 +82,32 @@ func NewFocusServiceClient(httpClient connect.HTTPClient, baseURL string, opts .
 
 // focusServiceClient implements FocusServiceClient.
 type focusServiceClient struct {
-	save *connect.Client[v1.SaveRequest, v1.SaveResponse]
-	load *connect.Client[v1.LoadRequest, v1.LoadResponse]
+	focus *connect.Client[v1.FocusRequest, v1.FocusResponse]
+	claim *connect.Client[v1.ClaimRequest, v1.ClaimResponse]
+	reply *connect.Client[v1.ReplyRequest, v1.ReplyResponse]
 }
 
-// Save calls focus.v1.FocusService.Save.
-func (c *focusServiceClient) Save(ctx context.Context, req *v1.SaveRequest) (*v1.SaveResponse, error) {
-	response, err := c.save.CallUnary(ctx, connect.NewRequest(req))
+// Focus calls focus.v1.FocusService.Focus.
+func (c *focusServiceClient) Focus(ctx context.Context, req *v1.FocusRequest) (*v1.FocusResponse, error) {
+	response, err := c.focus.CallUnary(ctx, connect.NewRequest(req))
 	if response != nil {
 		return response.Msg, err
 	}
 	return nil, err
 }
 
-// Load calls focus.v1.FocusService.Load.
-func (c *focusServiceClient) Load(ctx context.Context, req *v1.LoadRequest) (*v1.LoadResponse, error) {
-	response, err := c.load.CallUnary(ctx, connect.NewRequest(req))
+// Claim calls focus.v1.FocusService.Claim.
+func (c *focusServiceClient) Claim(ctx context.Context, req *v1.ClaimRequest) (*v1.ClaimResponse, error) {
+	response, err := c.claim.CallUnary(ctx, connect.NewRequest(req))
+	if response != nil {
+		return response.Msg, err
+	}
+	return nil, err
+}
+
+// Reply calls focus.v1.FocusService.Reply.
+func (c *focusServiceClient) Reply(ctx context.Context, req *v1.ReplyRequest) (*v1.ReplyResponse, error) {
+	response, err := c.reply.CallUnary(ctx, connect.NewRequest(req))
 	if response != nil {
 		return response.Msg, err
 	}
@@ -99,8 +116,9 @@ func (c *focusServiceClient) Load(ctx context.Context, req *v1.LoadRequest) (*v1
 
 // FocusServiceHandler is an implementation of the focus.v1.FocusService service.
 type FocusServiceHandler interface {
-	Save(context.Context, *v1.SaveRequest) (*v1.SaveResponse, error)
-	Load(context.Context, *v1.LoadRequest) (*v1.LoadResponse, error)
+	Focus(context.Context, *v1.FocusRequest) (*v1.FocusResponse, error)
+	Claim(context.Context, *v1.ClaimRequest) (*v1.ClaimResponse, error)
+	Reply(context.Context, *v1.ReplyRequest) (*v1.ReplyResponse, error)
 }
 
 // NewFocusServiceHandler builds an HTTP handler from the service implementation. It returns the
@@ -110,26 +128,32 @@ type FocusServiceHandler interface {
 // and JSON codecs. They also support gzip compression.
 func NewFocusServiceHandler(svc FocusServiceHandler, opts ...connect.HandlerOption) (string, http.Handler) {
 	focusServiceMethods := v1.File_focus_v1_focus_service_proto.Services().ByName("FocusService").Methods()
-	focusServiceSaveHandler := connect.NewUnaryHandlerSimple(
-		FocusServiceSaveProcedure,
-		svc.Save,
-		connect.WithSchema(focusServiceMethods.ByName("Save")),
-		connect.WithIdempotency(connect.IdempotencyIdempotent),
+	focusServiceFocusHandler := connect.NewUnaryHandlerSimple(
+		FocusServiceFocusProcedure,
+		svc.Focus,
+		connect.WithSchema(focusServiceMethods.ByName("Focus")),
 		connect.WithHandlerOptions(opts...),
 	)
-	focusServiceLoadHandler := connect.NewUnaryHandlerSimple(
-		FocusServiceLoadProcedure,
-		svc.Load,
-		connect.WithSchema(focusServiceMethods.ByName("Load")),
-		connect.WithIdempotency(connect.IdempotencyNoSideEffects),
+	focusServiceClaimHandler := connect.NewUnaryHandlerSimple(
+		FocusServiceClaimProcedure,
+		svc.Claim,
+		connect.WithSchema(focusServiceMethods.ByName("Claim")),
+		connect.WithHandlerOptions(opts...),
+	)
+	focusServiceReplyHandler := connect.NewUnaryHandlerSimple(
+		FocusServiceReplyProcedure,
+		svc.Reply,
+		connect.WithSchema(focusServiceMethods.ByName("Reply")),
 		connect.WithHandlerOptions(opts...),
 	)
 	return "/focus.v1.FocusService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
-		case FocusServiceSaveProcedure:
-			focusServiceSaveHandler.ServeHTTP(w, r)
-		case FocusServiceLoadProcedure:
-			focusServiceLoadHandler.ServeHTTP(w, r)
+		case FocusServiceFocusProcedure:
+			focusServiceFocusHandler.ServeHTTP(w, r)
+		case FocusServiceClaimProcedure:
+			focusServiceClaimHandler.ServeHTTP(w, r)
+		case FocusServiceReplyProcedure:
+			focusServiceReplyHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -139,10 +163,14 @@ func NewFocusServiceHandler(svc FocusServiceHandler, opts ...connect.HandlerOpti
 // UnimplementedFocusServiceHandler returns CodeUnimplemented from all methods.
 type UnimplementedFocusServiceHandler struct{}
 
-func (UnimplementedFocusServiceHandler) Save(context.Context, *v1.SaveRequest) (*v1.SaveResponse, error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("focus.v1.FocusService.Save is not implemented"))
+func (UnimplementedFocusServiceHandler) Focus(context.Context, *v1.FocusRequest) (*v1.FocusResponse, error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("focus.v1.FocusService.Focus is not implemented"))
 }
 
-func (UnimplementedFocusServiceHandler) Load(context.Context, *v1.LoadRequest) (*v1.LoadResponse, error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("focus.v1.FocusService.Load is not implemented"))
+func (UnimplementedFocusServiceHandler) Claim(context.Context, *v1.ClaimRequest) (*v1.ClaimResponse, error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("focus.v1.FocusService.Claim is not implemented"))
+}
+
+func (UnimplementedFocusServiceHandler) Reply(context.Context, *v1.ReplyRequest) (*v1.ReplyResponse, error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("focus.v1.FocusService.Reply is not implemented"))
 }

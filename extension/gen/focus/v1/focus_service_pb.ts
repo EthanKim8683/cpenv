@@ -4,95 +4,154 @@
 
 import type { GenFile, GenMessage, GenService } from "@bufbuild/protobuf/codegenv2";
 import { fileDesc, messageDesc, serviceDesc } from "@bufbuild/protobuf/codegenv2";
-import type { Focus } from "./focus_pb";
-import { file_focus_v1_focus } from "./focus_pb";
 import type { Message } from "@bufbuild/protobuf";
 
 /**
  * Describes the file focus/v1/focus_service.proto.
  */
 export const file_focus_v1_focus_service: GenFile = /*@__PURE__*/
-  fileDesc("Chxmb2N1cy92MS9mb2N1c19zZXJ2aWNlLnByb3RvEghmb2N1cy52MSItCgtTYXZlUmVxdWVzdBIeCgVmb2N1cxgBIAEoCzIPLmZvY3VzLnYxLkZvY3VzIg4KDFNhdmVSZXNwb25zZSINCgtMb2FkUmVxdWVzdCIuCgxMb2FkUmVzcG9uc2USHgoFZm9jdXMYASABKAsyDy5mb2N1cy52MS5Gb2N1czKGAQoMRm9jdXNTZXJ2aWNlEjoKBFNhdmUSFS5mb2N1cy52MS5TYXZlUmVxdWVzdBoWLmZvY3VzLnYxLlNhdmVSZXNwb25zZSIDkAICEjoKBExvYWQSFS5mb2N1cy52MS5Mb2FkUmVxdWVzdBoWLmZvY3VzLnYxLkxvYWRSZXNwb25zZSIDkAIBQp8BCgxjb20uZm9jdXMudjFCEUZvY3VzU2VydmljZVByb3RvUAFaO2dpdGh1Yi5jb20vRXRoYW5LaW04NjgzL2NwZW52L2ludGVybmFsL2dlbi9mb2N1cy92MTtmb2N1c3YxogIDRlhYqgIIRm9jdXMuVjHKAghGb2N1c1xWMeICFEZvY3VzXFYxXEdQQk1ldGFkYXRh6gIJRm9jdXM6OlYxYgZwcm90bzM", [file_focus_v1_focus]);
+  fileDesc("Chxmb2N1cy92MS9mb2N1c19zZXJ2aWNlLnByb3RvEghmb2N1cy52MSIsCgxGb2N1c1JlcXVlc3QSDgoGZW52X2lkGAEgASgJEgwKBHBhdGgYAiABKAkiLQoNRm9jdXNSZXNwb25zZRISCgVlcnJvchgBIAEoCUgAiAEBQggKBl9lcnJvciIeCgxDbGFpbVJlcXVlc3QSDgoGZW52X2lkGAEgASgJIi8KDUNsYWltUmVzcG9uc2USEAoIcmVwbHlfaWQYASABKA0SDAoEcGF0aBgCIAEoCSI+CgxSZXBseVJlcXVlc3QSEAoIcmVwbHlfaWQYASABKA0SEgoFZXJyb3IYAiABKAlIAIgBAUIICgZfZXJyb3IiDwoNUmVwbHlSZXNwb25zZTK8AQoMRm9jdXNTZXJ2aWNlEjgKBUZvY3VzEhYuZm9jdXMudjEuRm9jdXNSZXF1ZXN0GhcuZm9jdXMudjEuRm9jdXNSZXNwb25zZRI4CgVDbGFpbRIWLmZvY3VzLnYxLkNsYWltUmVxdWVzdBoXLmZvY3VzLnYxLkNsYWltUmVzcG9uc2USOAoFUmVwbHkSFi5mb2N1cy52MS5SZXBseVJlcXVlc3QaFy5mb2N1cy52MS5SZXBseVJlc3BvbnNlQp8BCgxjb20uZm9jdXMudjFCEUZvY3VzU2VydmljZVByb3RvUAFaO2dpdGh1Yi5jb20vRXRoYW5LaW04NjgzL2NwZW52L2ludGVybmFsL2dlbi9mb2N1cy92MTtmb2N1c3YxogIDRlhYqgIIRm9jdXMuVjHKAghGb2N1c1xWMeICFEZvY3VzXFYxXEdQQk1ldGFkYXRh6gIJRm9jdXM6OlYxYgZwcm90bzM");
 
 /**
- * @generated from message focus.v1.SaveRequest
+ * @generated from message focus.v1.FocusRequest
  */
-export type SaveRequest = Message<"focus.v1.SaveRequest"> & {
+export type FocusRequest = Message<"focus.v1.FocusRequest"> & {
   /**
-   * @generated from field: focus.v1.Focus focus = 1;
+   * @generated from field: string env_id = 1;
    */
-  focus?: Focus | undefined;
+  envId: string;
+
+  /**
+   * @generated from field: string path = 2;
+   */
+  path: string;
 };
 
 /**
- * Describes the message focus.v1.SaveRequest.
- * Use `create(SaveRequestSchema)` to create a new message.
+ * Describes the message focus.v1.FocusRequest.
+ * Use `create(FocusRequestSchema)` to create a new message.
  */
-export const SaveRequestSchema: GenMessage<SaveRequest> = /*@__PURE__*/
+export const FocusRequestSchema: GenMessage<FocusRequest> = /*@__PURE__*/
   messageDesc(file_focus_v1_focus_service, 0);
 
 /**
- * @generated from message focus.v1.SaveResponse
+ * @generated from message focus.v1.FocusResponse
  */
-export type SaveResponse = Message<"focus.v1.SaveResponse"> & {
+export type FocusResponse = Message<"focus.v1.FocusResponse"> & {
+  /**
+   * @generated from field: optional string error = 1;
+   */
+  error?: string | undefined;
 };
 
 /**
- * Describes the message focus.v1.SaveResponse.
- * Use `create(SaveResponseSchema)` to create a new message.
+ * Describes the message focus.v1.FocusResponse.
+ * Use `create(FocusResponseSchema)` to create a new message.
  */
-export const SaveResponseSchema: GenMessage<SaveResponse> = /*@__PURE__*/
+export const FocusResponseSchema: GenMessage<FocusResponse> = /*@__PURE__*/
   messageDesc(file_focus_v1_focus_service, 1);
 
 /**
- * @generated from message focus.v1.LoadRequest
+ * @generated from message focus.v1.ClaimRequest
  */
-export type LoadRequest = Message<"focus.v1.LoadRequest"> & {
+export type ClaimRequest = Message<"focus.v1.ClaimRequest"> & {
+  /**
+   * @generated from field: string env_id = 1;
+   */
+  envId: string;
 };
 
 /**
- * Describes the message focus.v1.LoadRequest.
- * Use `create(LoadRequestSchema)` to create a new message.
+ * Describes the message focus.v1.ClaimRequest.
+ * Use `create(ClaimRequestSchema)` to create a new message.
  */
-export const LoadRequestSchema: GenMessage<LoadRequest> = /*@__PURE__*/
+export const ClaimRequestSchema: GenMessage<ClaimRequest> = /*@__PURE__*/
   messageDesc(file_focus_v1_focus_service, 2);
 
 /**
- * @generated from message focus.v1.LoadResponse
+ * @generated from message focus.v1.ClaimResponse
  */
-export type LoadResponse = Message<"focus.v1.LoadResponse"> & {
+export type ClaimResponse = Message<"focus.v1.ClaimResponse"> & {
   /**
-   * @generated from field: focus.v1.Focus focus = 1;
+   * @generated from field: uint32 reply_id = 1;
    */
-  focus?: Focus | undefined;
+  replyId: number;
+
+  /**
+   * @generated from field: string path = 2;
+   */
+  path: string;
 };
 
 /**
- * Describes the message focus.v1.LoadResponse.
- * Use `create(LoadResponseSchema)` to create a new message.
+ * Describes the message focus.v1.ClaimResponse.
+ * Use `create(ClaimResponseSchema)` to create a new message.
  */
-export const LoadResponseSchema: GenMessage<LoadResponse> = /*@__PURE__*/
+export const ClaimResponseSchema: GenMessage<ClaimResponse> = /*@__PURE__*/
   messageDesc(file_focus_v1_focus_service, 3);
+
+/**
+ * @generated from message focus.v1.ReplyRequest
+ */
+export type ReplyRequest = Message<"focus.v1.ReplyRequest"> & {
+  /**
+   * @generated from field: uint32 reply_id = 1;
+   */
+  replyId: number;
+
+  /**
+   * @generated from field: optional string error = 2;
+   */
+  error?: string | undefined;
+};
+
+/**
+ * Describes the message focus.v1.ReplyRequest.
+ * Use `create(ReplyRequestSchema)` to create a new message.
+ */
+export const ReplyRequestSchema: GenMessage<ReplyRequest> = /*@__PURE__*/
+  messageDesc(file_focus_v1_focus_service, 4);
+
+/**
+ * @generated from message focus.v1.ReplyResponse
+ */
+export type ReplyResponse = Message<"focus.v1.ReplyResponse"> & {
+};
+
+/**
+ * Describes the message focus.v1.ReplyResponse.
+ * Use `create(ReplyResponseSchema)` to create a new message.
+ */
+export const ReplyResponseSchema: GenMessage<ReplyResponse> = /*@__PURE__*/
+  messageDesc(file_focus_v1_focus_service, 5);
 
 /**
  * @generated from service focus.v1.FocusService
  */
 export const FocusService: GenService<{
   /**
-   * @generated from rpc focus.v1.FocusService.Save
+   * @generated from rpc focus.v1.FocusService.Focus
    */
-  save: {
+  focus: {
     methodKind: "unary";
-    input: typeof SaveRequestSchema;
-    output: typeof SaveResponseSchema;
+    input: typeof FocusRequestSchema;
+    output: typeof FocusResponseSchema;
   },
   /**
-   * @generated from rpc focus.v1.FocusService.Load
+   * @generated from rpc focus.v1.FocusService.Claim
    */
-  load: {
+  claim: {
     methodKind: "unary";
-    input: typeof LoadRequestSchema;
-    output: typeof LoadResponseSchema;
+    input: typeof ClaimRequestSchema;
+    output: typeof ClaimResponseSchema;
+  },
+  /**
+   * @generated from rpc focus.v1.FocusService.Reply
+   */
+  reply: {
+    methodKind: "unary";
+    input: typeof ReplyRequestSchema;
+    output: typeof ReplyResponseSchema;
   },
 }> = /*@__PURE__*/
   serviceDesc(file_focus_v1_focus_service, 0);

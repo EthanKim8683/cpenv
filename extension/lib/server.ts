@@ -1,9 +1,9 @@
 import { createConnectTransport } from "@connectrpc/connect-web";
 import { createClient } from "@connectrpc/connect";
 import {
-  FocusService,
+  ActiveProblemService,
   SaveRequestSchema,
-} from "@/gen/focus/v1/focus_service_pb";
+} from "@/gen/active_problem/v1/active_problem_service_pb";
 import {
   SubmitService,
   ClaimRequestSchema,
@@ -11,7 +11,7 @@ import {
 } from "@/gen/submit/v1/submit_service_pb";
 import { create, MessageInitShape } from "@bufbuild/protobuf";
 import { ProblemSchema } from "@/gen/problem/v1/problem_pb";
-import { FocusSchema } from "@/gen/focus/v1/focus_pb";
+import { ActiveProblemSchema } from "@/gen/active_problem/v1/active_problem_pb";
 
 const PORT = import.meta.env.WXT_PORT ?? "8683";
 
@@ -21,7 +21,7 @@ const transport = createConnectTransport({
   baseUrl: `http://localhost:${PORT}`,
 });
 
-const focusClient = createClient(FocusService, transport);
+const activeProblemClient = createClient(ActiveProblemService, transport);
 const submitClient = createClient(SubmitService, transport);
 
 export function createProblemMain({
@@ -34,20 +34,22 @@ export function createProblemMain({
   submit: (file: File) => MaybePromise<void>;
 }) {
   return async () => {
-    let focus: MessageInitShape<typeof FocusSchema> | undefined;
+    let activeProblem: MessageInitShape<typeof ActiveProblemSchema> | undefined;
     try {
-      focus = { problem: await scrapeProblem() };
+      activeProblem = { problem: await scrapeProblem() };
     } catch (caughtError: unknown) {
       if (typeof caughtError !== "string") {
-        focus = { error: `uncaught error: ${caughtError}` };
+        activeProblem = { error: `uncaught error: ${caughtError}` };
       } else {
-        focus = { error: caughtError };
+        activeProblem = { error: caughtError };
       }
     }
 
     const handleVisibilityChange = async () => {
       if (document.visibilityState !== "visible") return;
-      await focusClient.save(create(SaveRequestSchema, { focus }));
+      await activeProblemClient.save(
+        create(SaveRequestSchema, { activeProblem }),
+      );
     };
     handleVisibilityChange();
     document.addEventListener("visibilitychange", handleVisibilityChange);
