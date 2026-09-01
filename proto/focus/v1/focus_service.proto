@@ -10,7 +10,7 @@ service FocusService {
 
 message FocusRequest {
   string env_id = 1;
-  string path = 2;
+  string dir = 2;
 }
 
 message FocusResponse {
@@ -23,7 +23,7 @@ message ClaimRequest {
 
 message ClaimResponse {
   uint32 reply_id = 1;
-  string path = 2;
+  string dir = 2;
 }
 
 message ReplyRequest {

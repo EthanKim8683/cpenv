@@ -10,7 +10,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file focus/v1/focus_service.proto.
  */
 export const file_focus_v1_focus_service: GenFile = /*@__PURE__*/
-  fileDesc("Chxmb2N1cy92MS9mb2N1c19zZXJ2aWNlLnByb3RvEghmb2N1cy52MSIsCgxGb2N1c1JlcXVlc3QSDgoGZW52X2lkGAEgASgJEgwKBHBhdGgYAiABKAkiLQoNRm9jdXNSZXNwb25zZRISCgVlcnJvchgBIAEoCUgAiAEBQggKBl9lcnJvciIeCgxDbGFpbVJlcXVlc3QSDgoGZW52X2lkGAEgASgJIi8KDUNsYWltUmVzcG9uc2USEAoIcmVwbHlfaWQYASABKA0SDAoEcGF0aBgCIAEoCSI+CgxSZXBseVJlcXVlc3QSEAoIcmVwbHlfaWQYASABKA0SEgoFZXJyb3IYAiABKAlIAIgBAUIICgZfZXJyb3IiDwoNUmVwbHlSZXNwb25zZTK8AQoMRm9jdXNTZXJ2aWNlEjgKBUZvY3VzEhYuZm9jdXMudjEuRm9jdXNSZXF1ZXN0GhcuZm9jdXMudjEuRm9jdXNSZXNwb25zZRI4CgVDbGFpbRIWLmZvY3VzLnYxLkNsYWltUmVxdWVzdBoXLmZvY3VzLnYxLkNsYWltUmVzcG9uc2USOAoFUmVwbHkSFi5mb2N1cy52MS5SZXBseVJlcXVlc3QaFy5mb2N1cy52MS5SZXBseVJlc3BvbnNlQp8BCgxjb20uZm9jdXMudjFCEUZvY3VzU2VydmljZVByb3RvUAFaO2dpdGh1Yi5jb20vRXRoYW5LaW04NjgzL2NwZW52L2ludGVybmFsL2dlbi9mb2N1cy92MTtmb2N1c3YxogIDRlhYqgIIRm9jdXMuVjHKAghGb2N1c1xWMeICFEZvY3VzXFYxXEdQQk1ldGFkYXRh6gIJRm9jdXM6OlYxYgZwcm90bzM");
+  fileDesc("Chxmb2N1cy92MS9mb2N1c19zZXJ2aWNlLnByb3RvEghmb2N1cy52MSIrCgxGb2N1c1JlcXVlc3QSDgoGZW52X2lkGAEgASgJEgsKA2RpchgCIAEoCSItCg1Gb2N1c1Jlc3BvbnNlEhIKBWVycm9yGAEgASgJSACIAQFCCAoGX2Vycm9yIh4KDENsYWltUmVxdWVzdBIOCgZlbnZfaWQYASABKAkiLgoNQ2xhaW1SZXNwb25zZRIQCghyZXBseV9pZBgBIAEoDRILCgNkaXIYAiABKAkiPgoMUmVwbHlSZXF1ZXN0EhAKCHJlcGx5X2lkGAEgASgNEhIKBWVycm9yGAIgASgJSACIAQFCCAoGX2Vycm9yIg8KDVJlcGx5UmVzcG9uc2UyvAEKDEZvY3VzU2VydmljZRI4CgVGb2N1cxIWLmZvY3VzLnYxLkZvY3VzUmVxdWVzdBoXLmZvY3VzLnYxLkZvY3VzUmVzcG9uc2USOAoFQ2xhaW0SFi5mb2N1cy52MS5DbGFpbVJlcXVlc3QaFy5mb2N1cy52MS5DbGFpbVJlc3BvbnNlEjgKBVJlcGx5EhYuZm9jdXMudjEuUmVwbHlSZXF1ZXN0GhcuZm9jdXMudjEuUmVwbHlSZXNwb25zZUKfAQoMY29tLmZvY3VzLnYxQhFGb2N1c1NlcnZpY2VQcm90b1ABWjtnaXRodWIuY29tL0V0aGFuS2ltODY4My9jcGVudi9pbnRlcm5hbC9nZW4vZm9jdXMvdjE7Zm9jdXN2MaICA0ZYWKoCCEZvY3VzLlYxygIIRm9jdXNcVjHiAhRGb2N1c1xWMVxHUEJNZXRhZGF0YeoCCUZvY3VzOjpWMWIGcHJvdG8z");
 
 /**
  * @generated from message focus.v1.FocusRequest
@@ -22,9 +22,9 @@ export type FocusRequest = Message<"focus.v1.FocusRequest"> & {
   envId: string;
 
   /**
-   * @generated from field: string path = 2;
+   * @generated from field: string dir = 2;
    */
-  path: string;
+  dir: string;
 };
 
 /**
@@ -78,9 +78,9 @@ export type ClaimResponse = Message<"focus.v1.ClaimResponse"> & {
   replyId: number;
 
   /**
-   * @generated from field: string path = 2;
+   * @generated from field: string dir = 2;
    */
-  path: string;
+  dir: string;
 };
 
 /**

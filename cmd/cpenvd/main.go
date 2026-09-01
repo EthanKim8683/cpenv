@@ -14,6 +14,7 @@ import (
 
 	"github.com/EthanKim8683/cpenv/internal/config"
 	"github.com/EthanKim8683/cpenv/internal/daemon"
+	focusv1connect "github.com/EthanKim8683/cpenv/internal/gen/Focus/v1/Focusv1connect"
 	"github.com/EthanKim8683/cpenv/internal/gen/active_problem/v1/active_problemv1connect"
 	"github.com/EthanKim8683/cpenv/internal/gen/submissions/v1/submissionsv1connect"
 	"github.com/EthanKim8683/cpenv/internal/gen/submit/v1/submitv1connect"
@@ -39,11 +40,13 @@ func main() {
 	}
 
 	activeProblemSvc := &daemon.ActiveProblemService{DB: db}
+	focusSvc := daemon.NewFocusService()
 	submissionsSvc := &daemon.SubmissionsService{DB: db}
 	submitSvc := daemon.NewSubmitService()
 
 	mux := http.NewServeMux()
 	mux.Handle(active_problemv1connect.NewActiveProblemServiceHandler(activeProblemSvc))
+	mux.Handle(focusv1connect.NewFocusServiceHandler(focusSvc))
 	mux.Handle(submissionsv1connect.NewSubmissionsServiceHandler(submissionsSvc))
 	mux.Handle(submitv1connect.NewSubmitServiceHandler(submitSvc))
 

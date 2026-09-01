@@ -31,7 +31,7 @@ func (s *FocusService) Claim(ctx context.Context, req *focusv1.ClaimRequest) (*f
 	}
 	return &focusv1.ClaimResponse{
 		ReplyId: msg.replyID,
-		Path:    msg.req.GetPath(),
+		Dir:     msg.req.GetDir(),
 	}, nil
 }
 

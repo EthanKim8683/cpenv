@@ -24,7 +24,7 @@ const (
 type FocusRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	EnvId         string                 `protobuf:"bytes,1,opt,name=env_id,json=envId,proto3" json:"env_id,omitempty"`
-	Path          string                 `protobuf:"bytes,2,opt,name=path,proto3" json:"path,omitempty"`
+	Dir           string                 `protobuf:"bytes,2,opt,name=dir,proto3" json:"dir,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -66,9 +66,9 @@ func (x *FocusRequest) GetEnvId() string {
 	return ""
 }
 
-func (x *FocusRequest) GetPath() string {
+func (x *FocusRequest) GetDir() string {
 	if x != nil {
-		return x.Path
+		return x.Dir
 	}
 	return ""
 }
@@ -164,7 +164,7 @@ func (x *ClaimRequest) GetEnvId() string {
 type ClaimResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	ReplyId       uint32                 `protobuf:"varint,1,opt,name=reply_id,json=replyId,proto3" json:"reply_id,omitempty"`
-	Path          string                 `protobuf:"bytes,2,opt,name=path,proto3" json:"path,omitempty"`
+	Dir           string                 `protobuf:"bytes,2,opt,name=dir,proto3" json:"dir,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -206,9 +206,9 @@ func (x *ClaimResponse) GetReplyId() uint32 {
 	return 0
 }
 
-func (x *ClaimResponse) GetPath() string {
+func (x *ClaimResponse) GetDir() string {
 	if x != nil {
-		return x.Path
+		return x.Dir
 	}
 	return ""
 }
@@ -305,18 +305,18 @@ var File_focus_v1_focus_service_proto protoreflect.FileDescriptor
 
 const file_focus_v1_focus_service_proto_rawDesc = "" +
 	"\n" +
-	"\x1cfocus/v1/focus_service.proto\x12\bfocus.v1\"9\n" +
+	"\x1cfocus/v1/focus_service.proto\x12\bfocus.v1\"7\n" +
 	"\fFocusRequest\x12\x15\n" +
-	"\x06env_id\x18\x01 \x01(\tR\x05envId\x12\x12\n" +
-	"\x04path\x18\x02 \x01(\tR\x04path\"4\n" +
+	"\x06env_id\x18\x01 \x01(\tR\x05envId\x12\x10\n" +
+	"\x03dir\x18\x02 \x01(\tR\x03dir\"4\n" +
 	"\rFocusResponse\x12\x19\n" +
 	"\x05error\x18\x01 \x01(\tH\x00R\x05error\x88\x01\x01B\b\n" +
 	"\x06_error\"%\n" +
 	"\fClaimRequest\x12\x15\n" +
-	"\x06env_id\x18\x01 \x01(\tR\x05envId\">\n" +
+	"\x06env_id\x18\x01 \x01(\tR\x05envId\"<\n" +
 	"\rClaimResponse\x12\x19\n" +
-	"\breply_id\x18\x01 \x01(\rR\areplyId\x12\x12\n" +
-	"\x04path\x18\x02 \x01(\tR\x04path\"N\n" +
+	"\breply_id\x18\x01 \x01(\rR\areplyId\x12\x10\n" +
+	"\x03dir\x18\x02 \x01(\tR\x03dir\"N\n" +
 	"\fReplyRequest\x12\x19\n" +
 	"\breply_id\x18\x01 \x01(\rR\areplyId\x12\x19\n" +
 	"\x05error\x18\x02 \x01(\tH\x00R\x05error\x88\x01\x01B\b\n" +

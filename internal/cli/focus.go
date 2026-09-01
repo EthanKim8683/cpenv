@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 
 	activeproblemv1 "github.com/EthanKim8683/cpenv/internal/gen/active_problem/v1"
+	focusv1 "github.com/EthanKim8683/cpenv/internal/gen/focus/v1"
 	problemv1 "github.com/EthanKim8683/cpenv/internal/gen/problem/v1"
 )
 
@@ -83,5 +84,16 @@ func (c *CLI) Focus(ctx context.Context, templateName string) (string, error) {
 	if err := c.Preferences.SetDefaultTemplate(t.path); err != nil {
 		return "", fmt.Errorf("focus: %w", err)
 	}
+
+	if envId := c.Cfg.EnvId; envId != nil {
+		_, err = c.FocusClient.Focus(ctx, &focusv1.FocusRequest{
+			EnvId: *envId,
+			Dir:   dir,
+		})
+		if err != nil {
+			return "", fmt.Errorf("focus: %w", err)
+		}
+	}
+
 	return dir, nil
 }
