@@ -2,8 +2,8 @@ package cli
 
 import (
 	"github.com/EthanKim8683/cpenv/internal/config"
-	focusv1connect "github.com/EthanKim8683/cpenv/internal/gen/Focus/v1/Focusv1connect"
 	"github.com/EthanKim8683/cpenv/internal/gen/active_problem/v1/active_problemv1connect"
+	focusv1connect "github.com/EthanKim8683/cpenv/internal/gen/focus/v1/focusv1connect"
 	"github.com/EthanKim8683/cpenv/internal/gen/submissions/v1/submissionsv1connect"
 	"github.com/EthanKim8683/cpenv/internal/gen/submit/v1/submitv1connect"
 )
