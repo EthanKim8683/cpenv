@@ -7,3 +7,5 @@
 - add auto-update
 - add submission tracking in extension
 - write jetbrains platform plugin (for clion)
+- github workflows; making everything easy to install
+- make cli stuff prettier

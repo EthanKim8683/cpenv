@@ -1,9 +1,9 @@
-package org.jetbrains.plugins.template.services
+package com.ethankim8683.cpenv.services
 
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
-import org.jetbrains.plugins.template.MyBundle
+import com.ethankim8683.cpenv.MyBundle
 
 @Service(Service.Level.PROJECT)
 class MyProjectService(project: Project) {
