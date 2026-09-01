@@ -86,12 +86,15 @@ func (c *CLI) Focus(ctx context.Context, templateName string) (string, error) {
 	}
 
 	if envId := c.Cfg.EnvId; envId != nil {
-		_, err = c.FocusClient.Focus(ctx, &focusv1.FocusRequest{
+		res, err := c.FocusClient.Focus(ctx, &focusv1.FocusRequest{
 			EnvId: *envId,
 			Dir:   dir,
 		})
 		if err != nil {
 			return "", fmt.Errorf("focus: %w", err)
+		}
+		if res.Error != nil {
+			return "", fmt.Errorf("focus: environment error: %s", res.GetError())
 		}
 	}
 
