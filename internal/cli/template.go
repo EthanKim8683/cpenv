@@ -143,58 +143,10 @@ func (t *template) render(dir string, problem *problemv1.Problem) error {
 	return nil
 }
 
-func (c *CLI) templatesDir() string {
-	return filepath.Join(c.Cfg.HomeDir, "templates")
-}
-
-func resolveTemplate(name string, cwd string, templatesDir string, defaultTemplate string) (*template, error) {
-	if filepath.IsAbs(name) {
-		src, err := os.ReadFile(name)
-		if err != nil {
-			return nil, err
-		}
-		return &template{path: name, src: src}, nil
-	}
-
-	if name != "" {
-		var errs error
-
-		path := filepath.Join(cwd, name)
-		src, err := os.ReadFile(path)
-		if err == nil {
-			return &template{path: path, src: src}, nil
-		}
-		errs = errors.Join(errs, err)
-
-		path = filepath.Join(templatesDir, name)
-		src, err = os.ReadFile(path)
-		if err == nil {
-			return &template{path: path, src: src}, nil
-		}
-		errs = errors.Join(errs, err)
-
-		return nil, errs
-	}
-
-	if defaultTemplate != "" {
-		src, err := os.ReadFile(defaultTemplate)
-		if err == nil {
-			return &template{path: defaultTemplate, src: src}, nil
-		}
-	}
-
-	matches, err := filepath.Glob(filepath.Join(templatesDir, "*.star"))
+func newTemplate(path string) (*template, error) {
+	src, err := os.ReadFile(path)
 	if err != nil {
 		return nil, err
 	}
-	if len(matches) >= 1 {
-		path := matches[0]
-		src, err := os.ReadFile(path)
-		if err != nil {
-			return nil, err
-		}
-		return &template{path: path, src: src}, nil
-	}
-
-	return nil, nil
+	return &template{path: path, src: src}, nil
 }

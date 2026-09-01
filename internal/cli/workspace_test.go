@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"path/filepath"
 	"testing"
 
 	problemv1 "github.com/EthanKim8683/cpenv/internal/gen/problem/v1"
@@ -39,5 +40,45 @@ func TestWorkspace(t *testing.T) {
 		w2, err := openWorkspace(dir)
 		require.NoError(t, err)
 		assert.Equal(t, problem, w2.problem)
+	})
+
+	t.Run("ensure", func(t *testing.T) {
+		t.Parallel()
+
+		t.Run("initialized", func(t *testing.T) {
+			t.Parallel()
+
+			dir := t.TempDir()
+			problem := &problemv1.Problem{Id: "id"}
+
+			_, err := initWorkspace(dir, problem)
+			require.NoError(t, err)
+
+			_, created, err := ensureWorkspace(dir, problem)
+			require.NoError(t, err)
+			assert.False(t, created)
+		})
+
+		t.Run("uninitialized", func(t *testing.T) {
+			t.Parallel()
+
+			dir := t.TempDir()
+			problem := &problemv1.Problem{Id: "id"}
+
+			_, created, err := ensureWorkspace(dir, problem)
+			require.NoError(t, err)
+			assert.False(t, created)
+		})
+
+		t.Run("nonexistent", func(t *testing.T) {
+			t.Parallel()
+
+			dir := filepath.Join(t.TempDir(), "dir")
+			problem := &problemv1.Problem{Id: "id"}
+
+			_, created, err := ensureWorkspace(dir, problem)
+			require.NoError(t, err)
+			assert.True(t, created)
+		})
 	})
 }

@@ -14,24 +14,17 @@ func (c *CLI) Reset(templateName string) error {
 		return fmt.Errorf("reset %q: %w", c.CWD, err)
 	}
 
-	defaultTemplate, err := c.Preferences.DefaultTemplate()
+	t, err := c.resolveTemplate(templateName)
 	if err != nil {
 		return fmt.Errorf("reset %q: %w", c.CWD, err)
 	}
 
-	t, err := resolveTemplate(templateName, c.CWD, c.templatesDir(), defaultTemplate)
-	if err != nil {
-		return fmt.Errorf("reset %q: %w", c.CWD, err)
-	}
-	if t == nil {
-		return nil
-	}
-	if err := t.render(w.dir, w.problem); err != nil {
+	if err := t.render(c.CWD, w.problem); err != nil {
 		return fmt.Errorf("reset %q: %w", c.CWD, err)
 	}
 
 	if err := c.Preferences.SetDefaultTemplate(t.path); err != nil {
-		return fmt.Errorf("reset %q: %w", c.CWD, err)
+		return fmt.Errorf("reset: %w", err)
 	}
 	return nil
 }

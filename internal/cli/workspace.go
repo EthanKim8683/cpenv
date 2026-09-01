@@ -55,20 +55,36 @@ func initWorkspace(dir string, problem *problemv1.Problem) (*workspace, error) {
 		return nil, fmt.Errorf("create workspace %q: %w", dir, err)
 	}
 
-	if err := os.MkdirAll(dir, 0755); err != nil {
-		return nil, fmt.Errorf("create workspace %q: %w", dir, err)
-	}
-
 	if err := os.WriteFile(filepath.Join(dir, problemFile), data, 0644); err != nil {
 		return nil, fmt.Errorf("create workspace %q: %w", dir, err)
 	}
 	return &workspace{dir: dir, problem: problem}, nil
 }
 
-func (c *CLI) workspacesDir() string {
-	return filepath.Join(c.Cfg.HomeDir, "workspaces")
-}
+func ensureWorkspace(dir string, problem *problemv1.Problem) (*workspace, bool, error) {
+	w, err := openWorkspace(dir)
+	if err == nil {
+		return w, false, nil
+	}
+	if !errors.Is(err, os.ErrNotExist) {
+		return nil, false, err
+	}
 
-func (c *CLI) workspaceDir(problemID string) string {
-	return filepath.Join(c.workspacesDir(), problemID)
+	if err := os.MkdirAll(filepath.Dir(dir), 0755); err != nil {
+		return nil, false, err
+	}
+	err = os.Mkdir(dir, 0755)
+	if err == nil {
+		if w, err := initWorkspace(dir, problem); err == nil {
+			return w, true, nil
+		}
+		return nil, false, err
+	}
+	if errors.Is(err, os.ErrExist) {
+		if w, err := initWorkspace(dir, problem); err == nil {
+			return w, false, nil
+		}
+		return nil, false, err
+	}
+	return nil, false, err
 }
