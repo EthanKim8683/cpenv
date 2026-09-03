@@ -131,6 +131,7 @@ async function submit(sourceFile: File) {
 
   // may not always work if cloudflare is upset
   // maybe reload the tab?
+  // the error is 403 Forbidden and a clue is "Content unavailable. Resource was not cached"
   const url = window.location.href;
   const response = await fetch(url, {
     method: "POST",
